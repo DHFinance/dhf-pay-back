@@ -4,6 +4,10 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from 'nestjs-config';
 import * as path from 'path';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { PaymentModule } from './payment/payment.module';
+import { TransactionModule } from './transaction/transaction.module';
 const isProduction = process.env.npm_lifecycle_event === 'start:prod';
 const dotEnvPath = isProduction
   ? path.resolve(__dirname, '..', '.env.staging')
@@ -26,6 +30,10 @@ console.log(process.env.npm_lifecycle_event);
       },
       inject: [ConfigService],
     }),
+    UserModule,
+    AuthModule,
+    PaymentModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
