@@ -9,7 +9,7 @@ import { PaymentService } from "./payment.service";
   },
 })
 
-@Controller('api/payment')
+@Controller('payment')
 export class PaymentController implements CrudController<Payment> {
   constructor(
     public readonly service: PaymentService
