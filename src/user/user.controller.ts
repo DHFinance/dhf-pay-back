@@ -1,14 +1,17 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
-import { AuthGuard } from '@nestjs/passport';
+import { Crud, CrudController } from '@nestjsx/crud';
+import { User } from './entities/user.entity';
+import { UserService } from "./user.service";
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Crud({
+  model: {
+    type: User,
+  },
+})
 
-  @Get('all')
-  @UseGuards(AuthGuard('bearer'))
-  async getAll(): Promise<any> {
-    return await this.userService.findAll();
-  }
+@Controller('api/users')
+export class UserController implements CrudController<User> {
+  constructor(
+    public readonly service: UserService
+  ) {}
 }

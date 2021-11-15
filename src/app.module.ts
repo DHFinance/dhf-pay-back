@@ -8,8 +8,6 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { TransactionModule } from './transaction/transaction.module';
-import { UsersController } from './users/users.controller';
-import { UsersService } from './users/users.service';
 const isProduction = process.env.npm_lifecycle_event === 'start:prod';
 const dotEnvPath = isProduction
   ? path.resolve(__dirname, '..', '.env.staging')
@@ -37,7 +35,7 @@ console.log(process.env.npm_lifecycle_event);
     PaymentModule,
     TransactionModule,
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
