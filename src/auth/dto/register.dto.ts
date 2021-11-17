@@ -3,4 +3,6 @@ export class RegisterDto {
   lastName: string;
   email: string;
   company: string;
+  password: string;
+  passwordConf: string;
 }

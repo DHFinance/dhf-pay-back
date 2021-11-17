@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUser } from './interfaces/user.interface';
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
+import { MailerService } from '@nest-modules/mailer';
 
 function randomString(len) {
   const charSet =
@@ -18,7 +18,9 @@ function randomString(len) {
 
 @Injectable()
 export class UserService extends TypeOrmCrudService<User> {
-  constructor(@InjectRepository(User) repo) {
+  constructor(@InjectRepository(User) repo,
+              private mailerService: MailerService
+  ) {
     super(repo);
   }
 
@@ -26,6 +28,22 @@ export class UserService extends TypeOrmCrudService<User> {
     return await this.repo.findOne({
       where: {
         token,
+      },
+    });
+  }
+
+  async findByEmail(email) {
+    return await this.repo.findOne({
+      where: {
+        email,
+      },
+    });
+  }
+
+  async findByCode(restorePasswordCode) {
+    return await this.repo.findOne({
+      where: {
+        restorePasswordCode,
       },
     });
   }
@@ -42,5 +60,49 @@ export class UserService extends TypeOrmCrudService<User> {
       console.log(err);
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async sendCode(email) {
+    const user = await this.findByEmail(email);
+
+    if (!user) {
+      throw new HttpException(
+        'No such user with this email',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
+    user.restorePasswordCode = code;
+    await user.save();
+    return await this.mailerService.sendMail({
+      to: email,
+      from: 'service-info@smartigy.ru',
+      subject: 'Код для сброса пароля',
+      template: 'send-password-code',
+      context: {
+        login: email,
+        email: email,
+        code: code,
+      },
+    });
+  }
+
+  async checkCode(code) {
+    const user = this.findByCode(code)
+    if (!user)  {
+      throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
+    }
+    return user
+  }
+
+  async changePassword(password, oldUser) {
+    const user = await this.findByCode(oldUser.restorePasswordCode);
+    if (!user) {
+      throw new HttpException('Invalid recovery code', HttpStatus.BAD_REQUEST);
+    }
+    user.restorePasswordCode = null;
+    user.password = password;
+    await user.save();
+    return user
   }
 }
