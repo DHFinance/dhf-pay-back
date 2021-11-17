@@ -19,9 +19,6 @@ export class AuthService {
   }
 
   public async register(userDto) {
-    if (userDto.password !== userDto.passwordConf) {
-      throw new HttpException('passwords dont match', HttpStatus.BAD_REQUEST);
-    }
     const user = {
       name: userDto.name,
       lastName: userDto.lastName,
@@ -29,6 +26,7 @@ export class AuthService {
       email: userDto.email,
       password: this.encryptPassword(userDto.password),
     }
+
     return await this.userService.create(user);
   }
 
