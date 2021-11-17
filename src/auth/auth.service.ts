@@ -36,13 +36,13 @@ export class AuthService {
     await this.userService.sendCode(email);
   }
 
-  public async checkCode(code) {
-    return await this.userService.checkCode(code);
+  public async checkCode({ code, email }) {
+    return await this.userService.checkCode(code, email);
   }
 
-  public async changePassword({ password, user }) {
+  public async changePassword({ password, email }) {
     const encryptPassword = this.encryptPassword(password)
-    return await this.userService.changePassword(encryptPassword, user);
+    return await this.userService.changePassword(encryptPassword, email);
   }
 
   public async login(authDto) {

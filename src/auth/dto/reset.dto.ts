@@ -3,10 +3,11 @@ export class ResetEmailDto {
 }
 
 export class ResetCodeDto {
+  email: string;
   code: string;
 }
 
 export class ChangePasswordDto {
   password: string;
-  user: any;
+  email: string;
 }
