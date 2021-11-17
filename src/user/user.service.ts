@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUser } from './interfaces/user.interface';
+import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
 
 function randomString(len) {
   const charSet =
@@ -16,14 +17,13 @@ function randomString(len) {
 }
 
 @Injectable()
-export class UserService {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
+export class UserService extends TypeOrmCrudService<User> {
+  constructor(@InjectRepository(User) repo) {
+    super(repo);
+  }
 
   async findByToken(token) {
-    return await this.userRepository.findOne({
+    return await this.repo.findOne({
       where: {
         token,
       },
@@ -31,13 +31,13 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.userRepository.find();
+    return await this.repo.find();
   }
 
   public async create(user): Promise<IUser> {
     try {
       const token = randomString(36);
-      return await this.userRepository.save({ ...user, token });
+      return await this.repo.save({ ...user, token });
     } catch (err) {
       console.log(err);
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
