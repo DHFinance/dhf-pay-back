@@ -60,7 +60,7 @@ export class AuthController {
     try {
       const user = await this.authService.changePassword(changeUserPasswordDto);
       if (user) {
-        return user.token
+        return user
       }
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
