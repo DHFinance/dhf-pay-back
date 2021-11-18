@@ -25,7 +25,7 @@ export class AuthController {
   @Post('/login')
   public async login(@Body() loginUserDto: LoginDto) {
     try {
-      return await this.authService.login(LoginDto);
+      return await this.authService.login(loginUserDto);
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }

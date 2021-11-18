@@ -43,10 +43,10 @@ export class AuthService {
     return await this.userService.changePassword(encryptPassword, email);
   }
 
-  public async login(authDto) {
-    const user = await this.userService.findByEmail(authDto.email);
+  public async login(loginUserDto) {
+    const user = await this.userService.findByEmail(loginUserDto.email);
     if (user) {
-      if (this.encryptPassword(authDto.password) === user.password) {
+      if (this.encryptPassword(loginUserDto.password) === user.password) {
         return user
       }
       else {

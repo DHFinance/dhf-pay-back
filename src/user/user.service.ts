@@ -89,7 +89,6 @@ export class UserService extends TypeOrmCrudService<User> {
 
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
-    console.log({ user, code })
     if (!user || user.restorePasswordCode !== +code)  {
       throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
     }
