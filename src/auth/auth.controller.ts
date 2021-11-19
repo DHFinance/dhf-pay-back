@@ -10,11 +10,11 @@ import { AuthService } from './auth.service';
 import { LoginDto } from "./dto/login.dto";
 import { ChangePasswordDto, ResetCodeDto, ResetEmailDto } from "./dto/reset.dto";
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('api/register')
+  @Post('register')
   public async register(@Body() registerUserDto: RegisterDto) {
     try {
       return await this.authService.register(registerUserDto);
@@ -22,7 +22,7 @@ export class AuthController {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
-  @Post('api/login')
+  @Post('login')
   public async login(@Body() loginUserDto: LoginDto) {
     try {
       return await this.authService.login(loginUserDto);
@@ -30,7 +30,7 @@ export class AuthController {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
   }
-  @Post('api/send-code')
+  @Post('send-code')
   public async sendCode(@Body() resetUserDto: ResetEmailDto) {
     try {
       await this.authService.sendCode(resetUserDto);
@@ -40,7 +40,7 @@ export class AuthController {
     }
   }
 
-  @Post('api/check-code')
+  @Post('check-code')
   public async checkCode(@Body() resetUserPasswordDto: ResetCodeDto) {
 
     try {
@@ -55,7 +55,7 @@ export class AuthController {
     }
   }
 
-  @Post('api/reset-pwd')
+  @Post('reset-pwd')
   public async reset(@Body() changeUserPasswordDto: ChangePasswordDto) {
     try {
       const user = await this.authService.changePassword(changeUserPasswordDto);

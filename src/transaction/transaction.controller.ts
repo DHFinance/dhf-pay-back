@@ -9,7 +9,7 @@ import { TransactionService } from "./transaction.service";
   },
 })
 
-@Controller('api/transaction')
+@Controller('transaction')
 export class TransactionController implements CrudController<Transaction> {
   constructor(
     public readonly service: TransactionService
