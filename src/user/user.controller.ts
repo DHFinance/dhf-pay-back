@@ -9,7 +9,7 @@ import { UserService } from "./user.service";
   },
 })
 
-@Controller('user')
+@Controller('api/user')
 export class UserController implements CrudController<User> {
   constructor(
     public readonly service: UserService

@@ -53,6 +53,12 @@ export class UserService extends TypeOrmCrudService<User> {
   }
 
   public async create(user): Promise<IUser> {
+    const userExisted = await this.findByEmail(user.email);
+
+    if (userExisted) {
+      throw new HttpException('user already exists', HttpStatus.BAD_REQUEST);
+    }
+
     try {
       const token = randomString(36);
       return await this.repo.save({ ...user, token });
