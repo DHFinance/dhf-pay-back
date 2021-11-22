@@ -87,18 +87,18 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
-  async checkCode(code) {
-    const user = this.findByCode(code)
-    if (!user)  {
+  async checkCode(code, email) {
+    const user = await this.findByEmail(email)
+    if (!user || user.restorePasswordCode !== +code)  {
       throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
     }
     return user
   }
 
-  async changePassword(password, oldUser) {
-    const user = await this.findByCode(oldUser.restorePasswordCode);
+  async changePassword(password, email) {
+    const user = await this.findByEmail(email);
     if (!user) {
-      throw new HttpException('Invalid recovery code', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
     }
     user.restorePasswordCode = null;
     user.password = password;

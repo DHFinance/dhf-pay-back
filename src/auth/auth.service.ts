@@ -19,9 +19,6 @@ export class AuthService {
   }
 
   public async register(userDto) {
-    if (userDto.password !== userDto.passwordConf) {
-      throw new HttpException('passwords dont match', HttpStatus.BAD_REQUEST);
-    }
     const user = {
       name: userDto.name,
       lastName: userDto.lastName,
@@ -29,6 +26,7 @@ export class AuthService {
       email: userDto.email,
       password: this.encryptPassword(userDto.password),
     }
+
     return await this.userService.create(user);
   }
 
@@ -36,19 +34,19 @@ export class AuthService {
     await this.userService.sendCode(email);
   }
 
-  public async checkCode(code) {
-    return await this.userService.checkCode(code);
+  public async checkCode({ code, email }) {
+    return await this.userService.checkCode(code, email);
   }
 
-  public async changePassword({ password, user }) {
+  public async changePassword({ password, email }) {
     const encryptPassword = this.encryptPassword(password)
-    return await this.userService.changePassword(encryptPassword, user);
+    return await this.userService.changePassword(encryptPassword, email);
   }
 
-  public async login(authDto) {
-    const user = await this.userService.findByEmail(authDto.email);
+  public async login(loginUserDto) {
+    const user = await this.userService.findByEmail(loginUserDto.email);
     if (user) {
-      if (this.encryptPassword(authDto.password) === user.password) {
+      if (this.encryptPassword(loginUserDto.password) === user.password) {
         return user
       }
       else {

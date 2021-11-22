@@ -25,7 +25,7 @@ export class AuthController {
   @Post('/login')
   public async login(@Body() loginUserDto: LoginDto) {
     try {
-      return await this.authService.login(LoginDto);
+      return await this.authService.login(loginUserDto);
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
@@ -44,10 +44,10 @@ export class AuthController {
   public async checkCode(@Body() resetUserPasswordDto: ResetCodeDto) {
 
     try {
-      const user = await this.authService.checkCode(resetUserPasswordDto.code);
+      const user = await this.authService.checkCode(resetUserPasswordDto);
       if (user) {
         return {
-          user
+          code: user.restorePasswordCode
         }
       }
     } catch (err) {
@@ -57,8 +57,6 @@ export class AuthController {
 
   @Post('/reset-pwd')
   public async reset(@Body() changeUserPasswordDto: ChangePasswordDto) {
-
-
     try {
       const user = await this.authService.changePassword(changeUserPasswordDto);
       if (user) {
