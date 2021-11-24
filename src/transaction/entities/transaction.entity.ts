@@ -15,5 +15,11 @@ export class Transaction extends BaseEntity {
   txHash: string;
 
   @Column()
-  wallet: string;
+  sender: string;
+
+  @Column({type: 'bigint'})
+  amount: string;
+
+  @Column()
+  receiver: string;
 }

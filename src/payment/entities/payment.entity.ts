@@ -18,8 +18,8 @@ export class Payment extends BaseEntity {
   @Column()
   datetime: Date;
 
-  @Column()
-  amount: number;
+  @Column({type: 'bigint'})
+  amount: string;
 
   @Column()
   comment: string;

@@ -1,5 +1,13 @@
 import { Controller, Get, Inject, Post } from "@nestjs/common";
-import { Crud, CrudController } from "@nestjsx/crud";
+import {
+  Crud,
+  CrudController,
+  Override,
+  CrudRequest,
+  ParsedRequest,
+  ParsedBody,
+  CreateManyDto,
+} from '@nestjsx/crud';
 import { Payment } from "./entities/payment.entity";
 import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
@@ -17,9 +25,62 @@ export class PaymentController implements CrudController<Payment> {
     @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
   ) {}
 
-  @Get('/create')
-  async hello() {
-    this.client.emit('hello', 'payment created')
+  get base(): CrudController<Payment> {
+    return this;
+  }
+
+  @Override()
+  getMany(
+    @ParsedRequest() req: CrudRequest,
+  ) {
+    return this.base.getManyBase(req);
+  }
+
+  @Override('getOneBase')
+  getOneAndDoStuff(
+    @ParsedRequest() req: CrudRequest,
+  ) {
+    return this.base.getOneBase(req);
+  }
+
+  @Override()
+  createOne(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Payment,
+  ) {
+    this.client.emit('create', dto)
+    return this.base.createOneBase(req, dto);
+  }
+
+  @Override()
+  createMany(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: CreateManyDto<Payment>
+  ) {
+    return this.base.createManyBase(req, dto);
+  }
+
+  @Override('updateOneBase')
+  coolFunction(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Payment,
+  ) {
+    return this.base.updateOneBase(req, dto);
+  }
+
+  @Override('replaceOneBase')
+  awesomePUT(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Payment,
+  ) {
+    return this.base.replaceOneBase(req, dto);
+  }
+
+  @Override()
+  async deleteOne(
+    @ParsedRequest() req: CrudRequest,
+  ) {
+    return this.base.deleteOneBase(req);
   }
 }
 
