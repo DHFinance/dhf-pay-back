@@ -11,7 +11,6 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
     super(repo);
   }
 
-  @Interval(60000)
   async updateTransactions() {
     const transactions = await this.repo.find();
     const updateProcessingTransactions = await Promise.all(transactions.map(async (transaction) => {
@@ -20,7 +19,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         if (res.data.data.errorMessage) {
           return {
             ...transaction,
-            status: 'error',
+            status: res.data.data.errorMessage,
             updated: res.data.data.timestamp
           }
         }

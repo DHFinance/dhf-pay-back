@@ -14,9 +14,38 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     super(repo);
   }
 
-  // @Interval(3000)
-  // async updateStatus() {
-  //   const transactions = await this.transactionService.find();
-  //   console.log(transactions)
-  // }
+  @Interval(60000)
+  async updateStatus() {
+    await this.transactionService.updateTransactions()
+    const payments = await this.repo.find();
+    const updatedPayments = await Promise.all(payments.map(async (payment) => {
+      const transactions = await this.transactionService.find({
+        where: {
+          payment: payment,
+          status: 'success'
+        }
+      });
+
+      const getTransactionsTotal = () => {
+        let counter = 0
+        transactions.forEach((transaction, i) => {
+          counter += +transaction.amount
+        })
+        return counter
+      }
+      if (payment.status !== 'Paid') {
+        if (getTransactionsTotal() >= +payment.amount) {
+          payment.status = 'Paid'
+          return payment
+        }
+        if (getTransactionsTotal() !== +payment.amount && getTransactionsTotal() > 0) {
+          payment.status = 'Particularly_paid'
+          return payment
+        }
+      }
+      return payment
+    }))
+
+    await this.repo.save(updatedPayments)
+  }
 }
