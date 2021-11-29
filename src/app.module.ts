@@ -13,7 +13,7 @@ const isProduction = process.env.npm_lifecycle_event === 'start:prod';
 const dotEnvPath = isProduction
   ? path.resolve(__dirname, '..', '.env.staging')
   : path.resolve(__dirname, '..', '.env');
-console.log(process.env.npm_lifecycle_event);
+// console.log(process.env.npm_lifecycle_event);
 @Module({
   imports: [
     ConfigModule.load(

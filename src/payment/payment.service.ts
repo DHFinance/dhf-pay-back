@@ -8,4 +8,6 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
   constructor(@InjectRepository(Payment) repo) {
     super(repo);
   }
+
+
 }

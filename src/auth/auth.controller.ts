@@ -1,10 +1,10 @@
 import {
   Body,
-  Controller,
+  Controller, Get,
   HttpException,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+  HttpStatus, Param,
+  Post, Query
+} from "@nestjs/common";
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from "./dto/login.dto";
@@ -35,6 +35,16 @@ export class AuthController {
     try {
       await this.authService.sendCode(resetUserDto);
       return true;
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('reAuth')
+  public async reAuth(@Body() resetUserDto: ResetEmailDto, @Query() query) {
+
+    try {
+      return await this.authService.reAuth(query.token);
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     }
