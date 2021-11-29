@@ -53,11 +53,16 @@ export class UserService extends TypeOrmCrudService<User> {
   }
 
   public async create(user): Promise<IUser> {
+    const userExisted = await this.findByEmail(user.email);
+
+    if (userExisted) {
+      throw new HttpException('user already exists', HttpStatus.BAD_REQUEST);
+    }
+
     try {
       const token = randomString(36);
       return await this.repo.save({ ...user, token });
     } catch (err) {
-      console.log(err);
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
   }
@@ -91,6 +96,14 @@ export class UserService extends TypeOrmCrudService<User> {
     const user = await this.findByEmail(email)
     if (!user || user.restorePasswordCode !== +code)  {
       throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
+    }
+    return user
+  }
+
+  async reAuth(token: string) {
+    const user = await this.findByToken(token)
+    if (!user)  {
+      throw new HttpException('User not exist', HttpStatus.BAD_REQUEST);
     }
     return user
   }

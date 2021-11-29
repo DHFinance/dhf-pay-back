@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import { Crud, CrudController } from '@nestjsx/crud';
 import { User } from './entities/user.entity';
 import { UserService } from "./user.service";

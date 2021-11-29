@@ -38,6 +38,10 @@ export class AuthService {
     return await this.userService.checkCode(code, email);
   }
 
+  public async reAuth(token: string) {
+    return await this.userService.reAuth(token);
+  }
+
   public async changePassword({ password, email }) {
     const encryptPassword = this.encryptPassword(password)
     return await this.userService.changePassword(encryptPassword, email);
