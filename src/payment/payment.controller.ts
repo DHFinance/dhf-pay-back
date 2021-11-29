@@ -16,6 +16,13 @@ import { ClientProxy } from "@nestjs/microservices";
   model: {
     type: Payment,
   },
+  query: {
+    join: {
+      user: {
+        eager: true,
+      },
+    },
+  },
 })
 
 @Controller('payment')

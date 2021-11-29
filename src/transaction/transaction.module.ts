@@ -10,6 +10,6 @@ import { ScheduleModule } from "@nestjs/schedule";
   imports: [TypeOrmModule.forFeature([Transaction]), HttpModule, ScheduleModule.forRoot()],
   controllers: [TransactionController],
   providers: [TransactionService],
-  exports: [],
+  exports: [TransactionService],
 })
 export class TransactionModule {}

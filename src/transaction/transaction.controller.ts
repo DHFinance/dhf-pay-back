@@ -7,6 +7,13 @@ import { TransactionService } from "./transaction.service";
   model: {
     type: Transaction,
   },
+  query: {
+    join: {
+      payment: {
+        eager: true,
+      },
+    },
+  },
 })
 
 @Controller('transaction')

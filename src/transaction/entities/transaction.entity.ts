@@ -1,4 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne } from "typeorm";
+import { User } from "../../user/entities/user.entity";
+import { Payment } from "../../payment/entities/payment.entity";
+import { JoinColumn } from "typeorm/browser";
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -13,6 +16,9 @@ export class Transaction extends BaseEntity {
 
   @Column()
   txHash: string;
+
+  @ManyToOne(() => Payment)
+  payment: Payment;
 
   @Column()
   sender: string;

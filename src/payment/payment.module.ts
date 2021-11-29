@@ -4,9 +4,10 @@ import { Payment } from './entities/payment.entity';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import { ClientsModule, Transport } from "@nestjs/microservices";
+import { TransactionModule } from "../transaction/transaction.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment]), ClientsModule.register([
+  imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, ClientsModule.register([
     {
       name: 'PAYMENT_SERVICE',
       transport: Transport.RMQ,
