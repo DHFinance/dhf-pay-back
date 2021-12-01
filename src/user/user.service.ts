@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUser } from './interfaces/user.interface';
@@ -56,7 +56,7 @@ export class UserService extends TypeOrmCrudService<User> {
     const userExisted = await this.findByEmail(user.email);
 
     if (userExisted) {
-      throw new HttpException('user already exists', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('email', 'User with this email does not exist');
     }
 
     try {
@@ -71,10 +71,7 @@ export class UserService extends TypeOrmCrudService<User> {
     const user = await this.findByEmail(email);
 
     if (!user) {
-      throw new HttpException(
-        'No such user with this email',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('email', 'User with this email does not exist');
     }
     const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
     user.restorePasswordCode = code;
@@ -95,7 +92,7 @@ export class UserService extends TypeOrmCrudService<User> {
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
     if (!user || user.restorePasswordCode !== +code)  {
-      throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('code', 'Wrong restore code');
     }
     return user
   }
@@ -103,7 +100,7 @@ export class UserService extends TypeOrmCrudService<User> {
   async reAuth(token: string) {
     const user = await this.findByToken(token)
     if (!user)  {
-      throw new HttpException('User not exist', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('token', 'User not exist');
     }
     return user
   }
@@ -111,7 +108,7 @@ export class UserService extends TypeOrmCrudService<User> {
   async changePassword(password, email) {
     const user = await this.findByEmail(email);
     if (!user) {
-      throw new HttpException('Wrong restore code', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('email', 'User with this email does not exist');
     }
     user.restorePasswordCode = null;
     user.password = password;
