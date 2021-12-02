@@ -14,10 +14,10 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
 
   async sendMail(transaction) {
 
-    return await this.mailerService.sendMail({
+    await this.mailerService.sendMail({
       to: transaction.email,
-      from: 'service-info@smartigy.ru',
-      subject: 'Код для сброса пароля',
+      from: process.env.MAILER_EMAIL,
+      subject: 'Transaction status changed',
       template: 'transaction-status-changed',
       context: {
         login: transaction.email,
@@ -39,6 +39,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
             status: res.data.data.errorMessage,
             updated: res.data.data.timestamp
           }
+          console.log({ updatedTransaction })
           await this.sendMail(updatedTransaction)
           return updatedTransaction
         }
