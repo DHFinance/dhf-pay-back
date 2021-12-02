@@ -19,7 +19,7 @@ export class AuthController {
     try {
       return await this.authService.register(registerUserDto);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
   @Post('login')
@@ -27,7 +27,7 @@ export class AuthController {
     try {
       return await this.authService.login(loginUserDto);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
   @Post('send-code')
@@ -36,7 +36,7 @@ export class AuthController {
       await this.authService.sendCode(resetUserDto);
       return true;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -46,7 +46,7 @@ export class AuthController {
     try {
       return await this.authService.reAuth(query.token);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -61,7 +61,7 @@ export class AuthController {
         }
       }
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -73,7 +73,7 @@ export class AuthController {
         return user
       }
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
 }
