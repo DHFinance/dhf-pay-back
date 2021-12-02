@@ -16,7 +16,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
 
     return await this.mailerService.sendMail({
       to: transaction.email,
-      from: 'caspers.mailer@gmail.com',
+      from: 'service-info@smartigy.ru',
       subject: 'Код для сброса пароля',
       template: 'transaction-status-changed',
       context: {

@@ -37,6 +37,8 @@ const dotEnvPath = isProduction
         auth: {
           user: 'service-info@smartigy.ru',
           pass: 'qweASDzxc123',
+          // user: 'caspers.mailer@gmail.com',
+          // pass: 'BCf!rufxQeYF@KVD87s76',
         },
       },
       template: {
