@@ -78,7 +78,7 @@ export class UserService extends TypeOrmCrudService<User> {
     await user.save();
     return await this.mailerService.sendMail({
       to: email,
-      from: 'caspers.mailer@gmail.com',
+      from: process.env.MAILER_EMAIL,
       subject: 'Код для сброса пароля',
       template: 'send-password-code',
       context: {

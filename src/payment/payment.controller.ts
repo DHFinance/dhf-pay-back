@@ -21,6 +21,9 @@ import { ClientProxy } from "@nestjs/microservices";
       user: {
         eager: true,
       },
+      transaction: {
+        eager: true,
+      },
     },
   },
 })
