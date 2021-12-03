@@ -12,6 +12,9 @@ export class Transaction extends BaseEntity {
   status: string;
 
   @Column()
+  email: string;
+
+  @Column()
   updated: Date;
 
   @Column()

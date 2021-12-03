@@ -35,6 +35,8 @@ const dotEnvPath = isProduction
       transport: {
         host: 'smtp.yandex.ru',
         auth: {
+          // user: process.env.MAILER_EMAIL,
+          // pass: process.env.MAILER_PASSWORD,
           user: 'service-info@smartigy.ru',
           pass: 'qweASDzxc123',
         },
