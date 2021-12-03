@@ -4,5 +4,4 @@ export class RegisterDto {
   email: string;
   company: string;
   password: string;
-  passwordConf: string;
 }

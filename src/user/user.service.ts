@@ -56,7 +56,7 @@ export class UserService extends TypeOrmCrudService<User> {
     const userExisted = await this.findByEmail(user.email);
 
     if (userExisted) {
-      throw new BadRequestException('email', 'User with this email does not exist');
+      throw new BadRequestException('email', 'User with this email exists');
     }
 
     try {

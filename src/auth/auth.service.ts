@@ -19,6 +19,7 @@ export class AuthService {
   }
 
   public async register(userDto) {
+    console.log(userDto)
     const user = {
       name: userDto.name,
       lastName: userDto.lastName,
