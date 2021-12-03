@@ -32,27 +32,27 @@ const dotEnvPath = isProduction
       inject: [ConfigService],
     }),
     MailerModule.forRoot({
-      // transport: {
-      //   host: 'smtp.gmail.com',
-      //   SSL: true,
-      //   QAuth: true,
-      //   port: 465,
-      //   auth: {
-      //     // user: process.env.MAILER_EMAIL,
-      //     // pass: process.env.MAILER_PASSWORD,
-      //     user: 'caspers.mailer@gmail.com',
-      //     pass: 'BCf!rufxQeYF@KVD87s76',
-      //   },
-      // },
       transport: {
-          host: 'smtp.yandex.ru',
-          auth: {
-            // user: process.env.MAILER_EMAIL,
-            // pass: process.env.MAILER_PASSWORD,
-            user: 'service-info@smartigy.ru',
-            pass: 'qweASDzxc123',
-          },
+        host: 'smtp.gmail.com',
+        SSL: true,
+        QAuth: true,
+        port: 465,
+        auth: {
+          // user: process.env.MAILER_EMAIL,
+          // pass: process.env.MAILER_PASSWORD,
+          user: 'caspers.mailer@gmail.com',
+          pass: 'BCf!rufxQeYF@KVD87s76',
         },
+      },
+      // transport: {
+      //     host: 'smtp.yandex.ru',
+      //     auth: {
+      //       // user: process.env.MAILER_EMAIL,
+      //       // pass: process.env.MAILER_PASSWORD,
+      //       user: 'service-info@smartigy.ru',
+      //       pass: 'qweASDzxc123',
+      //     },
+      //   },
       template: {
         dir: __dirname + '/../src/mail-templates',
         adapter: new HandlebarsAdapter(), // or new PugAdapter()
