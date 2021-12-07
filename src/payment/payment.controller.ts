@@ -54,12 +54,13 @@ export class PaymentController implements CrudController<Payment> {
   }
 
   @Override()
-  createOne(
+  async createOne(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Payment,
   ) {
-    this.client.emit('create', dto)
-    return this.base.createOneBase(req, dto);
+    const payment = await this.client.send('createOne', dto).toPromise()
+    console.log({payment})
+    // return this.base.createOneBase(req, dto);
   }
 
   @Override()
