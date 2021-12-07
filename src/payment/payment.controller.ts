@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Post } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Inject, Post } from "@nestjs/common";
 import {
   Crud,
   CrudController,
@@ -58,8 +58,15 @@ export class PaymentController implements CrudController<Payment> {
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Payment,
   ) {
-    const payment = await this.client.send('createOne', dto).toPromise()
-    console.log({payment})
+    try {
+      const payment = await this.client.send('createOne', dto).toPromise().then((res) => console.log({ res })).catch(e => console.log({e}))
+      console.log({payment})
+      return payment
+    } catch (err) {
+      console.log({err})
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
+    }
+
     // return this.base.createOneBase(req, dto);
   }
 
