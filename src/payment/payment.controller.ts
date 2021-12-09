@@ -11,6 +11,7 @@ import {
 import { Payment } from "./entities/payment.entity";
 import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
+import { SCondition } from "@nestjsx/crud-request";
 
 @Crud({
   model: {

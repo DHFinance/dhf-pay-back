@@ -25,6 +25,7 @@ export class AuthService {
       lastName: userDto.lastName,
       company: userDto.company,
       email: userDto.email,
+      role: 'customer',
       password: this.encryptPassword(userDto.password),
     }
 
