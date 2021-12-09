@@ -60,9 +60,7 @@ export class PaymentController implements CrudController<Payment> {
     @ParsedBody() dto: Payment,
   ) {
     try {
-      const payment = await this.client.send('createOne', dto).toPromise().then((res) => console.log({ res })).catch(e => console.log({e}))
-      console.log({payment})
-      return payment
+      await this.client.send('createOne', dto).toPromise().then((res) => console.log({ res }))
     } catch (err) {
       console.log({err})
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
