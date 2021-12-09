@@ -5,4 +5,6 @@ export interface IUser {
   email: string;
   company: string;
   password: string;
+  token: string;
+  role: 'admin' | 'customer';
 }
