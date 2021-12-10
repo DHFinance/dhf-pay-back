@@ -21,6 +21,9 @@ export class Stores extends BaseEntity {
   payments: Payment[];
 
   @Column()
+  url: string;
+
+  @Column()
   name: string;
 
   @Column()

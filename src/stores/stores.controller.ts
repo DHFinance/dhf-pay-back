@@ -29,7 +29,7 @@ import { Stores } from "./entities/stores.entity";
   },
 })
 
-@Controller('payment')
+@Controller('store')
 export class StoresController implements CrudController<Stores> {
   constructor(
     public readonly service: StoresService,
