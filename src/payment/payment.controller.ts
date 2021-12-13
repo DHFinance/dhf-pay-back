@@ -49,7 +49,8 @@ export class PaymentController implements CrudController<Payment> {
         store: {
           apiKey: param.apiKey
         }
-      }
+      },
+      relations: ['store'],
     })
     return payments
   }
