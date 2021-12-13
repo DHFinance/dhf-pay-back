@@ -7,14 +7,15 @@ import {
 } from "typeorm";
 import { User } from '../../user/entities/user.entity';
 import { Transaction } from "../../transaction/entities/transaction.entity";
+import { Stores } from "../../stores/entities/stores.entity";
 
 @Entity()
 export class Payment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, user => user)
-  user: User;
+  @ManyToOne(() => Stores, store => store)
+  store: Stores;
 
   @OneToMany(() => Transaction, (transactions) => transactions.payment)
   transactions: Transaction[];

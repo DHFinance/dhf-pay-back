@@ -8,7 +8,7 @@ import { TransactionService } from "../transaction/transaction.service";
 import { MailerService } from "@nest-modules/mailer";
 
 @Injectable()
-export class PaymentService extends TypeOrmCrudService<Payment> {
+export class PaymentService extends TypeOrmCrudService<Payment> {g
   constructor(@InjectRepository(Payment) repo,
               private readonly transactionService: TransactionService,
               private mailerService: MailerService
