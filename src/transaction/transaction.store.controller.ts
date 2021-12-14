@@ -23,12 +23,12 @@ export class TransactionStoreController {
     }
   }
 
-  @Get(':id')
+  @Get(':txHash')
   async getOneByStore(@Param() param) {
     try {
       const transaction = this.service.findOne({
         where: {
-          id: param.id
+          txHash: param.txHash
         }
       })
       return transaction
