@@ -5,10 +5,12 @@ import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
 import { HttpModule } from "@nestjs/axios";
 import { ScheduleModule } from "@nestjs/schedule";
+import { TransactionStoreController } from "./transaction.store.controller";
+import { StoresModule } from "../stores/stores.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction]), HttpModule, ScheduleModule.forRoot()],
-  controllers: [TransactionController],
+  imports: [TypeOrmModule.forFeature([Transaction]), StoresModule, HttpModule, ScheduleModule.forRoot()],
+  controllers: [TransactionController, TransactionStoreController],
   providers: [TransactionService],
   exports: [TransactionService],
 })

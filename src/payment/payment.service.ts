@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Payment } from "./entities/payment.entity";
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
@@ -8,11 +8,20 @@ import { TransactionService } from "../transaction/transaction.service";
 import { MailerService } from "@nest-modules/mailer";
 
 @Injectable()
-export class PaymentService extends TypeOrmCrudService<Payment> {
+export class PaymentService extends TypeOrmCrudService<Payment> {g
   constructor(@InjectRepository(Payment) repo,
               private readonly transactionService: TransactionService,
               private mailerService: MailerService
   ) {
     super(repo);
   }
+
+  // async create(dto) {
+  //   try {
+  //     const payment = this.repo.create(dto)
+  //     return payment
+  //   } catch (err) {
+  //     throw new HttpException(err, HttpStatus.BAD_REQUEST);
+  //   }
+  // }
 }

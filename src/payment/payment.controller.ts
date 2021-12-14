@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Inject, Post } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Inject, Param, Post } from "@nestjs/common";
 import {
   Crud,
   CrudController,
@@ -17,9 +17,15 @@ import { SCondition } from "@nestjsx/crud-request";
   model: {
     type: Payment,
   },
+  params: {
+    apiKey: {
+      field: 'apiKey',
+      type: "string",
+    },
+  },
   query: {
     join: {
-      user: {
+      store: {
         eager: true,
       },
       transaction: {
@@ -57,14 +63,15 @@ export class PaymentController implements CrudController<Payment> {
   @Override()
   async createOne(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
+    @ParsedBody() dto: Payment
   ) {
     try {
-      await this.client.send('createOne', dto).toPromise().then((res) => console.log({ res }))
+      const res = await this.client.send('createOne', dto).toPromise()
+      return {id: res}
     } catch (err) {
-      console.log({err})
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
+
 
     // return this.base.createOneBase(req, dto);
   }
