@@ -14,7 +14,9 @@ export class Payment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Stores, store => store)
+  @ManyToOne(() => Stores, store => store, {
+    eager: true,
+  })
   store: Stores;
 
   @OneToMany(() => Transaction, (transactions) => transactions.payment)

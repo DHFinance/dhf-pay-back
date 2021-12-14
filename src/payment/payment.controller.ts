@@ -25,7 +25,7 @@ import { SCondition } from "@nestjsx/crud-request";
   },
   query: {
     join: {
-      user: {
+      store: {
         eager: true,
       },
       transaction: {
@@ -35,7 +35,7 @@ import { SCondition } from "@nestjsx/crud-request";
   },
 })
 
-@Controller(':apiKey/payment')
+@Controller('payment')
 export class PaymentController implements CrudController<Payment> {
   constructor(
     public readonly service: PaymentService,
@@ -63,11 +63,10 @@ export class PaymentController implements CrudController<Payment> {
   @Override()
   async createOne(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
-    @Param() param: {apiKey: string}
+    @ParsedBody() dto: Payment
   ) {
     try {
-      const res = await this.client.send('createOne', { ...dto, apiKey: param.apiKey }).toPromise()
+      const res = await this.client.send('createOne', dto).toPromise()
       return {id: res}
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);

@@ -23,10 +23,10 @@ export class Stores extends BaseEntity {
   @Column({nullable: false})
   url: string;
 
-  @Column()
+  @Column({nullable: false})
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   description: string;
 
   @Column({nullable: true})

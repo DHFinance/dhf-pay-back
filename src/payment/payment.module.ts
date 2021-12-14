@@ -5,6 +5,7 @@ import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { TransactionModule } from "../transaction/transaction.module";
+import { PaymentStoreController } from "./payment.store.controller";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, ClientsModule.register([
@@ -20,8 +21,8 @@ import { TransactionModule } from "../transaction/transaction.module";
       },
     },
   ]),],
-  controllers: [PaymentController],
+  controllers: [PaymentController, PaymentStoreController],
   providers: [PaymentService],
-  exports: [],
+  exports: [PaymentService],
 })
 export class PaymentModule {}

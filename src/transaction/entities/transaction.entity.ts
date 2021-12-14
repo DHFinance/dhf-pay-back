@@ -20,7 +20,9 @@ export class Transaction extends BaseEntity {
   @Column()
   txHash: string;
 
-  @ManyToOne(() => Payment, payment => payment)
+  @ManyToOne(() => Payment, payment => payment, {
+    eager: true,
+  })
   payment: Payment;
 
   @Column()
