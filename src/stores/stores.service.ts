@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
 import { Stores } from "./entities/stores.entity";
@@ -10,12 +10,29 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     super(repo);
   }
 
+  async changeBlockStore(id, blocked) {
+    const store = await this.repo.findOne({
+      where: {
+        id
+      }
+    })
+    try {
+      const blockedStore = await this.repo.save({...store, blocked})
+      return blockedStore
+    } catch (e) {
+      throw new HttpException(e, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   async findStore(apiKey) {
     const store = await this.repo.findOne({
       where: {
         apiKey
       }
     })
+    if (store?.blocked === true) {
+      throw new BadRequestException('store', 'Store is blocked');
+    }
     if (store) {
       return store
     }

@@ -26,6 +26,7 @@ export class AuthService {
       company: userDto.company,
       email: userDto.email,
       role: 'customer',
+      blocked: userDto.blocked,
       password: this.encryptPassword(userDto.password),
     }
 

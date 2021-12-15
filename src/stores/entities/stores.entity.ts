@@ -31,4 +31,7 @@ export class Stores extends BaseEntity {
 
   @Column({nullable: true})
   apiKey: string;
+
+  @Column()
+  blocked: boolean;
 }

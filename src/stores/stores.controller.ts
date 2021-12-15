@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Inject, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Post } from "@nestjs/common";
 import {
   Crud,
   CrudController,
@@ -35,8 +35,11 @@ export class StoresController implements CrudController<Stores> {
     public readonly service: StoresService,
 
   ) {}
-
-
+x
+  @Post('block')
+  async storeBlock(@Body() body: {id: number, blocked: boolean}) {
+    return this.service.changeBlockStore(body.id, body.blocked)
+  }
 
 }
 
