@@ -13,7 +13,7 @@ import { PaymentStoreController } from "./payment.store.controller";
       name: 'PAYMENT_SERVICE',
       transport: Transport.RMQ,
       options: {
-        urls: ['amqps://tncqeoap:xg6g86QzZQw0SRnM8Zk6EZwu0_9wb9um@bonobo.rmq.cloudamqp.com/tncqeoap'],
+        urls: [process.env.RABBIT_MQ],
         queue: 'payment_queue',
         queueOptions: {
           durable: false
