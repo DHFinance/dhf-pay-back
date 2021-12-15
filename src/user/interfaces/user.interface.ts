@@ -6,5 +6,6 @@ export interface IUser {
   company: string;
   password: string;
   token: string;
+  blocked: boolean;
   role: 'admin' | 'customer';
 }

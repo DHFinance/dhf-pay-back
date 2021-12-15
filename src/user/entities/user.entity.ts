@@ -28,4 +28,7 @@ export class User extends BaseEntity {
 
   @Column()
   token: string;
+
+  @Column()
+  blocked: boolean;
 }

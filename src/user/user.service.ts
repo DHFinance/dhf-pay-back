@@ -24,6 +24,20 @@ export class UserService extends TypeOrmCrudService<User> {
     super(repo);
   }
 
+  async changeBlockUser(id, blocked) {
+    const store = await this.repo.findOne({
+      where: {
+        id
+      }
+    })
+    try {
+      const blockedUser = await this.repo.save({...store, blocked})
+      return blockedUser
+    } catch (e) {
+      throw new HttpException(e, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   async findByToken(token) {
     return await this.repo.findOne({
       where: {
@@ -33,11 +47,15 @@ export class UserService extends TypeOrmCrudService<User> {
   }
 
   async findByEmail(email) {
-    return await this.repo.findOne({
+    const user = await this.repo.findOne({
       where: {
         email,
       },
     });
+    if (user?.blocked === true) {
+      throw new BadRequestException('email', 'User is blocked');
+    }
+    return user
   }
 
   async findByCode(restorePasswordCode) {
@@ -63,6 +81,7 @@ export class UserService extends TypeOrmCrudService<User> {
       const token = randomString(36);
       return await this.repo.save({ ...user, token });
     } catch (err) {
+      console.log(err)
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
   }
@@ -99,6 +118,9 @@ export class UserService extends TypeOrmCrudService<User> {
 
   async reAuth(token: string) {
     const user = await this.findByToken(token)
+    if (user.blocked === true) {
+      throw new BadRequestException('email', 'User is blocked');
+    }
     if (!user)  {
       throw new BadRequestException('token', 'User not exist');
     }
