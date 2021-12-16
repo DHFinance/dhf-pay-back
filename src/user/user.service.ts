@@ -79,7 +79,7 @@ export class UserService extends TypeOrmCrudService<User> {
 
     try {
       const token = randomString(36);
-      return await this.repo.save({ ...user, token });
+      return await this.repo.save({ ...user, token, blocked: false });
     } catch (err) {
       console.log(err)
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
