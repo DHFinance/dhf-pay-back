@@ -1,41 +1,35 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+## Установка
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+## Создание .env
+Создайте .env файл (для образца дан env.sample)
 
 ```bash
+#Настройки для базы данных
+DB_HOST = localhost
+DB_PORT = 5432
+DB_PASSWORD = Ytrewq654321
+DB_USER = postgres
+DB_DATABASE = casper
+DB_SYNCRONIZE = true
+DB_LOGGING = true
+TYPEORM_MIGRATIONS_RUN = true
+SECRET_HASH = passwordHashSecret
+#Данные для почтового аккаунта, с которого будет вестись рассылка
+MAILER_EMAIL = caspers.mailer@gmail.com
+MAILER_PASSWORD = BCf!rufxQeYF@KVD87s76
+#Ссылка для подключения на rabbitMQ. Должен быть одинаковым для casper-back и casper-processor. По ней идет соединение
+RABBIT_MQ=amqps://tncqeoap:xg6g86QzZQw0SRnM8Zk6EZwu0_9wb9um@bonobo.rmq.cloudamqp.com/tncqeoap
+```
+
+## Запуск
+Запуск casper-back
+```bash
 # development
+$ npm run build
 $ npm run start
 
 # watch mode
@@ -45,29 +39,31 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+## Создание администратора
+Администратора можно создать в базе данных (например через DBeaver). Для этого нужно создать запись в таблице user со следующими данными. Пароль пользователя зашифрован. Для авторизации данными будут email и пароль 1234 (можно сменить в процессе на странице /restore если была указана ваша почта)
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+"name": "admin",
+"lastName": "admin",
+"password": "68be41e7f2b5683b5556b4562781cf7633477af3",
+"email": "admin@gmail.com", *ввести свою существующую почту*
+"role": "admin",
+"company": "admin",
+"token": "VNvDeoXRR6QDNSNj0NwXICpXxmv4xz3fDIfH",
+"blocked": false
 ```
 
-## Support
+## Запуск процессора
+За создание payments и рассылку оповещений (электронных писем и запросов на сайты) отвечает casper-processor. Он должен работать одновременно с casper-back
+```bash
+# development
+$ npm run build
+$ npm run start
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# watch mode
+$ npm run start:dev
 
-## Stay in touch
+# production mode
+$ npm run start:prod
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
