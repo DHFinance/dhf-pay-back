@@ -17,6 +17,7 @@ DB_DATABASE = casper
 DB_SYNCRONIZE = true
 DB_LOGGING = true
 TYPEORM_MIGRATIONS_RUN = true
+#Хэш для кодирования пароля
 SECRET_HASH = passwordHashSecret
 #Данные для почтового аккаунта, с которого будет вестись рассылка
 MAILER_EMAIL = caspers.mailer@gmail.com
