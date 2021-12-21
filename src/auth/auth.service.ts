@@ -27,8 +27,7 @@ export class AuthService {
       email: userDto.email,
       role: 'customer',
       blocked: userDto.blocked,
-      password: this.encryptPassword(userDto.password),
-      emailVerification: code
+      password: this.encryptPassword(userDto.password)
     }
 
     await this.userService.create(user);

@@ -54,7 +54,7 @@ export class UserService extends TypeOrmCrudService<User> {
         to: email,
         from: process.env.MAILER_EMAIL,
         subject: 'Casperpay',
-        template: 'send-registration',
+        template: 'send-reg-message',
         context: {
           login: email,
           email: email
