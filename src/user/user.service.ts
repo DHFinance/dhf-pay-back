@@ -50,6 +50,16 @@ export class UserService extends TypeOrmCrudService<User> {
     console.log({email, code})
     const userVerified = await this.findByEmail(email);
     if (userVerified.emailVerification == code) {
+      await this.mailerService.sendMail({
+        to: email,
+        from: process.env.MAILER_EMAIL,
+        subject: 'Casperpay',
+        template: 'send-registration',
+        context: {
+          login: email,
+          email: email
+        },
+      });
       return await this.repo.save({ ...userVerified, emailVerification: null });
     } else {
       throw new BadRequestException('code', 'Wrong code');
