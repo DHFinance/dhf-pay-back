@@ -26,6 +26,9 @@ export class Stores extends BaseEntity {
   @Column({nullable: false})
   name: string;
 
+  @Column({nullable: false})
+  wallet: string;
+
   @Column({nullable: true})
   description: string;
 

@@ -9,6 +9,7 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from "./dto/login.dto";
 import { ChangePasswordDto, ResetCodeDto, ResetEmailDto } from "./dto/reset.dto";
+import { VerifyDto } from "./dto/verify.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +23,14 @@ export class AuthController {
       return await this.authService.register(registerUserDto);
     } catch (err) {
       console.log(err)
+      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
+    }
+  }
+  @Post('verify')
+  public async verify(@Body() verifyDto: VerifyDto) {
+    try {
+      return await this.authService.verify(verifyDto);
+    } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }

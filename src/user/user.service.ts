@@ -46,6 +46,16 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
+  public async verifyUser(email, code) {
+    console.log({email, code})
+    const userVerified = await this.findByEmail(email);
+    if (userVerified.emailVerification == code) {
+      return await this.repo.save({ ...userVerified, emailVerification: null });
+    } else {
+      throw new BadRequestException('code', 'Wrong code');
+    }
+  }
+
   async findByEmail(email) {
     const user = await this.repo.findOne({
       where: {
@@ -70,19 +80,54 @@ export class UserService extends TypeOrmCrudService<User> {
     return await this.repo.find();
   }
 
-  public async create(user): Promise<IUser> {
+  public async create(user) {
     const userExisted = await this.findByEmail(user.email);
-
-    if (userExisted) {
+    const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
+    if (userExisted && userExisted.emailVerification === null) {
       throw new BadRequestException('email', 'User with this email exists');
     }
 
-    try {
-      const token = randomString(36);
-      return await this.repo.save({ ...user, token, blocked: false });
-    } catch (err) {
-      console.log(err)
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    if (userExisted && userExisted.emailVerification !== null) {
+      await this.mailerService.sendMail({
+        to: userExisted.email,
+        from: process.env.MAILER_EMAIL,
+        subject: 'Код для подтверждения регистрации',
+        template: 'send-verification-code',
+        context: {
+          login: userExisted.email,
+          email: userExisted.email,
+          code: code,
+        },
+      });
+
+      try {
+        await this.repo.save({ ...userExisted, emailVerification: code});
+        return true
+      } catch (err) {
+        console.log(err)
+        throw new HttpException(err, HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      await this.mailerService.sendMail({
+        to: user.email,
+        from: process.env.MAILER_EMAIL,
+        subject: 'Код для подтверждения регистрации',
+        template: 'send-verification-code',
+        context: {
+          login: user.email,
+          email: user.email,
+          code: code,
+        },
+      });
+
+      try {
+        const token = randomString(36);
+        await this.repo.save({ ...user, emailVerification: code, token, blocked: false });
+        return true
+      } catch (err) {
+        console.log(err)
+        throw new HttpException(err, HttpStatus.BAD_REQUEST);
+      }
     }
   }
 

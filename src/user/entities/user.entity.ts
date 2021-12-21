@@ -17,6 +17,9 @@ export class User extends BaseEntity {
   @Column({nullable: true})
   restorePasswordCode: number;
 
+  @Column({nullable: true})
+  emailVerification: number;
+
   @Column()
   email: string;
 

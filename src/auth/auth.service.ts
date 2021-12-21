@@ -28,9 +28,14 @@ export class AuthService {
       role: 'customer',
       blocked: userDto.blocked,
       password: this.encryptPassword(userDto.password),
+      emailVerification: code
     }
 
-    return await this.userService.create(user);
+    await this.userService.create(user);
+  }
+
+  public async verify({email, code}) {
+    return await this.userService.verifyUser(email, code);
   }
 
   public async sendCode({ email }) {
