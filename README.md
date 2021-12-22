@@ -19,6 +19,8 @@ DB_LOGGING = true
 TYPEORM_MIGRATIONS_RUN = true
 #Хэш для кодирования пароля
 SECRET_HASH = passwordHashSecret
+#Почта на которую будет создан админ. Не требует верификации
+ADMIN_EMAIL = caspers.mailer@gmail.com
 #Данные для почтового аккаунта, с которого будет вестись рассылка
 MAILER_EMAIL = caspers.mailer@gmail.com
 MAILER_PASSWORD = BCf!rufxQeYF@KVD87s76
@@ -27,7 +29,7 @@ RABBIT_MQ=amqps://tncqeoap:xg6g86QzZQw0SRnM8Zk6EZwu0_9wb9um@bonobo.rmq.cloudamqp
 ```
 
 ## Запуск
-Запуск casper-back
+Запуск casper-back. При каждом новом запуске база данных обнуляется
 ```bash
 # development
 $ npm run build
@@ -38,6 +40,13 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+```
+
+## Создание админа
+Админ создается через миграции. После сборки билда. Будет создан пользователь с ролью admin, паролем testtest и почтой указанной в ADMIN_EMAIL
+```bash
+$ npm run typeorm:migration:run
+
 ```
 
 ## Создание администратора
