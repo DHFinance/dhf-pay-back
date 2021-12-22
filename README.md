@@ -154,6 +154,8 @@ POST auth/change-password - изменяет пароль пользовател
     #ключ, который будет использоваться в запросах payment и transaction у пользователей customer
     "apiKey": "y6t5r4e3w2",
     "blocked": false,
+    #кошелек магазина. Все payments созданные от лица этого магазина будут с этим кошельком
+    "wallet": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
     #пользователь, создавший магазин
     "user": {
         "id": 64,
@@ -173,12 +175,22 @@ POST auth/change-password - изменяет пароль пользовател
 GET /store - получить список всех магазинов
 GET /store/1 - получить магазин с id=1
 
+POST /store - создает магазин
+{ 
+    "name": "storeUpdated",
+    "description": "store description",
+    "apiKey": "y6t5r4e3w2",
+    "url": "http://localhost:3001/"
+    "wallet": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
+}
+
 PATCH /store/1 - редактирует данные введенных в теле запроса полей магазина с id=1
 { 
     "name": "storeUpdated",
     "description": "store description",
     "apiKey": "y6t5r4e3w2",
     "url": "http://localhost:3001/"
+    "wallet": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
 }
 ```
 

@@ -6,8 +6,12 @@ export default {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: ['src/**/*.entity{.ts,.js}'],
+  // dropSchema: true,
   synchronize: true, // process.env.DB_SYNCRONIZE === 'true',
   migrationsRun: true,
-  // migrations: ['src/migrations/**{.js}'],
+  migrations: ['src/migrations/**{.ts,.js}'],
   logging: process.env.DB_LOGGING === 'true',
+  cli: {
+    migrations: 'src/migrations',
+  }
 };
