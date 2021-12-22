@@ -56,6 +56,9 @@ export class AuthService {
 
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
+    if (user?.emailVerification !== null) {
+      throw new BadRequestException('email', 'User is not exist');
+    }
     if (user) {
       if (this.encryptPassword(loginUserDto.password) === user.password) {
         return user
