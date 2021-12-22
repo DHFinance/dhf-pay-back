@@ -49,6 +49,7 @@ export class UserService extends TypeOrmCrudService<User> {
   public async verifyUser(email, code) {
     console.log({email, code})
     const userVerified = await this.findByEmail(email);
+
     if (userVerified.emailVerification == code) {
       await this.mailerService.sendMail({
         to: email,
@@ -78,18 +79,6 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
-  async findByCode(restorePasswordCode) {
-    return await this.repo.findOne({
-      where: {
-        restorePasswordCode,
-      },
-    });
-  }
-
-  async findAll() {
-    return await this.repo.find();
-  }
-
   public async create(user) {
     const userExisted = await this.findByEmail(user.email);
     const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
@@ -111,10 +100,9 @@ export class UserService extends TypeOrmCrudService<User> {
       });
 
       try {
-        await this.repo.save({ ...userExisted, emailVerification: code});
+        await this.repo.save({ ...userExisted, ...user, emailVerification: code});
         return true
       } catch (err) {
-        console.log(err)
         throw new HttpException(err, HttpStatus.BAD_REQUEST);
       }
     } else {
