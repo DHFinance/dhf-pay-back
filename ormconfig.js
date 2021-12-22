@@ -1,6 +1,7 @@
-import * as path from "path";
+// eslint-disable-next-line
+const path = require('path');
 
-export default {
+module.exports = {
   host: process.env.DB_HOST,
   type: 'postgres',
   port: process.env.DB_PORT || 5432,
@@ -8,9 +9,8 @@ export default {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: ['src/**/*.entity{.ts,.js}'],
-  // dropSchema: true,
-  synchronize: true, // process.env.DB_SYNCRONIZE === 'true',
+  synchronize: true,
   migrationsRun: true,
-  migrations: [path.resolve(__dirname + '../migrations/*{.ts,.js}')],
+  migrations: ['./dist/migrations/*.js'],
   logging: process.env.DB_LOGGING === 'true',
 };
