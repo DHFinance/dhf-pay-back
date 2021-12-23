@@ -22,13 +22,15 @@ export class TransactionController implements CrudController<Transaction> {
   constructor(
     public readonly service: TransactionService,
     public readonly userService: UserService,
+    public readonly TransactionService: TransactionService,
   ) {}
 
 
   @Get()
   async getAllByStore(@Param() param, @Headers() headers) {
     const user = await this.userService.findByToken(headers['authorization-x'])
-    if (user.role === 'admin') {
+    console.log(user, headers['authorization-x'])
+    if (user?.role === 'admin') {
       const transactions = await this.service.find()
       return transactions
     }
@@ -43,6 +45,23 @@ export class TransactionController implements CrudController<Transaction> {
     }
   }
 
+  @Get('/last/:id')
+  async getLastTransaction(@Param() param, @Headers() headers) {
+
+    try {
+      const transaction = await this.TransactionService.findOne({
+        where: {
+          payment: param.id
+        }
+      })
+      return transaction
+    } catch (err) {
+      throw new HttpException('This payment does not have such a transaction', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+
+
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers) {
 
@@ -54,6 +73,7 @@ export class TransactionController implements CrudController<Transaction> {
           txHash: param.txHash,
         }
       })
+      console.log(transaction, param.txHash)
       return transaction
     } catch (err) {
       throw new HttpException('This store does not have such a payment', HttpStatus.BAD_REQUEST);
