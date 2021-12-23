@@ -29,12 +29,14 @@ export class TransactionController implements CrudController<Transaction> {
   async getAllByStore(@Param() param, @Headers() headers) {
     const user = await this.userService.findByToken(headers['authorization-x'])
     if (user.role === 'admin') {
-      const transactions = this.service.find()
+      const transactions = await this.service.find()
       return transactions
     }
     try {
       const transactions = await this.service.find()
-      const filterByApi = transactions.filter((transaction) => transaction.payment.store.apiKey === param.apiKey)
+      const filterByApi = transactions.filter((transaction) => {
+        return transaction.payment.store.apiKey === headers.authorization
+      })
       return filterByApi
     } catch (err) {
       throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);

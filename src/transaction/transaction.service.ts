@@ -16,13 +16,8 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
 
   async create(transaction) {
     try {
-      const store = await this.storesService.findStore(transaction.apiKey)
-      if (store) {
-        const res = this.repo.save(transaction)
-        return res
-      } else {
-        throw new HttpException('Store not found', HttpStatus.BAD_REQUEST);
-      }
+      const res = this.repo.save({ ...transaction, amount: transaction.payment.amount, updated: new Date() })
+      return res
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
