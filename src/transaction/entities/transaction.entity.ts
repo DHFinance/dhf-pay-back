@@ -30,7 +30,4 @@ export class Transaction extends BaseEntity {
 
   @Column({type: 'bigint'})
   amount: string;
-
-  @Column()
-  receiver: string;
 }

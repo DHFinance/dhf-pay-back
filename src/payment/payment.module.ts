@@ -6,11 +6,12 @@ import { PaymentService } from './payment.service';
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { TransactionModule } from "../transaction/transaction.module";
 import { PaymentStoreController } from "./payment.store.controller";
+import { UserModule } from "../user/user.module";
 
 const env = require('dotenv').config().parsed
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, ClientsModule.register([
+  imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, UserModule, ClientsModule.register([
     {
       name: 'PAYMENT_SERVICE',
       transport: Transport.RMQ,

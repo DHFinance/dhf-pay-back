@@ -12,6 +12,7 @@ import { StoresService } from "./stores.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { SCondition } from "@nestjsx/crud-request";
 import { Stores } from "./entities/stores.entity";
+import { UserService } from "../user/user.service";
 
 @Crud({
   model: {
@@ -33,6 +34,7 @@ import { Stores } from "./entities/stores.entity";
 export class StoresController implements CrudController<Stores> {
   constructor(
     public readonly service: StoresService,
+    public readonly userService: UserService,
 
   ) {}
 x

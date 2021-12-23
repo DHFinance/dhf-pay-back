@@ -17,7 +17,6 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
   async create(transaction) {
     try {
       const store = await this.storesService.findStore(transaction.apiKey)
-
       if (store) {
         const res = this.repo.save(transaction)
         return res

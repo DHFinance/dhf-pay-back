@@ -46,6 +46,23 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
+  async checkRole(token, expectedRole) {
+    const user = await this.repo.findOne({
+      where: {
+        token,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    if (user.role === expectedRole) {
+      return user
+    } else {
+      throw new HttpException('This user does not have permission to do this', HttpStatus.BAD_REQUEST);
+    }
+
+  }
+
   public async verifyUser(email, code) {
     console.log({email, code})
     const userVerified = await this.findByEmail(email);
