@@ -52,12 +52,11 @@ export class PaymentController implements CrudController<Payment> {
     const user = await this.userService.findByToken(headers['authorization-x'])
 
     if (user?.role === 'admin') {
-      const payments = this.service.find()
-      console.log(payments)
+      const payments = await this.service.find()
       return payments
     }
     try {
-      const payments = this.service.find({
+      const payments = await this.service.find({
         where: {
           store: {
             apiKey: headers.authorization
