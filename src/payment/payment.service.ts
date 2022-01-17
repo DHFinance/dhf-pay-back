@@ -16,6 +16,27 @@ export class PaymentService extends TypeOrmCrudService<Payment> {g
     super(repo);
   }
 
+  async sendMailBill(billMailDto) {
+    const payment = await this.repo.findOne({
+      where: {
+        id: billMailDto.id
+      }, relations: ['store']
+    })
+    await this.mailerService.sendMail({
+      to: billMailDto.email,
+      from: process.env.MAILER_EMAIL,
+      subject: `Payment to store ${payment.store.name}`,
+      template: 'send-mail-bill',
+      context: {
+        email: billMailDto.email,
+        billUrl: billMailDto.billUrl,
+        store: payment.store.name,
+        comment: payment.comment,
+        amount: payment.amount,
+      },
+    });
+  }
+
   // @Interval(1000)
   // async getStore(){
   //   const parentParent = await this.repo.findOne({

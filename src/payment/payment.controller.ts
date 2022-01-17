@@ -50,7 +50,6 @@ export class PaymentController implements CrudController<Payment> {
   @Get()
   async getAllByStore(@Headers() headers) {
     const user = await this.userService.findByToken(headers['authorization-x'])
-
     if (user?.role === 'admin') {
       const payments = await this.service.find()
       return payments
