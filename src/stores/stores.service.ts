@@ -24,7 +24,7 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     }
   }
 
-  async findStore(apiKey) {
+  async validateStore(apiKey) {
     const store = await this.repo.findOne({
       where: {
         apiKey

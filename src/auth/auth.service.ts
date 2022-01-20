@@ -3,10 +3,11 @@ import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { createHmac } from "crypto";
 import { ensureProgram } from "ts-loader/dist/utils";
+import { StoresService } from "../stores/stores.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly storesService: StoresService) {}
 
   encryptPassword = (password: string): string => {
     return createHmac('sha1', process.env.SECRET_HASH)
@@ -14,8 +15,16 @@ export class AuthService {
       .digest('hex');
   };
 
-  public async validate(token) {
-    return await this.userService.findByToken(token);
+  public async validate(token, as) {
+    if (as === 'user') {
+      const user = await this.userService.findByToken(token.slice(7));
+      return user
+    }
+    if (as === 'store') {
+      const store = await this.storesService.validateStore(token.slice(7));
+      return store
+    }
+
   }
 
   public async register(userDto) {

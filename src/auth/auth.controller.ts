@@ -10,12 +10,15 @@ import { AuthService } from './auth.service';
 import { LoginDto } from "./dto/login.dto";
 import { ChangePasswordDto, ResetCodeDto, ResetEmailDto } from "./dto/reset.dto";
 import { VerifyDto } from "./dto/verify.dto";
+import { ApiProperty, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ApiProperty({ type: RegisterDto })
   public async register(@Body() registerUserDto: RegisterDto) {
     try {
       // console.log(await this.authService.register(registerUserDto))
@@ -27,6 +30,7 @@ export class AuthController {
     }
   }
   @Post('verify')
+  @ApiProperty({ type: VerifyDto })
   public async verify(@Body() verifyDto: VerifyDto) {
     try {
       return await this.authService.verify(verifyDto);
@@ -35,6 +39,7 @@ export class AuthController {
     }
   }
   @Post('login')
+  @ApiProperty({ type: LoginDto })
   public async login(@Body() loginUserDto: LoginDto) {
     try {
       return await this.authService.login(loginUserDto);
@@ -43,6 +48,7 @@ export class AuthController {
     }
   }
   @Post('send-code')
+  @ApiProperty({ type: ResetEmailDto })
   public async sendCode(@Body() resetUserDto: ResetEmailDto) {
     try {
       await this.authService.sendCode(resetUserDto);
@@ -53,6 +59,7 @@ export class AuthController {
   }
 
   @Get('reAuth')
+  @ApiProperty({ type: ResetEmailDto })
   public async reAuth(@Body() resetUserDto: ResetEmailDto, @Query() query) {
 
     try {
@@ -63,6 +70,7 @@ export class AuthController {
   }
 
   @Post('check-code')
+  @ApiProperty({ type: ResetCodeDto })
   public async checkCode(@Body() resetUserPasswordDto: ResetCodeDto) {
 
     try {
@@ -78,6 +86,7 @@ export class AuthController {
   }
 
   @Post('reset-pwd')
+  @ApiProperty({ type: ChangePasswordDto })
   public async reset(@Body() changeUserPasswordDto: ChangePasswordDto) {
     try {
       const user = await this.authService.changePassword(changeUserPasswordDto);

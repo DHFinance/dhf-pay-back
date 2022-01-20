@@ -13,6 +13,7 @@ import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { SCondition } from "@nestjsx/crud-request";
 import { UserService } from "../user/user.service";
+import { ApiTags } from "@nestjs/swagger";
 
 @Crud({
   model: {
@@ -37,7 +38,7 @@ import { UserService } from "../user/user.service";
 })
 
 
-
+@ApiTags('payment')
 @Controller('payment')
 export class PaymentController implements CrudController<Payment> {
   constructor(
@@ -49,19 +50,22 @@ export class PaymentController implements CrudController<Payment> {
 
   @Get()
   async getAllByStore(@Headers() headers) {
-    const user = await this.userService.findByToken(headers['authorization-x'])
+    const user = await this.userService.findByToken(headers['authorization'].slice(7))
     if (user?.role === 'admin') {
       const payments = await this.service.find()
+      console.log(payments)
       return payments
     }
     try {
+
       const payments = await this.service.find({
         where: {
           store: {
-            apiKey: headers.authorization
+            apiKey: headers.authorization.slice(7)
           }
         }, relations: ['store']
       })
+      console.log(headers.authorization.slice(7), payments)
       return payments
     } catch (err) {
       throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
@@ -127,9 +131,8 @@ export class PaymentController implements CrudController<Payment> {
     @ParsedBody() dto: Payment,
     @Headers() headers
   ) {
-    console.log({ ...dto, apiKey: headers.authorization, headers })
     try {
-      const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization  }).toPromise()
+      const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization.slice(7)  }).toPromise()
       return {id: res}
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);

@@ -3,6 +3,7 @@ import { Crud, CrudController } from "@nestjsx/crud";
 import { Transaction } from "./entities/transaction.entity";
 import { TransactionService } from "./transaction.service";
 import { UserService } from "../user/user.service";
+import { ApiBody, ApiTags } from "@nestjs/swagger";
 
 @Crud({
   model: {
@@ -17,6 +18,7 @@ import { UserService } from "../user/user.service";
   },
 })
 
+@ApiTags('transaction')
 @Controller('transaction')
 export class TransactionController implements CrudController<Transaction> {
   constructor(
@@ -28,8 +30,8 @@ export class TransactionController implements CrudController<Transaction> {
 
   @Get()
   async getAllByStore(@Param() param, @Headers() headers) {
-    const user = await this.userService.findByToken(headers['authorization-x'])
-    console.log(user, headers['authorization-x'])
+    const user = await this.userService.findByToken(headers['authorization'].slice(7))
+
     if (user?.role === 'admin') {
       const transactions = await this.service.find()
       return transactions
@@ -37,7 +39,7 @@ export class TransactionController implements CrudController<Transaction> {
     try {
       const transactions = await this.service.find()
       const filterByApi = transactions.filter((transaction) => {
-        return transaction.payment.store.apiKey === headers.authorization
+        return transaction.payment.store.apiKey === headers.authorization.slice(7)
       })
       return filterByApi
     } catch (err) {
@@ -65,7 +67,9 @@ export class TransactionController implements CrudController<Transaction> {
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers) {
 
-    const user = await this.userService.findByToken(headers['authorization-x'])
+
+
+    const user = await this.userService.findByToken(headers['authorization'])
 
     try {
       const transaction = await this.service.findOne({
@@ -73,37 +77,19 @@ export class TransactionController implements CrudController<Transaction> {
           txHash: param.txHash,
         }
       })
+      if (!transaction) {
+        throw new HttpException('Transaction not exist', HttpStatus.BAD_REQUEST);
+      }
       console.log(transaction, param.txHash)
       return transaction
     } catch (err) {
-      throw new HttpException('This store does not have such a payment', HttpStatus.BAD_REQUEST);
+      throw new HttpException('This store does not have such a transaction', HttpStatus.BAD_REQUEST);
     }
-    // if (user?.role === 'admin') {
-    //   const transaction = await this.service.findOne({
-    //     where: {
-    //       txHash: param.txHash
-    //     }
-    //   })
-    //   return transaction
-    // }
-    // try {
-    //   const transaction = await this.service.findOne({
-    //     where: {
-    //       txHash: param.txHash,
-    //     }, relations: ['payment', 'payment.store']
-    //   })
-    //   if (transaction.payment.store.apiKey === headers.authorization) {
-    //     return transaction
-    //   } else {
-    //     throw new HttpException('This payment does not belong to you', HttpStatus.BAD_REQUEST);
-    //   }
-    // } catch (err) {
-    //   throw new HttpException('This store does not have such a payment', HttpStatus.BAD_REQUEST);
-    // }
   }
 
   @Post()
   async createByStore(@Param() param: {apiKey: string}, @Body() dto: Transaction) {
+
     try {
       const res = await this.service.create(dto)
       return res

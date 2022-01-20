@@ -1,11 +1,10 @@
 import { Body, Controller, Get, Headers, HttpException, HttpStatus, Inject, Param, Post } from "@nestjs/common";
-
-import { Payment } from "./entities/payment.entity";
 import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { UserService } from "../user/user.service";
-import { RegisterDto } from "../auth/dto/register.dto";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('store payment')
 @Controller('/payment')
 export class PaymentStoreController {
 
