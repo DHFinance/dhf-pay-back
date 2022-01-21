@@ -16,34 +16,58 @@ export class Stores extends BaseEntity {
   id: number;
 
   @ManyToOne(() => User, user => user, {nullable: false})
-  @ApiProperty({type: () => User})
+  @ApiProperty({type: () => User,
+    description: 'Пользователь, которому принадлежит магазин, можно указывать id или сам объект',
+    default: 2,
+  })
   user: User;
 
   @OneToMany(() => Payment, (payment) => payment)
-  @ApiProperty({type: () => Payment})
+  @ApiProperty({type: () => Payment,
+    description: 'Платежи, совершенные от лица этого магазина',
+    default: 2,
+  })
   payments: Payment[];
 
   @Column({nullable: false})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Адрес, на который придет post запрос с деталями платежа при изменении его статуса',
+    default: 'https://lms.sfedu.ru/my/',
+  })
   url: string;
 
   @Column({nullable: false})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Название магазина',
+    default: 'Store',
+  })
   name: string;
 
   @Column({nullable: false})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Кошелек магазина. Все payment, созданные от лица этого магазина будут иметь этот кошелек',
+    default: '01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9',
+  })
   wallet: string;
 
   @Column({nullable: true})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Описание магазина',
+    default: 'Good store',
+  })
   description: string;
 
   @Column({nullable: true})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Уникальный ключ магазина. По нему осуществляется выдача payment и transaction, связанных с этим магазином',
+    default: 'FL1f0BNoBB3qRQ4dKtzwNgmdT95qJniM89Ak',
+  })
   apiKey: string;
 
   @Column({default: false})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Статус блокировки магазина',
+    default: false,
+  })
   blocked: boolean;
 }

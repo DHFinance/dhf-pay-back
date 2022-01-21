@@ -10,32 +10,53 @@ export class Transaction extends BaseEntity {
   id: number;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Статус транзакции. processing при создании. success при выполнении. Информация об ошибке при сбое',
+    default: 'processing',
+  })
   status: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Почта пользователя',
+    default: 'kriruban1@gmail.com',
+  })
   email: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Время последнего обновления транзакции',
+    default: '2022-01-20 12:46:26.000',
+  })
   updated: Date;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Уникальный хэш транзакции',
+    default: '16ae42729a88a4df9519a8e08807d68856070d93cf162898948b7de57e1a3368',
+  })
   txHash: string;
 
   @ManyToOne(() => Payment, payment => payment, {
     eager: true,
   })
-  @ApiProperty({type: () => Payment})
+  @ApiProperty({
+    type: () => Payment,
+    description: 'Payment, по реквизитам которого была произведена транзакция, можно указывать id или сам объект',
+    default: 2,})
   payment: Payment;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Кошелек отправителя',
+    default: '01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9',
+  })
   sender: string;
 
   @Column({type: 'bigint'})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Количество переведенных токенов',
+    default: '2500000000',
+  })
   amount: string;
 }

@@ -5,23 +5,22 @@ import { Stores } from "../stores/entities/stores.entity";
  * авторизация пользователя
  */
 export const checkAuth = async (req, res, next) => {
-  console.log(req.originalUrl, req.originalUrl === '/api/swagger/')
-  if (req.originalUrl.includes('/api/swagger/') || req.originalUrl === '/favicon.ico') {
+  if (req.originalUrl.includes('swagger')) {
     next();
   }
   /**
    * Эндпоинты /api/auth используются без аккаунта. Поэтому токен для них не требуется
    */
-  else if (req.originalUrl.includes('/api/auth')) {
+  else if (req.originalUrl.includes('auth')) {
     next();
   }
   /**
    * На странице bill могут находиться неавторизованные пользователи, которые должны иметь доступ к store, transaction и payment, связанных с этим чеком
    */
-  else if (req.method === "GET" && (req.originalUrl.includes('/api/store') || req.originalUrl.includes('/api/payment') || req.originalUrl.includes('/api/transaction'))) {
+  else if (req.method === "GET" && (req.originalUrl.includes('store') || req.originalUrl.includes('payment') || req.originalUrl.includes('transaction'))) {
     next();
   }
-  else if (req.method === "POST" && req.originalUrl.includes('/api/transaction')) {
+  else if (req.method === "POST" && req.originalUrl.includes('transaction')) {
     next();
   }
   else if (req.headers.authorization) {
@@ -38,7 +37,7 @@ export const checkAuth = async (req, res, next) => {
         blocked: false,
       },
     });
-    if (req.originalUrl.includes('block')) {
+    if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
       const isAdmin = existsUser.role === "admin"
       if (isAdmin) {
         next();

@@ -7,42 +7,72 @@ export class User extends BaseEntity {
   id: number;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Имя',
+    default: 'kri',
+  })
   name: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Фамилия',
+    default: 'ruban',
+  })
   lastName: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Зашифрованный пароль. Текущий пароль - admin',
+    default: '5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v',
+  })
   password: string;
 
   @Column({nullable: true})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Код, высланный на email для сброса пароля. Нужен только на шаге /auth/check-code',
+    default: null,
+  })
   restorePasswordCode: number;
 
   @Column({nullable: true})
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Код, высланный на email для первичного подтверждения. Нужен только на шаге /auth/verify',
+    default: null,
+  })
   emailVerification: number;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Почта пользователя',
+    default: 'kriruban1@gmail.com',
+  })
   email: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Роль пользователя: admin или customer',
+    default: 'customer',
+  })
   role: 'admin' | 'customer';
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Компания',
+    default: 'mail.ru',
+  })
   company: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Bearer токен пользователя',
+    default: '5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v',
+  })
   token: string;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Состояние блокировки. Заблокированный пользователь не может авторизироваться',
+    default: false,
+  })
   blocked: boolean;
 }

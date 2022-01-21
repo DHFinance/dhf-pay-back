@@ -72,39 +72,6 @@ export class PaymentController implements CrudController<Payment> {
     }
   }
 
-  // @Get(':id')
-  // async getOneByStore(@Param() param, @Headers() headers) {
-  //   const user = await this.userService.findByToken(headers['authorization-x'])
-  //   if (user?.role === 'admin') {
-  //     const payment = await this.service.findOne({
-  //       where: {
-  //         id: param.id
-  //       }
-  //     })
-  //     if (payment) {
-  //       return payment
-  //     } else {
-  //       throw new HttpException('Payment not found', HttpStatus.BAD_REQUEST);
-  //     }
-  //   }
-  //   try {
-  //     const payments = await this.service.findOne({
-  //       where: {
-  //         id: param.id,
-  //       }, relations: ['store']
-  //     })
-  //     return payments
-  //     // if (payments.store.apiKey === headers.authorization) {
-  //     //   return payments
-  //     // } else {
-  //     //   throw new HttpException('This payment does not belong to you', HttpStatus.BAD_REQUEST);
-  //     // }
-  //
-  //   } catch (err) {
-  //     throw new HttpException('This store does not have such a payment', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-
   get base(): CrudController<Payment> {
     return this;
   }
