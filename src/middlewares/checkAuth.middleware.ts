@@ -38,14 +38,22 @@ export const checkAuth = async (req, res, next) => {
       },
     });
     if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
-      const isAdmin = existsUser.role === "admin"
-      if (isAdmin) {
-        next();
-      } else {
-        res.status(403).send({
-          statusCode: 403,
-          error: 'only admin can block',
-        });
+      try {
+        console.log(req.originalUrl)
+        const isAdmin = existsUser.role === "admin"
+        console.log(isAdmin)
+        if (isAdmin) {
+          console.log('next')
+          next();
+        } else {
+          console.log('err')
+          res.status(403).send({
+            statusCode: 403,
+            error: 'only admin can block',
+          });
+        }
+      } catch (e) {
+        console.log('admin action error:', e)
       }
     }
     /**
