@@ -66,8 +66,8 @@ $ npm run start:prod
 
 # Справка по эндпоинтам
 
-All endoints hase prefix /api.  http://demo.casperpay.live:8088/api/user - for example.
-All entytys (user, store, payment, transaction) hase CRUD  based on  https://github.com/nestjsx/crud .
+All endoints hase prefix /api.  http://pay.dhfi.online:8088/api/user - for example.
+All entytys (user, store, payment, transaction) support CRUD operations based on  https://github.com/nestjsx/crud .
 
 ## User
 
@@ -79,26 +79,26 @@ All entytys (user, store, payment, transaction) hase CRUD  based on  https://git
     "company": "abc_абц1",
     # По почте происходит поиск пользователя и восстановление пароля. Должна быть уникальной
     "email": "kriruban1@gmail.com",
-    # Роль пользователя. admin или customer. admin - может блокировать пользователей, магазины, может видеть все записи из базы данных на фронте, не может иметь собственных магазинов (соответственно создавать payment). customer - может видеть только свои записи, может создавать payments
+    # User role. admin or customer.
     "role": "customer",
-    # Блокировка пользователя. Запрещает пользователю входить в систему
+    # User block status
     "blocked": false,
-    # Пароль. Хранится в зашифрованном виде с помощью SECRET_HASH
+    # Pasword - stored encrypted
     "password": "801d3d52484551164e7dbddd98b0e55a0e7f3981",
-    # Токен. Выдается после регистрации. Хранится в localstore на фронте. По нему проверяется наличие пользователя в базе
+    # Acces token
     "token": "DGphw7ZRd7db9TYS17s249WEMmDnaWjyMDzf",
-    # При восстановлении пароля сюда записывается уникальный код для восстановления, который отправляется на почту. После смены пароля - обнуляется
+    # Password recovery code
     "restorePasswordCode": null,
-    # Подтверждение почты. Если пройдено - значение null. Если пользователь не подтвердил еще свою почту - значение - десятизначный код, высланный на указанную почту. 
+    # Email Verification, if null e-mail is veryfide else verification code that sent to user. 
     emailVerification": null,
     "id": 5
 }
 
-# получить пользователя
-GET /user - получить список всех пользователей
-GET /user/1 - получить пользователя с id=1
+# Get user
+GET /user - users list
+GET /user/1 - user with id=1
 
-POST auth/register - регистрация нового пользователя. Пароль будет храниться в закодированном виде с помощью SECRET_HASH. email проверяется на совпадение в базе и должен быть уникальным. На указанную почту отправляется письмо с кодом. До момента подтверждения почты пользователь не может быть авторизован.
+POST auth/register - registre  a new user. The password will be stored encoded using SECRET_HASH. the email is found to match in the database and should be set. An email with a code will be sent to the email address provided. Until the email is confirmed, the user cannot be authorized.
 
 {
     "name": "abc_абц1",
@@ -108,36 +108,36 @@ POST auth/register - регистрация нового пользовател�
     "password": "12345678"
 }
 
-POST auth/verify - подтверждение почты. Нужно ввести код с почты (если было несколько попыток регистрации ввести последний). Если код верен - пользователь зарегистрирован в системе.
+POST auth/verify - e-mail confirmation. You need to enter the code from the mail (if there were several attempts to register, enter the last one). If the code is correct, the user is registered in the system.
 
 { 
     "email": "kriruban1@gmail.com",
     "code": "12345678"
 }
 
-POST auth/login - авторизация. Выдает ошибку если логин или пароль не совпадают
+POST auth/login - authorization
 
 { 
     "email": "kriruban1@gmail.com",
     "password": "12345678"
 }
 
-GET auth/reAuth?token=${token} - проверка токена. Происходит на каждой странице где есть нужна авторизация. Передает данные пользователя. Если токена не существует - возвращает ошибку и пользователя на фронте перенаправляет на /login
+GET auth/reAuth?token=${token} - token verification. Occurs on every page where authorization is required. Passes user data. If the token does not exist - returns an error and the user on the front is redirected to /login
 
-POST auth/send-code - восстановление забытого пароля. Происходит в 3 этапа. Первый - указание почты и отправление сообщения с кодом на указанную почту (если пользователь существует). Указанная на фронте почта используется во всех 3х шагах
+POST auth/send-code - Forgotten password recovery. Occurs in 3 stages. The first is to specify the mail and send a message with the code to the specified mail (if the user exists). The mail specified on the front is used in all 3 steps
 
 { 
     "email": "kriruban1@gmail.com",
 }
 
-POST auth/check-code - сверяет введенный код с тем, что был выслан на почту
+POST auth/check-code - checks the entered code with the one sent to the mail
 
 {
     "code": "17686007",
     "email": "kriruban1@gmail.com"
 }
 
-POST auth/change-password - изменяет пароль пользователя на новый 
+POST auth/change-password - changes the user's password to a new one
 
 {
     "password": "12345678",
@@ -148,19 +148,19 @@ POST auth/change-password - изменяет пароль пользовател
 ## Store
 
 ```bash
-# сущность store
+# entity store
 {
     "id": 28,
-    #урл на который будет совершен post-запрос с данными payment после смены статуса
+    #the URL to which the post-request with the payment data will be made after the status change
     "url": "http://localhost:3001/",
     "name": "store1",
     "description": "store description",
-    #ключ, который будет использоваться в запросах payment и transaction у пользователей customer
+    #key that will be used in payment and transaction requests from customer users
     "apiKey": "y6t5r4e3w2",
     "blocked": false,
-    #кошелек магазина. Все payments созданные от лица этого магазина будут с этим кошельком
+    #store wallet. All payments created on behalf of this store will be with this wallet
     "wallet": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
-    #пользователь, создавший магазин
+    #the user who created the store
     "user": {
         "id": 64,
         "name": "1",
@@ -175,11 +175,11 @@ POST auth/change-password - изменяет пароль пользовател
     }
 }
 
-# получить пользователя
-GET /store - получить список всех магазинов
-GET /store/1 - получить магазин с id=1
+# Get store
+GET /store - stores list
+GET /store/1 - store with  id=1
 
-POST /store - создает магазин
+POST /store - create store
 { 
     "name": "storeUpdated",
     "description": "store description",
@@ -188,7 +188,7 @@ POST /store - создает магазин
     "wallet": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
 }
 
-PATCH /store/1 - редактирует данные введенных в теле запроса полей магазина с id=1
+PATCH /store/1 - edits the data of the store fields entered in the request body with id=1
 { 
     "name": "storeUpdated",
     "description": "store description",
