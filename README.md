@@ -1,14 +1,14 @@
-## Установка
+## Install
 
 ```bash
 $ npm install
 ```
 
-## Создание .env
-Создайте .env файл (для образца дан env.sample)
+## Create  .env
+Create .env file based on env.sample
 
 ```bash
-#Настройки для базы данных
+#Database settings
 DB_HOST = localhost
 DB_PORT = 5432
 DB_PASSWORD = Ytrewq654321
@@ -17,19 +17,19 @@ DB_DATABASE = casper
 DB_SYNCRONIZE = true
 DB_LOGGING = true
 TYPEORM_MIGRATIONS_RUN = true
-#Хэш для кодирования пароля
+#Password hash secret
 SECRET_HASH = passwordHashSecret
-#Почта на которую будет создан админ. Не требует верификации
+#Admin e-mail 
 ADMIN_EMAIL = caspers.mailer@gmail.com
-#Данные для почтового аккаунта, с которого будет вестись рассылка
+#Mail accaunt settings
 MAILER_EMAIL = caspers.mailer@gmail.com
 MAILER_PASSWORD = BCf!rufxQeYF@KVD87s76
-#Ссылка для подключения на rabbitMQ. Должен быть одинаковым для casper-back и casper-processor. По ней идет соединение
+#rabbitMQ connetction string
 RABBIT_MQ=amqps://tncqeoap:xg6g86QzZQw0SRnM8Zk6EZwu0_9wb9um@bonobo.rmq.cloudamqp.com/tncqeoap
 ```
 
-## Запуск
-Запуск casper-back. При каждом новом запуске база данных обнуляется
+## Run
+Run casper-back.
 ```bash
 # development
 $ npm run build
@@ -42,17 +42,16 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Создание админа
-Админ создается через миграции. После сборки билда. Будет создан пользователь с ролью admin, паролем admin и почтой указанной в env.ADMIN_EMAIL
+## Admin creation
+Admin is creat automaticli with login admin and  password admin and e-mail from env.ADMIN_EMAIL
 ```bash
-#создание админа
+#create admin
 $ npm run typeorm:migration:run
-#удаление админа
+#remove admin
 $ npm run migration:revert
 ```
 
-## Запуск процессора
-За создание payments и рассылку оповещений (электронных писем и запросов на сайты) отвечает casper-processor. Он должен работать одновременно с casper-back
+## Run processor
 ```bash
 # development
 $ npm run build
@@ -67,14 +66,13 @@ $ npm run start:prod
 
 # Справка по эндпоинтам
 
-Для всех эндпоинтов используется префикс /api.  http://demo.casperpay.live:8088/api/user - пример эндпоинта.
-Для всех 4х сущностей (user, store, payment, transaction) существуют круды, созданные при помощи https://github.com/nestjsx/crud . Те что используются будут описаны ниже.
-
+All endoints hase prefix /api.  http://demo.casperpay.live:8088/api/user - for example.
+All entytys (user, store, payment, transaction) hase CRUD  based on  https://github.com/nestjsx/crud .
 
 ## User
 
 ```bash
-# сущность user
+# User
 {
     "name": "abc_абц1",
     "lastName": "abc_абц1",
