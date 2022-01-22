@@ -204,14 +204,14 @@ PATCH /store/1 - edits the data of the store fields entered in the request body 
 # сущность payment
 {
 "id": 215,
-#время последнего обновления
+#update time
 "datetime": "2021-12-16T11:55:25.111Z",
-#размер перевода
+#Amaunt
 "amount": "2500000000",
-#статус платежа. Not_paid если транзакции по этому платежу не совершались. Particularly_paid - если оплачен, но не полностью (сумма транзакции всегда равна сумме платежа, но могут быть исключения. Например перевод не из нашего приложения). Paid - если сумма транзакций превышает или равна сумме платежа
+#payment status. Not_paid if no transactions were made for this payment. Paid - if the transaction amount is greater than or equal to the payment amount
 "status": "Not_paid",
 "comment": "",
-#кошелек получателя. Берется из магазина, от лица которого создан платеж
+#Recipient wallet. Taken from the merchant settings.
 "wallet": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
 "store": {
             "id": 20,
@@ -223,7 +223,7 @@ PATCH /store/1 - edits the data of the store fields entered in the request body 
         }
 },
 
-Платеж обновляется на процессоре каждые 60 секунд. Если его статус меняется - отправляется сообщение на почту владельца магазина, на почту оплатившего транзакцию и post запрос с данными payment на url указанный в магазине
+The payment is updated on the processor every 60 seconds. If its status changes, a message is sent to the mail of the store owner who paid for the transaction and a post request with payment data to the url specified in the store
 
 apiKey - токен магазина, от лица которого будет создан платеж
 
