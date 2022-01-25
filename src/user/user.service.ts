@@ -103,7 +103,7 @@ export class UserService extends TypeOrmCrudService<User> {
       throw new BadRequestException('email', 'User with this email exists');
     }
 
-    console.log(process.env.MAILER_EMAIL)
+
 
     if (userExisted && userExisted.emailVerification !== null) {
       await this.mailerService.sendMail({
@@ -125,7 +125,7 @@ export class UserService extends TypeOrmCrudService<User> {
         throw new HttpException(err, HttpStatus.BAD_REQUEST);
       }
     } else {
-      await this.mailerService.sendMail({
+       await this.mailerService.sendMail({
         to: user.email,
         from: process.env.MAILER_EMAIL,
         subject: 'Код для подтверждения регистрации',
@@ -136,7 +136,6 @@ export class UserService extends TypeOrmCrudService<User> {
           code: code,
         },
       });
-
       try {
         const token = randomString(36);
         await this.repo.save({ ...user, emailVerification: code, token, blocked: false });

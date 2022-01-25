@@ -24,10 +24,6 @@ export class Payment extends BaseEntity {
   store: Stores;
 
   @OneToMany(() => Transaction, (transactions) => transactions.payment)
-  @ApiProperty({type: () => Transaction,
-    description: 'Транзакции, совершенные по реквизитам этого платежа, можно указывать id или сам объект',
-    default: 2
-  })
   transactions: Transaction[];
 
   @Column()

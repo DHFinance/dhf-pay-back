@@ -3,7 +3,7 @@ import { Crud, CrudController } from "@nestjsx/crud";
 import { Transaction } from "./entities/transaction.entity";
 import { TransactionService } from "./transaction.service";
 import { UserService } from "../user/user.service";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 
 @Crud({
   model: {
@@ -20,6 +20,7 @@ import { ApiBody, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('transaction')
 @Controller('transaction')
+@ApiBearerAuth('JWT')
 export class TransactionController implements CrudController<Transaction> {
   constructor(
     public readonly service: TransactionService,

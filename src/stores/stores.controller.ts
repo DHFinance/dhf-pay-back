@@ -6,7 +6,7 @@ import {
 import { StoresService } from "./stores.service";
 import { Stores } from "./entities/stores.entity";
 import { UserService } from "../user/user.service";
-import { ApiProperty, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
 import { BlockStoreDto } from "./dto/block.dto";
 
 @Crud({
@@ -27,6 +27,7 @@ import { BlockStoreDto } from "./dto/block.dto";
 
 @ApiTags('store')
 @Controller('store')
+@ApiBearerAuth('JWT')
 export class StoresController implements CrudController<Stores> {
   constructor(
     public readonly service: StoresService,

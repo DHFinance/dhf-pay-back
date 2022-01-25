@@ -23,10 +23,6 @@ export class Stores extends BaseEntity {
   user: User;
 
   @OneToMany(() => Payment, (payment) => payment)
-  @ApiProperty({type: () => Payment,
-    description: 'Платежи, совершенные от лица этого магазина',
-    default: 2,
-  })
   payments: Payment[];
 
   @Column({nullable: false})

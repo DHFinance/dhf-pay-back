@@ -5,10 +5,11 @@ import { TransactionService } from "./transaction.service";
 import { Payment } from "../payment/entities/payment.entity";
 import { PaymentService } from "../payment/payment.service";
 import { UserService } from "../user/user.service";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('transaction store')
 @Controller('/transaction')
+@ApiBearerAuth('JWT')
 export class TransactionStoreController {
   constructor(
     public readonly service: TransactionService,

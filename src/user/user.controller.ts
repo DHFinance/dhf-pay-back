@@ -6,7 +6,7 @@ import {
 import { Crud, CrudController} from "@nestjsx/crud";
 import { User } from './entities/user.entity';
 import { UserService } from "./user.service";
-import { ApiProperty, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
 import { BlockUserDto } from "./dto/block.dto";
 
 @Crud({
@@ -17,6 +17,7 @@ import { BlockUserDto } from "./dto/block.dto";
 
 @ApiTags('user')
 @Controller('user')
+@ApiBearerAuth('JWT')
 export class UserController implements CrudController<User> {
   constructor(
     public readonly service: UserService

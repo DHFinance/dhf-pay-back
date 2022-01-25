@@ -2,10 +2,11 @@ import { Body, Controller, Get, Headers, HttpException, HttpStatus, Inject, Para
 import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { UserService } from "../user/user.service";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('store payment')
 @Controller('/payment')
+@ApiBearerAuth('JWT')
 export class PaymentStoreController {
 
   constructor(

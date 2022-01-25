@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiBearerAuth, DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Transport } from '@nestjs/microservices'
 import { checkAuth } from "./middlewares/checkAuth.middleware";
 
@@ -20,7 +20,7 @@ async function bootstrap() {
       type: 'http',
       scheme: 'bearer',
       bearerFormat: 'JWT',
-    })
+    }, 'Bearer')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api/swagger', app, document);
