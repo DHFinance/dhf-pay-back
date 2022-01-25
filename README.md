@@ -1,3 +1,6 @@
+## Installation using docker
+See https://github.com/DHFinance/dhf-pay-deploy
+
 ## Установка
 
 ```bash
