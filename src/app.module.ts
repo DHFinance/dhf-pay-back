@@ -35,10 +35,10 @@ const env = require('dotenv').config().parsed
     }),
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.gmail.com',
-        SSL: true,
-        QAuth: true,
-        port: 465,
+        host: env.MAILER_HOST,
+        SSL: !!env.MAILER_SSL,
+        QAuth: !!env.MAILER_QAUTH,
+        port: env.MAILER_PORT,
         auth: {
           user: env.MAILER_EMAIL,
           pass: env.MAILER_PASSWORD,

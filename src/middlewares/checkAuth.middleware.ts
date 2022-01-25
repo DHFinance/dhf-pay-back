@@ -37,6 +37,9 @@ export const checkAuth = async (req, res, next) => {
         blocked: false,
       },
     });
+    console.log({
+      existsShop, existsUser
+    })
     if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
       try {
         console.log(req.originalUrl)
