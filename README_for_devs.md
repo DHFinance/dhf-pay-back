@@ -85,6 +85,7 @@ $ npm run start:prod
 
 # Справка по эндпоинтам
 
+Store apiKey - токен вашего магазина. Используется для создания платежа от лица магазина и получения платежей и транзакций, связанных с вашим магазином. Передается в заголовке Authorization в подобном виде:
 
 Authorization: Bearer FesYGprJMRpUKhqvuz7r7YqrQyHX4ebwSmfz
 
