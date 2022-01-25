@@ -22,6 +22,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {g
         id: billMailDto.id
       }, relations: ['store']
     })
+    console.log(billMailDto.billUrl, {billMailDto})
     await this.mailerService.sendMail({
       to: billMailDto.email,
       from: process.env.MAILER_EMAIL,
