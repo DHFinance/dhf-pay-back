@@ -103,6 +103,8 @@ export class UserService extends TypeOrmCrudService<User> {
       throw new BadRequestException('email', 'User with this email exists');
     }
 
+    console.log(process.env.MAILER_EMAIL)
+
     if (userExisted && userExisted.emailVerification !== null) {
       await this.mailerService.sendMail({
         to: userExisted.email,

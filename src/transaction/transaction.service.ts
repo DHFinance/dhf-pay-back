@@ -18,7 +18,8 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
     try {
       const activeTransaction = await this.repo.findOne({
         where: {
-          payment: transaction.payment.id
+          payment: transaction.payment.id,
+          status: 'processing'
         }
       })
 
