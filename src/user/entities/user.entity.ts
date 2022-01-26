@@ -8,70 +8,70 @@ export class User extends BaseEntity {
 
   @Column()
   @ApiProperty({
-    description: 'Имя',
+    description: 'Name',
     default: 'kri',
   })
   name: string;
 
   @Column()
   @ApiProperty({
-    description: 'Фамилия',
+    description: 'Last name',
     default: 'ruban',
   })
   lastName: string;
 
   @Column()
   @ApiProperty({
-    description: 'Зашифрованный пароль. Текущий пароль - admin',
-    default: '5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v',
+    description: 'Encrypted password. Current value - admin',
+    default: '$2b$07$PUx7RK/NjXwo7i9xpYT2vejPjU3A4hxCCvYYkDbZ/fcfgyFnCw9f.',
   })
   password: string;
 
   @Column({nullable: true})
   @ApiProperty({
-    description: 'Код, высланный на email для сброса пароля. Нужен только на шаге /auth/check-code',
+    description: 'The code sent to your email to reset your password. Only needed at the /auth/check-code step',
     default: null,
   })
   restorePasswordCode: number;
 
   @Column({nullable: true})
   @ApiProperty({
-    description: 'Код, высланный на email для первичного подтверждения. Нужен только на шаге /auth/verify',
+    description: 'Code sent to email for initial confirmation. Only needed at the /auth/verify step',
     default: null,
   })
   emailVerification: number;
 
   @Column()
   @ApiProperty({
-    description: 'Почта пользователя',
+    description: 'User mail',
     default: 'kriruban1@gmail.com',
   })
   email: string;
 
   @Column()
   @ApiProperty({
-    description: 'Роль пользователя: admin или customer',
+    description: 'User role: admin or customer',
     default: 'customer',
   })
   role: 'admin' | 'customer';
 
   @Column()
   @ApiProperty({
-    description: 'Компания',
+    description: 'Company',
     default: 'mail.ru',
   })
   company: string;
 
   @Column()
   @ApiProperty({
-    description: 'Bearer токен пользователя',
+    description: 'Bearer user token',
     default: '5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v',
   })
   token: string;
 
   @Column()
   @ApiProperty({
-    description: 'Состояние блокировки. Заблокированный пользователь не может авторизироваться',
+    description: 'Lock state. Blocked user cannot login',
     default: false,
   })
   blocked: boolean;

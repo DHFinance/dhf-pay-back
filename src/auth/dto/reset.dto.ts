@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class ResetEmailDto {
   @ApiProperty({
-    description: 'Почта пользователя, потерявшего пароль',
+    description: 'Email of the user who lost the password',
     default: 'kriruban1@gmail.com',
   })
   email: string;
@@ -10,12 +10,12 @@ export class ResetEmailDto {
 
 export class ResetCodeDto {
   @ApiProperty({
-    description: 'Почта пользователя, указанная на предыдущем этапе (reset)',
+    description: 'User email specified in the previous step (reset)',
     default: 'kriruban1@gmail.com',
   })
   email: string;
   @ApiProperty({
-    description: 'Код, пришедший в письме на почту',
+    description: 'Code sent by email',
     default: '12345678',
   })
   code: string;
@@ -23,12 +23,12 @@ export class ResetCodeDto {
 
 export class ChangePasswordDto {
   @ApiProperty({
-    description: 'Новый пароль',
+    description: 'New password',
     default: '1234',
   })
   password: string;
   @ApiProperty({
-    description: 'Почта пользователя, указанная на предыдущем этапе (reset)',
+    description: 'User email specified in the previous step (reset)',
     default: 'kriruban1@gmail.com',
   })
   email: string;

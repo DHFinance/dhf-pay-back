@@ -13,8 +13,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(checkAuth);
   const options = new DocumentBuilder()
-    .setTitle('CASPER API V1')
-    .setDescription('CASPER project api')
+    .setTitle('pay dhfi API V1')
+    .setDescription('pay dhfi project api')
     .setVersion('1.0')
     .addBearerAuth({
       type: 'http',

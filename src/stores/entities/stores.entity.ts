@@ -17,7 +17,7 @@ export class Stores extends BaseEntity {
 
   @ManyToOne(() => User, user => user, {nullable: false})
   @ApiProperty({type: () => User,
-    description: 'Пользователь, которому принадлежит магазин, можно указывать id или сам объект',
+    description: 'The user who owns the store, you can specify the id or the object itself',
     default: 2,
   })
   user: User;
@@ -27,42 +27,42 @@ export class Stores extends BaseEntity {
 
   @Column({nullable: false})
   @ApiProperty({
-    description: 'Адрес, на который придет post запрос с деталями платежа при изменении его статуса',
+    description: 'The address to which a post request with payment details will be sent when its status changes',
     default: 'https://lms.sfedu.ru/my/',
   })
   url: string;
 
   @Column({nullable: false})
   @ApiProperty({
-    description: 'Название магазина',
+    description: 'Name of shop',
     default: 'Store',
   })
   name: string;
 
   @Column({nullable: false})
   @ApiProperty({
-    description: 'Кошелек магазина. Все payment, созданные от лица этого магазина будут иметь этот кошелек',
+    description: 'Shop wallet. All payments created on behalf of this store will have this wallet',
     default: '01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9',
   })
   wallet: string;
 
   @Column({nullable: true})
   @ApiProperty({
-    description: 'Описание магазина',
+    description: 'Store Description',
     default: 'Good store',
   })
   description: string;
 
   @Column({nullable: true})
   @ApiProperty({
-    description: 'Уникальный ключ магазина. По нему осуществляется выдача payment и transaction, связанных с этим магазином',
+    description: 'Unique shop key. It is used to issue payment and transaction associated with this store',
     default: 'FL1f0BNoBB3qRQ4dKtzwNgmdT95qJniM89Ak',
   })
   apiKey: string;
 
   @Column({default: false})
   @ApiProperty({
-    description: 'Статус блокировки магазина',
+    description: 'Store lock status',
     default: false,
   })
   blocked: boolean;

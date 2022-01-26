@@ -71,7 +71,7 @@ export class UserService extends TypeOrmCrudService<User> {
       await this.mailerService.sendMail({
         to: email,
         from: process.env.MAILER_EMAIL,
-        subject: 'Casperpay',
+        subject: 'pay.dhfi.online',
         template: 'send-reg-message',
         context: {
           login: email,
