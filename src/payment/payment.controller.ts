@@ -51,24 +51,23 @@ export class PaymentController implements CrudController<Payment> {
 
   @Get()
   async getAllByStore(@Headers() headers) {
-    const user = await this.userService.findByToken(headers['authorization'].slice(7))
-    if (user?.role === 'admin') {
+    if (!headers['authorization']) {
       const payments = await this.service.find()
-      console.log(payments)
       return payments
-    }
-    try {
+    } else {
+      try {
 
-      const payments = await this.service.find({
-        where: {
-          store: {
-            apiKey: headers.authorization.slice(7)
-          }
-        }, relations: ['store']
-      })
-      return payments
-    } catch (err) {
-      throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
+        const payments = await this.service.find({
+          where: {
+            store: {
+              apiKey: headers.authorization.slice(7)
+            }
+          }, relations: ['store']
+        })
+        return payments
+      } catch (err) {
+        throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
+      }
     }
   }
 
