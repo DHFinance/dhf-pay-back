@@ -4,15 +4,17 @@ import { User } from '../user/entities/user.entity';
 import { createHmac } from "crypto";
 import { ensureProgram } from "ts-loader/dist/utils";
 import { StoresService } from "../stores/stores.service";
+const bcrypt = require("bcrypt");
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService, private readonly storesService: StoresService) {}
 
   encryptPassword = (password: string): string => {
-    return createHmac('sha1', process.env.SECRET_HASH)
-      .update(password)
-      .digest('hex');
+    const saltRounds = 7
+    const salt = bcrypt.genSaltSync(saltRounds)
+    const hashed = bcrypt.hashSync(password, salt); // GOOD
+    return hashed;
   };
 
   public async validate(token, as) {
@@ -69,11 +71,11 @@ export class AuthService {
       throw new BadRequestException('email', 'User is not exist');
     }
     if (user) {
-      if (this.encryptPassword(loginUserDto.password) === user.password) {
+      const match = await bcrypt.compare(loginUserDto.password, user.password)
+      if (match) {
         return user
-      }
-      else {
-        throw new BadRequestException('password', 'wrong password');
+      } else {
+        throw new BadRequestException('password', 'wrong password')
       }
     } else {
       throw new BadRequestException('email', 'user with this email does not exist');
