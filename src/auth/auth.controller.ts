@@ -42,7 +42,9 @@ export class AuthController {
   @ApiProperty({ type: LoginDto })
   public async login(@Body() loginUserDto: LoginDto) {
     try {
-      return await this.authService.login(loginUserDto);
+      const user = await this.authService.login(loginUserDto);
+      console.log({user})
+      return user
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
