@@ -60,7 +60,7 @@ $ npm run start:prod
 ```
 
 ## Admin creation
-Admin will be craete using migration with password and login equals `admin` and with email wrote in env.ADMIN_EMAIL
+Admin will be create using migration with password and login equals `admin` and with email wrote in env.ADMIN_EMAIL
 ```bash
 #create admin
 $ npm run typeorm:migration:run
@@ -69,7 +69,7 @@ $ npm run migration:revert
 ```
 
 ## Run processor
-To crete  payments, mailing and notification clients dhf-pay-processor should run. See <https://github.com/DHFinance/dhf-pay-processor> for details.
+To create payments, mailing and notification clients dhf-pay-processor should run. See <https://github.com/DHFinance/dhf-pay-processor> for details.
 ```bash
 # development
 $ npm run build
@@ -93,7 +93,7 @@ Store apiKey - your merchant token  need to sign request to API. Api use token a
 ```bash
 GET /payment (Authorization: Bearer *store ApiKey*) - payments list
 
-GET /payment/1 (Authorization не требуется) - payment with  id = 1
+GET /payment/1 (Authorization not required) - payment with  id = 1
 
 POST /payment (Authorization: Bearer *store ApiKey*) - create  payment 
 { 
