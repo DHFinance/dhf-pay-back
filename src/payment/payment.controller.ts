@@ -66,7 +66,6 @@ export class PaymentController implements CrudController<Payment> {
           }
         }, relations: ['store']
       })
-      console.log(headers.authorization.slice(7), payments)
       return payments
     } catch (err) {
       throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
