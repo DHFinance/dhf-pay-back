@@ -1,5 +1,6 @@
 import { User } from "../user/entities/user.entity";
 import { Stores } from "../stores/entities/stores.entity";
+import e from "express";
 
 /**
  * авторизация пользователя
@@ -23,6 +24,30 @@ export const checkAuth = async (req, res, next) => {
   else if (req.method === "POST" && req.originalUrl.includes('transaction')) {
     next();
   }
+  else if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
+    if (req.headers.authorization) {
+      const token = req.headers.authorization.slice(7);
+      const admin = await User.findOne({
+        where: {
+          token: token,
+          role: 'admin',
+        },
+      });
+      if (admin) {
+        next();
+      } else {
+        res.status(401).send({
+          statusCode: 401,
+          error: 'There is no admin with this token',
+        });
+      }
+      } else {
+      res.status(401).send({
+        statusCode: 401,
+        error: 'Token not found',
+      });
+    }
+  }
   else if (req.headers.authorization) {
     const token = req.headers.authorization.slice(7);
     const existsUser = await User.findOne({
@@ -37,28 +62,6 @@ export const checkAuth = async (req, res, next) => {
         blocked: false,
       },
     });
-    console.log({
-      existsShop, existsUser
-    })
-    if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
-      try {
-        console.log(req.originalUrl)
-        const isAdmin = existsUser.role === "admin"
-        console.log(isAdmin)
-        if (isAdmin) {
-          console.log('next')
-          next();
-        } else {
-          console.log('err')
-          res.status(403).send({
-            statusCode: 403,
-            error: 'only admin can block',
-          });
-        }
-      } catch (e) {
-        console.log('admin action error:', e)
-      }
-    }
     /**
      * если токен или apiKey найден, пропустить запрос в контроллер
      * иначе вернуть ошибку

@@ -40,7 +40,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('payment')
 @Controller('payment')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class PaymentController implements CrudController<Payment> {
   constructor(
     public readonly service: PaymentService,
