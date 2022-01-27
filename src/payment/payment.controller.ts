@@ -78,7 +78,6 @@ export class PaymentController implements CrudController<Payment> {
   @Override()
   getMany(
     @ParsedRequest() req: CrudRequest,
-    @Headers() headers,
   ) {
     // const user = this.userService.findByToken()
     return this.base.getManyBase(req);
