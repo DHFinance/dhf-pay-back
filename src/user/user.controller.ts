@@ -17,7 +17,7 @@ import { BlockUserDto } from "./dto/block.dto";
 
 @ApiTags('user')
 @Controller('user')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class UserController implements CrudController<User> {
   constructor(
     public readonly service: UserService

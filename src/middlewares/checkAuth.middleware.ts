@@ -1,5 +1,6 @@
 import { User } from "../user/entities/user.entity";
 import { Stores } from "../stores/entities/stores.entity";
+import e from "express";
 
 /**
  * авторизация пользователя
@@ -22,6 +23,30 @@ export const checkAuth = async (req, res, next) => {
   }
   else if (req.method === "POST" && req.originalUrl.includes('transaction')) {
     next();
+  }
+  else if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
+    if (req.headers.authorization) {
+      const token = req.headers.authorization.slice(7);
+      const admin = await User.findOne({
+        where: {
+          token: token,
+          role: 'admin',
+        },
+      });
+      if (admin) {
+        next();
+      } else {
+        res.status(401).send({
+          statusCode: 401,
+          error: 'There is no admin with this token',
+        });
+      }
+      } else {
+      res.status(401).send({
+        statusCode: 401,
+        error: 'Token not found',
+      });
+    }
   }
   else if (req.headers.authorization) {
     const token = req.headers.authorization.slice(7);

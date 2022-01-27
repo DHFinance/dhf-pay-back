@@ -27,7 +27,7 @@ import { BlockStoreDto } from "./dto/block.dto";
 
 @ApiTags('store')
 @Controller('store')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class StoresController implements CrudController<Stores> {
   constructor(
     public readonly service: StoresService,

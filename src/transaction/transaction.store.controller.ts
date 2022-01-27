@@ -9,7 +9,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('transaction store')
 @Controller('/transaction')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class TransactionStoreController {
   constructor(
     public readonly service: TransactionService,

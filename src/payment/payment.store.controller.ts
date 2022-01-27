@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('store payment')
 @Controller('/payment')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class PaymentStoreController {
 
   constructor(
