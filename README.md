@@ -11,6 +11,9 @@ System composet from 3 service:
 ## Installation using docker
 See https://github.com/DHFinance/dhf-pay-deploy
 
+## Swagger
+See https://pay.dhfi.online/api/swagger/
+
 ## Install
 
 ```bash
