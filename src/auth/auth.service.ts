@@ -67,6 +67,7 @@ export class AuthService {
 
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
+    console.log("loginUserDto", loginUserDto)
     if (user?.emailVerification !== null) {
       throw new BadRequestException('email', 'User is not exist');
     }
