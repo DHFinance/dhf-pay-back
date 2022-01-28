@@ -17,6 +17,11 @@ import { ApiProperty, ApiTags } from "@nestjs/swagger";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   *
+   * @param registerUserDto {RegisterDto}
+   * @description Регистрация пользователя, этап 1. Получает данные пользователя, отправляет код для подтверждения в письме на указанную email
+   */
   @Post('register')
   @ApiProperty({ type: RegisterDto })
   public async register(@Body() registerUserDto: RegisterDto) {
@@ -29,6 +34,12 @@ export class AuthController {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
+
+  /**
+   *
+   * @param verifyDto {VerifyDto}
+   * @description Регистрация пользователя, этап 2. принимает код подтвержения, сравнивает его с тем, что записан на беке. Если код верен - на этом пользователе можно авторизироваться
+   */
   @Post('verify')
   @ApiProperty({ type: VerifyDto })
   public async verify(@Body() verifyDto: VerifyDto) {
@@ -38,6 +49,12 @@ export class AuthController {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
+
+  /**
+   *
+   * @param loginUserDto {LoginDto}
+   * @description вход в систему. ищет пользователя по email и сверяет пароль. Если все данные верны - выдает токен
+   */
   @Post('login')
   @ApiProperty({ type: LoginDto })
   public async login(@Body() loginUserDto: LoginDto) {
@@ -49,6 +66,12 @@ export class AuthController {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
+  /**
+   *
+   * @param loginUserDto {LoginDto}
+   * @description Восстановление пароля этап 1. ищет пользователя по email отправляет на почту код. Return true для перехода к следующему этапу
+   * @return true
+   */
   @Post('send-code')
   @ApiProperty({ type: ResetEmailDto })
   public async sendCode(@Body() resetUserDto: ResetEmailDto) {
@@ -60,9 +83,14 @@ export class AuthController {
     }
   }
 
+  /**
+   *
+   * @param query {token: string}
+   * @description проверка существования пользователя в базе данных. Происходит при каждой перезагрузке страницы
+   */
   @Get('reAuth')
-  @ApiProperty({ type: ResetEmailDto })
-  public async reAuth(@Body() resetUserDto: ResetEmailDto, @Query() query) {
+  @ApiProperty()
+  public async reAuth(@Query() query) {
 
     try {
       return await this.authService.reAuth(query.token);
@@ -71,6 +99,11 @@ export class AuthController {
     }
   }
 
+  /**
+   *
+   * @param resetUserPasswordDto {ResetCodeDto}
+   * @description Восстановление пароля этап 2. Сравнение кода, пришедшего с фронта и кода из записи пользователя. Если коды совпадают - переходит к следующему этапу
+   */
   @Post('check-code')
   @ApiProperty({ type: ResetCodeDto })
   public async checkCode(@Body() resetUserPasswordDto: ResetCodeDto) {
@@ -87,6 +120,12 @@ export class AuthController {
     }
   }
 
+  /**
+   *
+   * @param changeUserPasswordDto {ChangePasswordDto}
+   * @description Восстановление пароля этап 3. Замена пароля, получает новый пароль и заменяет им текущий. Отправляет данные пользователя
+   * @return {User}
+   */
   @Post('reset-pwd')
   @ApiProperty({ type: ChangePasswordDto })
   public async reset(@Body() changeUserPasswordDto: ChangePasswordDto) {

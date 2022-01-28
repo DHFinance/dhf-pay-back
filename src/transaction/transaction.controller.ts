@@ -29,6 +29,9 @@ export class TransactionController implements CrudController<Transaction> {
   ) {}
 
 
+  /**
+   * @description если Authorization не указан или не существует магазин с таким apiKey, то выдается массив со всеми записями. Если магазин с таким apiKey существует - выдает массив платежей, которые зависят от payment, которые зависят от этого магазина
+   */
   @Get()
   async getAllByStore(@Param() param, @Headers() headers) {
     const user = await this.userService.findByToken(headers['authorization'].slice(7))
@@ -48,6 +51,9 @@ export class TransactionController implements CrudController<Transaction> {
     }
   }
 
+  /**
+   * @description выдача последней совершенной транзакции для payment с :id
+   */
   @Get('/last/:id')
   async getLastTransaction(@Param() param, @Headers() headers) {
 
@@ -64,7 +70,9 @@ export class TransactionController implements CrudController<Transaction> {
   }
 
 
-
+  /**
+   * @description поиск по txHash для транзакции
+   */
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers) {
 

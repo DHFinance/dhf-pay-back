@@ -11,6 +11,9 @@ import { UserModule } from "../user/user.module";
 const env = require('dotenv').config().parsed
 
 @Module({
+  /**
+   * @description ClientsModule.register отвечает за связь с dhf-pay-back. payment_queue - это очередь, через которую будут создаваться payment. Связь осуществляется по url, указанным в RABBIT_MQ
+   */
   imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, UserModule, ClientsModule.register([
     {
       name: 'PAYMENT_SERVICE',

@@ -46,23 +46,11 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
-  async checkRole(token, expectedRole) {
-    const user = await this.repo.findOne({
-      where: {
-        token,
-      },
-    });
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
-    }
-    if (user.role === expectedRole) {
-      return user
-    } else {
-      throw new HttpException('This user does not have permission to do this', HttpStatus.BAD_REQUEST);
-    }
 
-  }
-
+  /**
+   * @description сверяет полученный с фронта код и код из базы данных. Если они одинаковы - отправляет письмо об успешной регистрации и удаляет код из записи пользователя (пользователь с кодом в поле emailVerification не может быть авторизован). Отправляет на фронт запись о пользователе
+   * @return {User}
+   */
   public async verifyUser(email, code) {
     console.log({email, code})
     const userVerified = await this.findByEmail(email);
@@ -96,15 +84,18 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
+  /**
+   *
+   * @param user {User}
+   * @description создает пользователя с указанными данными и добавляет ему в поле emailVerification код, который отправляет на указанную почту.
+   * @return true
+   */
   public async create(user) {
     const userExisted = await this.findByEmail(user.email);
     const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
     if (userExisted && userExisted.emailVerification === null) {
       throw new BadRequestException('email', 'User with this email exists');
     }
-
-
-
     if (userExisted && userExisted.emailVerification !== null) {
       await this.mailerService.sendMail({
         to: userExisted.email,
@@ -147,6 +138,11 @@ export class UserService extends TypeOrmCrudService<User> {
     }
   }
 
+  /**
+   *
+   * @param email {string}
+   * @description получает почту, на которую отправляет сгенерированный код, который записывает в restorePasswordCode
+   */
   async sendCode(email) {
     const user = await this.findByEmail(email);
     if (user?.emailVerification !== null) {
@@ -171,6 +167,12 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
+  /**
+   *
+   * @param code {string}
+   * @param email {string}
+   * @description сверяет полученный код с кодом пользователя с полученной почтой из базы данных. Если коды совпадают - допускает к следующему этапу
+   */
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
     if (!user || user.restorePasswordCode !== +code)  {
@@ -179,6 +181,11 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
+  /**
+   * @description ищет пользователя по токену. Если пользователь существует - возвращает его данные. Если заблокирован или не существует - выдает ошибку
+   * @param token {string}
+   * @return {User}
+   */
   async reAuth(token: string) {
     const user = await this.findByToken(token)
     if (user.blocked === true) {
@@ -190,6 +197,12 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
+  /**
+   *
+   * @param password {string}
+   * @param email {string}
+   * @description заменяет пароль пользователя на новый
+   */
   async changePassword(password, email) {
     const user = await this.findByEmail(email);
     if (!user) {

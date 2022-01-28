@@ -10,6 +10,10 @@ const bcrypt = require("bcrypt");
 export class AuthService {
   constructor(private readonly userService: UserService, private readonly storesService: StoresService) {}
 
+  /**
+   *
+   * @param password
+   */
   encryptPassword = (password: string): string => {
     const saltRounds = 7
     const salt = bcrypt.genSaltSync(saltRounds)
@@ -44,6 +48,7 @@ export class AuthService {
     await this.userService.create(user);
   }
 
+
   public async verify({email, code}) {
     return await this.userService.verifyUser(email, code);
   }
@@ -65,12 +70,24 @@ export class AuthService {
     return await this.userService.changePassword(encryptPassword, email);
   }
 
+  /**
+   *
+   * @param loginUserDto {LoginDto}
+   * @description авторизация пользователя. Если пароль и email верны - выдает объект с пользователем
+   * @return {User}
+   */
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
+    /**
+     * @description если пользователь еще не ввел свой код, который был прислан ему на email - он не считается верифицированным
+     */
     if (user?.emailVerification !== null) {
       throw new BadRequestException('email', 'User is not exist');
     }
     if (user) {
+      /**
+       * @description сравнение паролей через алгоритм bcrypt. loginUserDto.password - незашифрованный с фронта, user.password - зашифрованный с базы
+       */
       const match = await bcrypt.compare(loginUserDto.password, user.password)
       if (match) {
         return user

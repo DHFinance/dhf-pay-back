@@ -11,7 +11,13 @@ async function bootstrap() {
     methods: 'GET, PUT, POST, DELETE, PATCH',
   });
   app.setGlobalPrefix('api');
+  /**
+   * @description этот middleware отвечает за авторизацию и проверку токенов
+   */
   app.use(checkAuth);
+  /**
+   * @description создание swagger
+   */
   const options = new DocumentBuilder()
     .setTitle('pay dhfi API V1')
     .setDescription('pay dhfi project api')
