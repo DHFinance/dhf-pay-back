@@ -51,13 +51,14 @@ export class PaymentController implements CrudController<Payment> {
 
   @Get()
   async getAllByStore(@Headers() headers) {
+    /**
+     * @description если Authorization не указан или не существует магазин с таким apiKey, то выдается массив со всеми записями. Если магазин с таким apiKey существует - выдает массив платежей, которые зависят от этого магазина
+     */
     if (!headers['authorization']) {
       const payments = await this.service.find()
       return payments
     } else {
       try {
-
-
         const payments = await this.service.find({
           where: {
             store: {
@@ -104,6 +105,11 @@ export class PaymentController implements CrudController<Payment> {
     @Headers() headers
   ) {
     try {
+      /**
+       * @description все payment отправляются на создание в dhf-pay-processor с помощью RabbitMQ. После обработки на сервере возвращается id созданного payment. Магазин, к которому будет привязан созданный payment, определяется по apiKey, который передается в headers.authorization
+       * @data {amount: {number}, comment: {string}, apiKey: {string}}
+       * @return {id: {number}}
+       */
       const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization.slice(7)  }).toPromise()
       return {id: res}
     } catch (err) {
