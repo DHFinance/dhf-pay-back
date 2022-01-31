@@ -20,7 +20,7 @@ export class AuthController {
   /**
    *
    * @param registerUserDto {RegisterDto}
-   * @description Регистрация пользователя, этап 1. Получает данные пользователя, отправляет код для подтверждения в письме на указанную email
+   * @description User registration, stage 1. Receives user data, sends a confirmation code in a letter to the specified email
    */
   @Post('register')
   @ApiProperty({ type: RegisterDto })
@@ -38,7 +38,7 @@ export class AuthController {
   /**
    *
    * @param verifyDto {VerifyDto}
-   * @description Регистрация пользователя, этап 2. принимает код подтвержения, сравнивает его с тем, что записан на беке. Если код верен - на этом пользователе можно авторизироваться
+   * @description User registration, stage 2. receives the confirmation code, compares it with what is written on the back. If the code is correct, you can log in to this user
    */
   @Post('verify')
   @ApiProperty({ type: VerifyDto })
@@ -53,7 +53,7 @@ export class AuthController {
   /**
    *
    * @param loginUserDto {LoginDto}
-   * @description вход в систему. ищет пользователя по email и сверяет пароль. Если все данные верны - выдает токен
+   * @description login. searches for a user by email and checks the password. If all data is correct - issues a token
    */
   @Post('login')
   @ApiProperty({ type: LoginDto })
@@ -69,7 +69,7 @@ export class AuthController {
   /**
    *
    * @param loginUserDto {LoginDto}
-   * @description Восстановление пароля этап 1. ищет пользователя по email отправляет на почту код. Return true для перехода к следующему этапу
+   * @description Password recovery stage 1. searches for a user by email sends a code to the mail. Return true to move to the next step
    * @return true
    */
   @Post('send-code')
@@ -86,7 +86,7 @@ export class AuthController {
   /**
    *
    * @param query {token: string}
-   * @description проверка существования пользователя в базе данных. Происходит при каждой перезагрузке страницы
+   * @description check if the user exists in the database. Occurs every time the page is reloaded
    */
   @Get('reAuth')
   @ApiProperty()
@@ -102,7 +102,7 @@ export class AuthController {
   /**
    *
    * @param resetUserPasswordDto {ResetCodeDto}
-   * @description Восстановление пароля этап 2. Сравнение кода, пришедшего с фронта и кода из записи пользователя. Если коды совпадают - переходит к следующему этапу
+   * @description Password recovery stage 2. Comparison of the code that came from the front and the code from the user's record. If the codes match, move on to the next step.
    */
   @Post('check-code')
   @ApiProperty({ type: ResetCodeDto })
@@ -123,7 +123,7 @@ export class AuthController {
   /**
    *
    * @param changeUserPasswordDto {ChangePasswordDto}
-   * @description Восстановление пароля этап 3. Замена пароля, получает новый пароль и заменяет им текущий. Отправляет данные пользователя
+   * @description Password recovery stage 3. Password change, receives a new password and replaces the current one with it. Sends user data
    * @return {User}
    */
   @Post('reset-pwd')

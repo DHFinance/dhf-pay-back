@@ -12,11 +12,11 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api');
   /**
-   * @description этот middleware отвечает за авторизацию и проверку токенов
+   * @description this middleware is responsible for authorization and verification of tokens
    */
   app.use(checkAuth);
   /**
-   * @description создание swagger
+   * @description swagger creation
    */
   const options = new DocumentBuilder()
     .setTitle('pay dhfi API V1')

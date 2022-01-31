@@ -73,20 +73,20 @@ export class AuthService {
   /**
    *
    * @param loginUserDto {LoginDto}
-   * @description авторизация пользователя. Если пароль и email верны - выдает объект с пользователем
+   * @description user authorization. If the password and email are correct - returns an object with the user
    * @return {User}
    */
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
     /**
-     * @description если пользователь еще не ввел свой код, который был прислан ему на email - он не считается верифицированным
+     * @description if the user has not yet entered his code that was sent to him by email - he is not considered verified
      */
     if (user?.emailVerification !== null) {
       throw new BadRequestException('email', 'User is not exist');
     }
     if (user) {
       /**
-       * @description сравнение паролей через алгоритм bcrypt. loginUserDto.password - незашифрованный с фронта, user.password - зашифрованный с базы
+       * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
        */
       const match = await bcrypt.compare(loginUserDto.password, user.password)
       if (match) {

@@ -30,7 +30,7 @@ export class TransactionController implements CrudController<Transaction> {
 
 
   /**
-   * @description если Authorization не указан или не существует магазин с таким apiKey, то выдается массив со всеми записями. Если магазин с таким apiKey существует - выдает массив платежей, которые зависят от payment, которые зависят от этого магазина
+   * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on payment that depend on this store
    */
   @Get()
   async getAllByStore(@Param() param, @Headers() headers) {
@@ -52,7 +52,7 @@ export class TransactionController implements CrudController<Transaction> {
   }
 
   /**
-   * @description выдача последней совершенной транзакции для payment с :id
+   * @description return last completed transaction for payment with :id
    */
   @Get('/last/:id')
   async getLastTransaction(@Param() param, @Headers() headers) {
@@ -71,7 +71,7 @@ export class TransactionController implements CrudController<Transaction> {
 
 
   /**
-   * @description поиск по txHash для транзакции
+   * @description search by txHash for transaction
    */
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers) {

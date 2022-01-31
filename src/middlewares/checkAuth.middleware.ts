@@ -3,35 +3,35 @@ import { Stores } from "../stores/entities/stores.entity";
 import e from "express";
 
 /**
- * @description в этом middleware происходит авторизация. На некоторые запросы токен не нужен. Токен получается из Authorisation. Токен может пренадлежать либо пользователю, либо магазину (apiKey)
+ * @description authorization occurs in this middleware. Some requests do not require a token. The token is obtained from Authorization. The token can belong to either the user or the store (apiKey)
  */
 export const checkAuth = async (req, res, next) => {
   /**
-   *  @description Авторизация происходит в интерфейсе swagger, поэтому авторизация для этого запроса не требуется
+   *  @description Authorization happens in the swagger interface, so authorization is not required for this request
    */
   if (req.originalUrl.includes('swagger')) {
     next();
   }
   /**
-   *  @description Эндпоинты /api/auth используются без аккаунта. Поэтому токен для них не требуется
+   *  @description The /api/auth endpoints are used without an account. Therefore, a token is not required for them.
    */
   else if (req.originalUrl.includes('auth')) {
     next();
   }
   /**
-   * @description На странице bill могут находиться неавторизованные пользователи, которые должны иметь доступ к store, transaction и payment, связанных с этим чеком
+   * @description The bill page may contain unauthorized users who should have access to the store, transaction and payment associated with this receipt
    */
   else if (req.method === "GET" && (req.originalUrl.includes('store') || req.originalUrl.includes('payment') || req.originalUrl.includes('transaction'))) {
     next();
   }
   /**
-   * @description Транзакции на создаются неавторизованными пользователями на странице bill
+   * @description Transactions are not created by unauthorized users on the bill page
    */
   else if (req.method === "POST" && req.originalUrl.includes('transaction')) {
     next();
   }
   /**
-   * @description Полномочия на блокировку и просмотр пользователей есть только у админа
+   * @description Only the admin has the authority to block and view users
    */
   else if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
     if (req.headers.authorization) {
@@ -58,15 +58,15 @@ export const checkAuth = async (req, res, next) => {
     }
   }
   /**
-   * @description Для всех остальных роутов проверяется токен. Токен может принадлежать пользователю (token) или магазину (apiKey). В зависимости от токена изменяется выборка данных. Если в Authorisation введен apiKey - для /payment и /transaction дается выборка по магазину, которому принадлежит этот apiKey.
+   * @description For all other routes, the token is checked. The token can be owned by the user (token) or the store (apiKey). Depending on the token, the data selection changes. If an apiKey is entered in Authorization - for /payment and /transaction a selection is given for the store that owns this apiKey.
    */
   else if (req.headers.authorization) {
     /**
-     * @description получение токена из вида Bearer s8sN4V475LqBdYYze3oZKVY4fyqozwKMBaN5 к виду s8sN4V475LqBdYYze3oZKVY4fyqozwKMBaN5
+     * @description getting a token from the Bearer view s8sN4V475LqBdYYze3oZKVY4fyqozwKMBaN5 to the view s8sN4V475LqBdYYze3oZKVY4fyqozwKMBaN5
      */
     const token = req.headers.authorization.slice(7);
     /**
-     * @description Поиск пользователей с таким токеном
+     * @description Search for users with this token
      */
     const existsUser = await User.findOne({
       where: {
@@ -75,7 +75,7 @@ export const checkAuth = async (req, res, next) => {
       },
     });
     /**
-     * @description Поиск магазина с таким apiKey
+     * @description Search for a store with this apiKey
      */
     const existsShop = await Stores.findOne({
       where: {
@@ -103,8 +103,8 @@ export const checkAuth = async (req, res, next) => {
       }
     }
     /**
-     * если токен или apiKey найден, пропустить запрос в контроллер
-     * иначе вернуть ошибку
+     * if token or apiKey found, skip request to controller
+     * else return an error
      */
     if (existsUser || existsShop) {
       next();

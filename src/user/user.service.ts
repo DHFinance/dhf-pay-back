@@ -48,7 +48,7 @@ export class UserService extends TypeOrmCrudService<User> {
 
 
   /**
-   * @description сверяет полученный с фронта код и код из базы данных. Если они одинаковы - отправляет письмо об успешной регистрации и удаляет код из записи пользователя (пользователь с кодом в поле emailVerification не может быть авторизован). Отправляет на фронт запись о пользователе
+   * @description checks the code received from the front and the code from the database. If they are the same, it sends an email about successful registration and removes the code from the user record (the user with the code in the emailVerification field cannot be authorized). Sends a user record to the front
    * @return {User}
    */
   public async verifyUser(email, code) {
@@ -87,7 +87,7 @@ export class UserService extends TypeOrmCrudService<User> {
   /**
    *
    * @param user {User}
-   * @description создает пользователя с указанными данными и добавляет ему в поле emailVerification код, который отправляет на указанную почту.
+   * @description creates a user with the specified data and adds a code to the emailVerification field that sends it to the specified email.
    * @return true
    */
   public async create(user) {
@@ -100,7 +100,7 @@ export class UserService extends TypeOrmCrudService<User> {
       await this.mailerService.sendMail({
         to: userExisted.email,
         from: process.env.MAILER_EMAIL,
-        subject: 'Код для подтверждения регистрации',
+        subject: 'Registration confirmation code',
         template: 'send-verification-code',
         context: {
           login: userExisted.email,
@@ -119,7 +119,7 @@ export class UserService extends TypeOrmCrudService<User> {
        await this.mailerService.sendMail({
         to: user.email,
         from: process.env.MAILER_EMAIL,
-        subject: 'Код для подтверждения регистрации',
+        subject: 'Registration confirmation code',
         template: 'send-verification-code',
         context: {
           login: user.email,
@@ -141,7 +141,7 @@ export class UserService extends TypeOrmCrudService<User> {
   /**
    *
    * @param email {string}
-   * @description получает почту, на которую отправляет сгенерированный код, который записывает в restorePasswordCode
+   * @description receives the mail to which it sends the generated code, which writes to restorePasswordCode
    */
   async sendCode(email) {
     const user = await this.findByEmail(email);
@@ -157,7 +157,7 @@ export class UserService extends TypeOrmCrudService<User> {
     return await this.mailerService.sendMail({
       to: email,
       from: process.env.MAILER_EMAIL,
-      subject: 'Код для сброса пароля',
+      subject: 'Password reset code',
       template: 'send-password-code',
       context: {
         login: email,
@@ -171,7 +171,7 @@ export class UserService extends TypeOrmCrudService<User> {
    *
    * @param code {string}
    * @param email {string}
-   * @description сверяет полученный код с кодом пользователя с полученной почтой из базы данных. Если коды совпадают - допускает к следующему этапу
+   * @description checks the received code with the user code with received mail from the database. If the codes match - admits to the next stage
    */
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
@@ -182,7 +182,7 @@ export class UserService extends TypeOrmCrudService<User> {
   }
 
   /**
-   * @description ищет пользователя по токену. Если пользователь существует - возвращает его данные. Если заблокирован или не существует - выдает ошибку
+   * @description searches for a user by token. If the user exists, returns his data. If blocked or does not exist - throws an error
    * @param token {string}
    * @return {User}
    */
@@ -201,7 +201,7 @@ export class UserService extends TypeOrmCrudService<User> {
    *
    * @param password {string}
    * @param email {string}
-   * @description заменяет пароль пользователя на новый
+   * @description replaces the user's password with a new one
    */
   async changePassword(password, email) {
     const user = await this.findByEmail(email);

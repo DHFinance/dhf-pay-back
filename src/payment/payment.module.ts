@@ -12,7 +12,7 @@ const env = require('dotenv').config().parsed
 
 @Module({
   /**
-   * @description ClientsModule.register отвечает за связь с dhf-pay-back. payment_queue - это очередь, через которую будут создаваться payment. Связь осуществляется по url, указанным в RABBIT_MQ
+   * @description ClientsModule.register is responsible for communicating with dhf-pay-back. payment_queue is the queue through which payment will be created. Communication is carried out by url specified in RABBIT_MQ
    */
   imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, UserModule, ClientsModule.register([
     {
