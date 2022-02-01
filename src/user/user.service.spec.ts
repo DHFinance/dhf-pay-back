@@ -39,7 +39,6 @@ describe('UserService', () => {
           useValue: {
             get: jest.fn(() => {
             }),
-            findByEmail: jest.fn().mockImplementation(()=> Promise.resolve())
             // really it can be anything, but the closer to your actual logic the better
           }
         }
@@ -60,8 +59,8 @@ describe('UserService', () => {
     };
     expect(await User.findOne({
       where: {
-        email: "ermachenkovvova@gmail.com",
+      ...user
       },
-    })).toBe({id:expect.any(Number), ...user});
+    })).toHaveProperty("email","ermachenkovvova@gmail.com");
   });
 });
