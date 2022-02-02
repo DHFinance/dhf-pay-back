@@ -2,11 +2,13 @@ import { Body, Controller, Get, Headers, HttpException, HttpStatus, Inject, Para
 import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { UserService } from "../user/user.service";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
+import { ChangePasswordDto } from "../auth/dto/reset.dto";
+import { BillMailDto } from "./dto/billMail.dto";
 
 @ApiTags('store payment')
 @Controller('/payment')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class PaymentStoreController {
 
   constructor(
@@ -16,7 +18,8 @@ export class PaymentStoreController {
   ) {}
 
   @Post('send-mail-bill')
-  public async sendMailBill(@Body() billMailDto) {
+  @ApiProperty({ type: BillMailDto })
+  public async sendMailBill(@Body() billMailDto: BillMailDto) {
     try {
       return await this.service.sendMailBill(billMailDto);
     } catch (err) {

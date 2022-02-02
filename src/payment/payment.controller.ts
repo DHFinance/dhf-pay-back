@@ -40,39 +40,39 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('payment')
 @Controller('payment')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class PaymentController implements CrudController<Payment> {
   constructor(
-    public readonly service: PaymentService,
-    public readonly userService: UserService,
-    @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
+      public readonly service: PaymentService,
+      public readonly userService: UserService,
+      @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
   ) {}
 
 
   @Get()
   async getAllByStore(@Headers() headers) {
+    /**
+     * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on this store
+     */
     if (!headers['authorization']) {
-      console.log("not have token");
-      const payments = await this.service.find();
+      const payments = await this.service.find()
       return payments
     } else {
       try {
-        console.log(headers.authorization.slice(7));
         const payments = await this.service.find({
           where: {
             store: {
               apiKey: headers.authorization.slice(7)
             }
           }, relations: ['store']
-        });
-        if(!payments.length) {
-          console.log("invalid token");
-          return this.service.find();
+        })
+        if (payments.length) {
+          return payments
+        } else {
+          const allPayments = await this.service.find()
+          return allPayments
         }
-        else {
-          console.log("valid token");
-          return payments;
-        }
+
       } catch (err) {
         throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
       }
@@ -85,8 +85,7 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   getMany(
-    @ParsedRequest() req: CrudRequest,
-    @Headers() headers,
+      @ParsedRequest() req: CrudRequest,
   ) {
     // const user = this.userService.findByToken()
     return this.base.getManyBase(req);
@@ -94,23 +93,26 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override('getOneBase')
   getOneAndDoStuff(
-    @ParsedRequest() req: CrudRequest,
+      @ParsedRequest() req: CrudRequest,
   ) {
     return this.base.getOneBase(req);
   }
 
   @Override()
   async createOne(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
-    @Headers() headers
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: Payment,
+      @Headers() headers
   ) {
     try {
-      console.log("try create", headers.authorization.slice(7), dto);
-      const res = await this.service.create(dto, headers.authorization.slice(7));
+      /**
+       * @description all payments are sent to create in dhf-pay-processor using RabbitMQ. After processing on the server, the id of the created payment is returned. The store to which the created payment will be linked is determined by apiKey, which is passed to headers.authorization
+       * @data {amount: {number}, comment: {string}, apiKey: {string}}
+       * @return {id: {number}}
+       */
+      const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization.slice(7)  }).toPromise()
       return {id: res}
     } catch (err) {
-      console.log("error",err);
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
 
@@ -120,33 +122,32 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   createMany(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyDto<Payment>
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: CreateManyDto<Payment>
   ) {
     return this.base.createManyBase(req, dto);
   }
 
   @Override('updateOneBase')
   coolFunction(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: Payment,
   ) {
     return this.base.updateOneBase(req, dto);
   }
 
   @Override('replaceOneBase')
   awesomePUT(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: Payment,
   ) {
     return this.base.replaceOneBase(req, dto);
   }
 
   @Override()
   async deleteOne(
-    @ParsedRequest() req: CrudRequest,
+      @ParsedRequest() req: CrudRequest,
   ) {
     return this.base.deleteOneBase(req);
   }
 }
-

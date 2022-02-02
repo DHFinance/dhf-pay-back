@@ -46,23 +46,11 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
-  async checkRole(token, expectedRole) {
-    const user = await this.repo.findOne({
-      where: {
-        token,
-      },
-    });
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
-    }
-    if (user.role === expectedRole) {
-      return user
-    } else {
-      throw new HttpException('This user does not have permission to do this', HttpStatus.BAD_REQUEST);
-    }
 
-  }
-
+  /**
+   * @description checks the code received from the front and the code from the database. If they are the same, it sends an email about successful registration and removes the code from the user record (the user with the code in the emailVerification field cannot be authorized). Sends a user record to the front
+   * @return {User}
+   */
   public async verifyUser(email, code) {
     console.log({email, code})
     const userVerified = await this.findByEmail(email);
@@ -71,7 +59,7 @@ export class UserService extends TypeOrmCrudService<User> {
       await this.mailerService.sendMail({
         to: email,
         from: process.env.MAILER_EMAIL,
-        subject: 'Casperpay',
+        subject: 'pay.dhfi.online',
         template: 'send-reg-message',
         context: {
           login: email,
@@ -96,20 +84,23 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
+  /**
+   *
+   * @param user {User}
+   * @description creates a user with the specified data and adds a code to the emailVerification field that sends it to the specified email.
+   * @return true
+   */
   public async create(user) {
     const userExisted = await this.findByEmail(user.email);
     const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
     if (userExisted && userExisted.emailVerification === null) {
       throw new BadRequestException('email', 'User with this email exists');
     }
-
-
-
     if (userExisted && userExisted.emailVerification !== null) {
       await this.mailerService.sendMail({
         to: userExisted.email,
         from: process.env.MAILER_EMAIL,
-        subject: 'Код для подтверждения регистрации',
+        subject: 'Registration confirmation code',
         template: 'send-verification-code',
         context: {
           login: userExisted.email,
@@ -128,7 +119,7 @@ export class UserService extends TypeOrmCrudService<User> {
        await this.mailerService.sendMail({
         to: user.email,
         from: process.env.MAILER_EMAIL,
-        subject: 'Код для подтверждения регистрации',
+        subject: 'Registration confirmation code',
         template: 'send-verification-code',
         context: {
           login: user.email,
@@ -147,6 +138,11 @@ export class UserService extends TypeOrmCrudService<User> {
     }
   }
 
+  /**
+   *
+   * @param email {string}
+   * @description receives the mail to which it sends the generated code, which writes to restorePasswordCode
+   */
   async sendCode(email) {
     const user = await this.findByEmail(email);
     if (user?.emailVerification !== null) {
@@ -161,7 +157,7 @@ export class UserService extends TypeOrmCrudService<User> {
     return await this.mailerService.sendMail({
       to: email,
       from: process.env.MAILER_EMAIL,
-      subject: 'Код для сброса пароля',
+      subject: 'Password reset code',
       template: 'send-password-code',
       context: {
         login: email,
@@ -171,6 +167,12 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
+  /**
+   *
+   * @param code {string}
+   * @param email {string}
+   * @description checks the received code with the user code with received mail from the database. If the codes match - admits to the next stage
+   */
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
     if (!user || user.restorePasswordCode !== +code)  {
@@ -179,6 +181,11 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
+  /**
+   * @description searches for a user by token. If the user exists, returns his data. If blocked or does not exist - throws an error
+   * @param token {string}
+   * @return {User}
+   */
   async reAuth(token: string) {
     const user = await this.findByToken(token)
     if (user.blocked === true) {
@@ -190,6 +197,12 @@ export class UserService extends TypeOrmCrudService<User> {
     return user
   }
 
+  /**
+   *
+   * @param password {string}
+   * @param email {string}
+   * @description replaces the user's password with a new one
+   */
   async changePassword(password, email) {
     const user = await this.findByEmail(email);
     if (!user) {

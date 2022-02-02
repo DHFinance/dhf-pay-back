@@ -11,10 +11,16 @@ async function bootstrap() {
     methods: 'GET, PUT, POST, DELETE, PATCH',
   });
   app.setGlobalPrefix('api');
+  /**
+   * @description this middleware is responsible for authorization and verification of tokens
+   */
   app.use(checkAuth);
+  /**
+   * @description swagger creation
+   */
   const options = new DocumentBuilder()
-    .setTitle('CASPER API V1')
-    .setDescription('CASPER project api')
+    .setTitle('pay dhfi API V1')
+    .setDescription('pay dhfi project api')
     .setVersion('1.0')
     .addBearerAuth({
       type: 'http',

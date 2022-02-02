@@ -20,7 +20,7 @@ import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('transaction')
 @Controller('transaction')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth('Bearer')
 export class TransactionController implements CrudController<Transaction> {
   constructor(
     public readonly service: TransactionService,
@@ -29,6 +29,9 @@ export class TransactionController implements CrudController<Transaction> {
   ) {}
 
 
+  /**
+   * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on payment that depend on this store
+   */
   @Get()
   async getAllByStore(@Param() param, @Headers() headers) {
     const user = await this.userService.findByToken(headers['authorization'].slice(7))
@@ -48,6 +51,9 @@ export class TransactionController implements CrudController<Transaction> {
     }
   }
 
+  /**
+   * @description return last completed transaction for payment with :id
+   */
   @Get('/last/:id')
   async getLastTransaction(@Param() param, @Headers() headers) {
 
@@ -64,7 +70,9 @@ export class TransactionController implements CrudController<Transaction> {
   }
 
 
-
+  /**
+   * @description search by txHash for transaction
+   */
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers) {
 

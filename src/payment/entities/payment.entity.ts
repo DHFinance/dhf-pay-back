@@ -19,7 +19,7 @@ export class Payment extends BaseEntity {
     eager: true,
   })
   @ApiProperty({type: () => Stores,
-    description: 'Магазин, которому принадлежит платеж, можно указывать id или сам объект',
+    description: 'The store to which the payment belongs, you can specify the id or the object itself',
     default: 2,})
   store: Stores;
 
@@ -31,35 +31,35 @@ export class Payment extends BaseEntity {
 
   @Column({type: 'bigint'})
   @ApiProperty({
-    description: 'Количество токенов, необходимых, чтобы закрыть платеж',
+    description: 'Number of tokens needed to close the payment',
     default: '2500000000',
   })
   amount: string;
 
   @Column()
   @ApiProperty({
-    description: 'Статус платежа Not_paid при создании, Particularly_paid если оплачен не полностью (возможно в теории), Paid - оплачен полностью',
+    description: 'Payment status Not_paid when creating, Particularly_paid if not paid in full (maybe in theory), Paid - paid in full',
     default: 'Not_paid',
   })
   status: 'Not_paid' | 'Particularly_paid' | 'Paid';
 
   @Column()
   @ApiProperty({
-    description: 'Комментарий к платежу',
+    description: 'Payment comment',
     default: 'Tips',
   })
   comment: string;
 
   @Column({nullable: true})
   @ApiProperty({
-    description: 'Номер шаблона кнопки, привязанной к платежу (если у платежа есть кнопка)',
+    description: 'Button template number associated with the payment (if the payment has a button)',
     default: 1,
   })
   type: number;
 
   @Column({nullable: true})
   @ApiProperty({
-    description: 'Текст кнопки, привязанной к платежу (если у платежа есть кнопка)',
+    description: 'The text of the button associated with the payment (if the payment has a button)',
     default: 'Pay',
   })
   text: string;

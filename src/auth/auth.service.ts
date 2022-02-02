@@ -4,15 +4,21 @@ import { User } from '../user/entities/user.entity';
 import { createHmac } from "crypto";
 import { ensureProgram } from "ts-loader/dist/utils";
 import { StoresService } from "../stores/stores.service";
+const bcrypt = require("bcrypt");
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService, private readonly storesService: StoresService) {}
 
+  /**
+   *
+   * @param password
+   */
   encryptPassword = (password: string): string => {
-    return createHmac('sha1', process.env.SECRET_HASH)
-      .update(password)
-      .digest('hex');
+    const saltRounds = 7
+    const salt = bcrypt.genSaltSync(saltRounds)
+    const hashed = bcrypt.hashSync(password, salt); // GOOD
+    return hashed;
   };
 
   public async validate(token, as) {
@@ -42,6 +48,7 @@ export class AuthService {
     await this.userService.create(user);
   }
 
+
   public async verify({email, code}) {
     return await this.userService.verifyUser(email, code);
   }
@@ -63,17 +70,29 @@ export class AuthService {
     return await this.userService.changePassword(encryptPassword, email);
   }
 
+  /**
+   *
+   * @param loginUserDto {LoginDto}
+   * @description user authorization. If the password and email are correct - returns an object with the user
+   * @return {User}
+   */
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
+    /**
+     * @description if the user has not yet entered his code that was sent to him by email - he is not considered verified
+     */
     if (user?.emailVerification !== null) {
       throw new BadRequestException('email', 'User is not exist');
     }
     if (user) {
-      if (this.encryptPassword(loginUserDto.password) === user.password) {
+      /**
+       * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
+       */
+      const match = await bcrypt.compare(loginUserDto.password, user.password)
+      if (match) {
         return user
-      }
-      else {
-        throw new BadRequestException('password', 'wrong password');
+      } else {
+        throw new BadRequestException('password', 'wrong password')
       }
     } else {
       throw new BadRequestException('email', 'user with this email does not exist');
