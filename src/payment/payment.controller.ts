@@ -51,25 +51,31 @@ export class PaymentController implements CrudController<Payment> {
 
   @Get()
   async getAllByStore(@Headers() headers) {
-    const user = await this.userService.findByToken(headers['authorization'].slice(7))
-    if (user?.role === 'admin') {
-      const payments = await this.service.find()
-      console.log(payments)
+    if (!headers['authorization']) {
+      console.log("not have token");
+      const payments = await this.service.find();
       return payments
-    }
-    try {
-
-      const payments = await this.service.find({
-        where: {
-          store: {
-            apiKey: headers.authorization.slice(7)
-          }
-        }, relations: ['store']
-      })
-      console.log(headers.authorization.slice(7), payments)
-      return payments
-    } catch (err) {
-      throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
+    } else {
+      try {
+        console.log(headers.authorization.slice(7));
+        const payments = await this.service.find({
+          where: {
+            store: {
+              apiKey: headers.authorization.slice(7)
+            }
+          }, relations: ['store']
+        });
+        if(!payments.length) {
+          console.log("invalid token");
+          return this.service.find();
+        }
+        else {
+          console.log("valid token");
+          return payments;
+        }
+      } catch (err) {
+        throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
+      }
     }
   }
 
@@ -100,9 +106,11 @@ export class PaymentController implements CrudController<Payment> {
     @Headers() headers
   ) {
     try {
-      const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization.slice(7)  }).toPromise()
+      console.log("try create", headers.authorization.slice(7), dto);
+      const res = await this.service.create(dto, headers.authorization.slice(7));
       return {id: res}
     } catch (err) {
+      console.log("error",err);
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
 

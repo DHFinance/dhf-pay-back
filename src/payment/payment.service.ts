@@ -8,7 +8,7 @@ import { TransactionService } from "../transaction/transaction.service";
 import { MailerService } from "@nest-modules/mailer";
 
 @Injectable()
-export class PaymentService extends TypeOrmCrudService<Payment> {g
+export class PaymentService extends TypeOrmCrudService<Payment> {
   constructor(@InjectRepository(Payment) repo,
               private readonly transactionService: TransactionService,
               private mailerService: MailerService
@@ -51,12 +51,19 @@ export class PaymentService extends TypeOrmCrudService<Payment> {g
   //   console.log(parentParent)
   // }
 
-  // async create(dto) {
-  //   try {
-  //     const payment = this.repo.create(dto)
-  //     return payment
-  //   } catch (err) {
-  //     throw new HttpException(err, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
+  async create(dto, apiKey) {
+    try {
+      console.log("service", apiKey);
+      const storeId = await this.repo.findOne({
+        where: {
+          apiKey: apiKey
+        }, relations: ['store']
+      })
+      console.log("storeId", storeId);
+      const payment = await this.repo.save({...dto, storeId: storeId});
+      return payment
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
 }
