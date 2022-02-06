@@ -111,4 +111,4 @@ POST /payment (Authorization: Bearer *store ApiKey*) - create  payment
 GET /transaction (Authorization: Bearer *store ApiKey*) - transactions list 
 ```
 ## Swagger
-You can see swagger her /api/swagger/.
+You can see swagger here /api/swagger/.
