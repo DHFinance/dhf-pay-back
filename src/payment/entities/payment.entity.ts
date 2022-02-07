@@ -20,7 +20,7 @@ export class Payment extends BaseEntity {
   })
   @ApiProperty({type: () => Stores,
     description: 'The store to which the payment belongs, you can specify the id or the object itself',
-    default: 2,})
+    default: 60,})
   store: Stores;
 
   @OneToMany(() => Transaction, (transactions) => transactions.payment)
