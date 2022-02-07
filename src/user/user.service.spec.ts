@@ -96,8 +96,8 @@ describe('UserService',() => {
 
     expect(foundedUser).toHaveProperty("email","mail@gmail.com");
 
-    // @ts-ignore
-    // await User.remove({...foundedUser});
+    //@ts-ignore
+    await User.remove({...foundedUser});
   });
 
 });
