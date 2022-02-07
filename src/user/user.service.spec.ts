@@ -16,7 +16,8 @@ const user = {
   role:"customer",
   // id: 60,
   password:"5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v",
-  company:"mail.ru"
+  company:"mail.ru",
+  blocked: false
 };
 
 describe('UserService',() => {
@@ -71,24 +72,25 @@ describe('UserService',() => {
   });
 
   it('should created user',  async () => {
-    const createdUser = await service.create({ ...user, blocked: false });
+    const createdUser = await service.create({ ...user });
     expect(createdUser).toEqual(true);
 
   });
 
-  it('should get error at creating user',  async () => {
-    await expect(service.create(user)).rejects.toThrow();
+  it('should get error at creating user',() => {
+    expect(async ()=> await service.create(user)).rejects.toThrow();
   });
 
 
-  it('should get error at verifying user',  async () => {
-    await expect(service.verifyUser(user.email, 5454)).rejects.toThrow();
+  it('should get error at verifying user', () => {
+    expect(async () => await service.verifyUser(user.email, 5454)).rejects.toThrow();
   });
 
   it('should changed block',  async () => {
     let foundedUser = await service.findByEmail(user.email);
     const change = await service.changeBlockUser(foundedUser.id,true);
     expect(change).toHaveProperty("blocked",true);
+    await service.changeBlockUser(foundedUser.id,false);
   });
 
   it('find user by email',async () => {
