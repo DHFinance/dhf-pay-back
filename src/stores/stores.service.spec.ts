@@ -37,6 +37,7 @@ describe('StoresService', () => {
                         return {
                             ...config.get('database.config'),
                             entities: [path.join(__dirname, '**', '*.entity.{ts,js}')],
+                            keepConnectionAlive: true
                         };
                     },
                     inject: [ConfigService],
@@ -70,10 +71,6 @@ describe('StoresService', () => {
 
     });
 
-    it('should ',  () => {
-        expect(service).toBeDefined()
-    });
-
     it('should change blocked ', async () => {
         // @ts-ignore
         await Stores.save({...store});
@@ -88,8 +85,8 @@ describe('StoresService', () => {
 
     });
 
-    it('should get error if store is blocked ',  () => {
-        expect(async () => await service.validateStore(store.apiKey)).rejects.toThrow();
+    it('should get error if store is blocked ',  async () => {
+        await expect(async () => await service.validateStore(store.apiKey)).rejects.toThrow();
     });
 
     it('should validate store', async () => {
@@ -101,8 +98,13 @@ describe('StoresService', () => {
         const validateStore = await service.validateStore(store.apiKey);
 
         expect(validateStore).toHaveProperty("apiKey", store.apiKey);
+    });
 
+    afterAll(async ()=>{
+        const testStore = await Stores.findOne({where: {
+                name: store.name,
+            }})
         // @ts-ignore
         await Stores.remove({...testStore});
-    });
+    })
 });

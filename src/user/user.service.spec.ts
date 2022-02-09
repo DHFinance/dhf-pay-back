@@ -1,4 +1,5 @@
 import {Test, TestingModule} from '@nestjs/testing';
+import { Connection, Repository } from 'typeorm'
 import {UserService} from './user.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {User} from "./entities/user.entity";
@@ -23,7 +24,7 @@ const user = {
 describe('UserService',() => {
   let service: UserService;
   let mailerService: MailerService;
-
+  let connection: Connection;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,6 +40,7 @@ describe('UserService',() => {
             return {
               ...config.get('database.config'),
               entities: [path.join(__dirname, '**', '*.entity.{ts,js}')],
+              keepConnectionAlive: true
             };
           },
           inject: [ConfigService],
@@ -66,30 +68,26 @@ describe('UserService',() => {
 
   });
 
-  it('should be defined', () => {
-    console.log(service)
-    expect(service).toBeDefined();
-  });
-
   it('should created user',  async () => {
     const createdUser = await service.create({ ...user });
     expect(createdUser).toEqual(true);
-
   });
 
-  it('should get error at creating user',() => {
-    expect(async ()=> await service.create(user)).rejects.toThrow();
+  it('should get error the same users', () => {
+    const foundedUser = service.findByEmail(user.email);
+    if (foundedUser) expect(async ()=> await service.create({ ...foundedUser })).rejects.toThrow();
   });
-
 
   it('should get error at verifying user', () => {
     expect(async () => await service.verifyUser(user.email, 5454)).rejects.toThrow();
   });
 
   it('should changed block',  async () => {
-    let foundedUser = await service.findByEmail(user.email);
+    const foundedUser = await service.findByEmail(user.email);
     const change = await service.changeBlockUser(foundedUser.id,true);
+
     expect(change).toHaveProperty("blocked",true);
+
     await service.changeBlockUser(foundedUser.id,false);
   });
 
@@ -98,8 +96,11 @@ describe('UserService',() => {
 
     expect(foundedUser).toHaveProperty("email","mail@gmail.com");
 
-    //@ts-ignore
-    await User.remove({...foundedUser});
   });
 
+  afterAll(async ()=>{
+    const foundedUser = await service.findByEmail(user.email);
+    //@ts-ignore
+    await User.remove({...foundedUser});
+  })
 });

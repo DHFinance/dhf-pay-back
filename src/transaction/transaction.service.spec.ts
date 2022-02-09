@@ -2,17 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionService } from './transaction.service';
 import {ConfigModule, ConfigService} from "nestjs-config";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {User} from "../user/entities/user.entity";
 import {MailerModule, MailerService} from "@nest-modules/mailer";
 import * as path from "path";
 import {StoresService} from "../stores/stores.service";
-import {HttpModule, HttpService} from "@nestjs/axios";
+import {HttpService} from "@nestjs/axios";
 import {Transaction} from "./entities/transaction.entity";
 import {Stores} from "../stores/entities/stores.entity";
-import {UserModule} from "../user/user.module";
-import {UserService} from "../user/user.service";
-import {StoresModule} from "../stores/stores.module";
-import {TransactionController} from "./transaction.controller";
 
 const dotEnvPath = path.resolve(__dirname, '..', '.env');
 
@@ -45,6 +40,7 @@ describe('TransactionService', () => {
             return {
               ...config.get('database.config'),
               entities: [path.join(__dirname, '**', '*.entity.{ts,js}')],
+              keepConnectionAlive: true
             };
           },
           inject: [ConfigService],
@@ -88,16 +84,17 @@ describe('TransactionService', () => {
   });
 
   it('should get error the same transaction', async () => {
+    await expect(async ()=> await service.create(transaction)).rejects.toThrow();
+  });
+
+  afterAll(async ()=>{
     const res = await Transaction.findOne({
       where: {
         email: transaction.email
       }
     });
-
-    expect(async ()=> await service.create(transaction)).rejects.toThrow();
-
     // @ts-ignore
     await Transaction.remove({...res});
-  });
+  })
 
 });
