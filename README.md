@@ -110,3 +110,5 @@ POST /payment (Authorization: Bearer *store ApiKey*) - create  payment
 ```bash
 GET /transaction (Authorization: Bearer *store ApiKey*) - transactions list 
 ```
+## Swagger
+You can see swagger here /api/swagger/.

@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, HttpException, HttpStatus, Inject, Param, Post } from "@nestjs/common";
+import {Controller, Get, Headers, HttpException, HttpStatus, Inject, Param, Post, Response} from "@nestjs/common";
 import {
   Crud,
   CrudController,
@@ -13,7 +13,8 @@ import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { SCondition } from "@nestjsx/crud-request";
 import { UserService } from "../user/user.service";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {CreateOnePaymentDto} from "./dto/createOnePayment.dto";
 
 @Crud({
   model: {
@@ -91,14 +92,9 @@ export class PaymentController implements CrudController<Payment> {
     return this.base.getManyBase(req);
   }
 
-  @Override('getOneBase')
-  getOneAndDoStuff(
-      @ParsedRequest() req: CrudRequest,
-  ) {
-    return this.base.getOneBase(req);
-  }
-
   @Override()
+  @ApiResponse({
+    status: 201, description: 'Get create one base response', type: CreateOnePaymentDto })
   async createOne(
       @ParsedRequest() req: CrudRequest,
       @ParsedBody() dto: Payment,
@@ -118,6 +114,15 @@ export class PaymentController implements CrudController<Payment> {
 
 
     // return this.base.createOneBase(req, dto);
+  }
+
+
+
+  @Override('getOneBase')
+  getOneAndDoStuff(
+    @ParsedRequest() req: CrudRequest,
+  ) {
+    return this.base.getOneBase(req);
   }
 
   @Override()
