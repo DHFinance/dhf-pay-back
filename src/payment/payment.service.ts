@@ -6,6 +6,7 @@ import { Interval } from "@nestjs/schedule";
 import { Transaction } from "../transaction/entities/transaction.entity";
 import { TransactionService } from "../transaction/transaction.service";
 import { MailerService } from "@nest-modules/mailer";
+import {Stores} from "../stores/entities/stores.entity";
 
 @Injectable()
 export class PaymentService extends TypeOrmCrudService<Payment> {
@@ -53,14 +54,12 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
 
   async create(dto, apiKey) {
     try {
-      console.log("service", apiKey);
-      const storeId = await this.repo.findOne({
+      const store = await Stores.findOne({
         where: {
           apiKey: apiKey
-        }, relations: ['store']
+        }
       })
-      console.log("storeId", storeId);
-      const payment = await this.repo.save({...dto, storeId: storeId});
+      const payment = await this.repo.save({...dto, status: 'Not_paid', datetime: new Date(), store});
       return payment
     } catch (err) {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);

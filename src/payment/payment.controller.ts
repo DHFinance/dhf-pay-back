@@ -15,6 +15,7 @@ import { SCondition } from "@nestjsx/crud-request";
 import { UserService } from "../user/user.service";
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {CreateOnePaymentDto} from "./dto/createOnePayment.dto";
+import {StoresService} from "../stores/stores.service";
 
 @Crud({
   model: {
@@ -106,9 +107,10 @@ export class PaymentController implements CrudController<Payment> {
        * @data {amount: {number}, comment: {string}, apiKey: {string}}
        * @return {id: {number}}
        */
-      const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization.slice(7)  }).toPromise()
-      return {id: res}
+      const res = await this.service.create(dto, headers.authorization.slice(7));
+      return {id: res.id};
     } catch (err) {
+      console.log("error");
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
 
