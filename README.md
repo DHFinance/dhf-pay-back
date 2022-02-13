@@ -8,6 +8,9 @@ System composet from 3 service:
 |Frontend          |<https://github.com/DHFinance/dhf-pay-front>            |Service frontend            |
 |Processor          |<https://github.com/DHFinance/dhf-pay-processor>| Process a background tasks|
 
+## Usage Guide 
+See https://github.com/DHFinance/dhf-pay-front/blob/main/UserGuide.pdf
+
 ## Installation using docker
 See https://github.com/DHFinance/dhf-pay-deploy
 
