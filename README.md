@@ -115,3 +115,15 @@ GET /transaction (Authorization: Bearer *store ApiKey*) - transactions list
 ```
 ## Swagger
 You can see swagger here /api/swagger/.
+
+## Run a specific test file
+To run a separate file with tests, for example user.service.spec.ts in the user folder
+```bash
+jest src/user/user.service.spec.ts
+```
+
+## Run tests
+To run the tests, enter at the root of the project
+```bash
+npm run test
+```
