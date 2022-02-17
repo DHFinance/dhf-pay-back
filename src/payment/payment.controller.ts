@@ -68,13 +68,7 @@ export class PaymentController implements CrudController<Payment> {
             }
           }, relations: ['store']
         })
-        if (payments.length) {
-          return payments
-        } else {
-          const allPayments = await this.service.find()
-          return allPayments
-        }
-
+        return payments
       } catch (err) {
         throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
       }
