@@ -27,7 +27,7 @@ export class AuthController {
   public async register(@Body() registerUserDto: RegisterDto) {
     try {
       // console.log(await this.authService.register(registerUserDto))
-      console.log(registerUserDto)
+
       return await this.authService.register(registerUserDto);
     } catch (err) {
       console.log(err)
@@ -60,7 +60,7 @@ export class AuthController {
   public async login(@Body() loginUserDto: LoginDto) {
     try {
       const user = await this.authService.login(loginUserDto);
-      console.log({user})
+
       return user
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);

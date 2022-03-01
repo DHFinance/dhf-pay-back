@@ -89,7 +89,7 @@ export class TransactionController implements CrudController<Transaction> {
       if (!transaction) {
         throw new HttpException('Transaction not exist', HttpStatus.BAD_REQUEST);
       }
-      console.log(transaction, param.txHash)
+
       return transaction
     } catch (err) {
       throw new HttpException('This store does not have such a transaction', HttpStatus.BAD_REQUEST);

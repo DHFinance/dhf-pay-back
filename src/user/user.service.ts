@@ -52,7 +52,7 @@ export class UserService extends TypeOrmCrudService<User> {
    * @return {User}
    */
   public async verifyUser(email, code) {
-    console.log({email, code})
+
     const userVerified = await this.findByEmail(email);
 
     if (userVerified.emailVerification == code) {
