@@ -3,7 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   BaseEntity,
-  ManyToOne, OneToMany
+  ManyToOne, OneToMany, CreateDateColumn
 } from "typeorm";
 import { User } from '../../user/entities/user.entity';
 import { Transaction } from "../../transaction/entities/transaction.entity";
@@ -26,7 +26,7 @@ export class Payment extends BaseEntity {
   @OneToMany(() => Transaction, (transactions) => transactions.payment)
   transactions: Transaction[];
 
-  @Column()
+  @CreateDateColumn()
   datetime: Date;
 
   @Column({type: 'bigint'})

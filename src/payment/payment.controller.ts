@@ -15,6 +15,7 @@ import { SCondition } from "@nestjsx/crud-request";
 import { UserService } from "../user/user.service";
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {CreateOnePaymentDto} from "./dto/createOnePayment.dto";
+import {StoresService} from "../stores/stores.service";
 
 @Crud({
   model: {
@@ -44,9 +45,9 @@ import {CreateOnePaymentDto} from "./dto/createOnePayment.dto";
 @ApiBearerAuth('Bearer')
 export class PaymentController implements CrudController<Payment> {
   constructor(
-    public readonly service: PaymentService,
-    public readonly userService: UserService,
-    @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
+      public readonly service: PaymentService,
+      public readonly userService: UserService,
+      @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
   ) {}
 
 
@@ -67,13 +68,7 @@ export class PaymentController implements CrudController<Payment> {
             }
           }, relations: ['store']
         })
-        if (payments.length) {
-          return payments
-        } else {
-          const allPayments = await this.service.find()
-          return allPayments
-        }
-
+        return payments
       } catch (err) {
         throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
       }
@@ -86,7 +81,7 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   getMany(
-    @ParsedRequest() req: CrudRequest,
+      @ParsedRequest() req: CrudRequest,
   ) {
     // const user = this.userService.findByToken()
     return this.base.getManyBase(req);
@@ -106,9 +101,10 @@ export class PaymentController implements CrudController<Payment> {
        * @data {amount: {number}, comment: {string}, apiKey: {string}}
        * @return {id: {number}}
        */
-      const res = await this.client.send('createOne', { ...dto, apiKey: headers.authorization.slice(7)  }).toPromise()
-      return {id: res}
+      const res = await this.service.create(dto, headers.authorization.slice(7));
+      return {id: res.id};
     } catch (err) {
+      console.log("error");
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
 
@@ -127,33 +123,32 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   createMany(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyDto<Payment>
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: CreateManyDto<Payment>
   ) {
     return this.base.createManyBase(req, dto);
   }
 
   @Override('updateOneBase')
   coolFunction(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: Payment,
   ) {
     return this.base.updateOneBase(req, dto);
   }
 
   @Override('replaceOneBase')
   awesomePUT(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Payment,
+      @ParsedRequest() req: CrudRequest,
+      @ParsedBody() dto: Payment,
   ) {
     return this.base.replaceOneBase(req, dto);
   }
 
   @Override()
   async deleteOne(
-    @ParsedRequest() req: CrudRequest,
+      @ParsedRequest() req: CrudRequest,
   ) {
     return this.base.deleteOneBase(req);
   }
 }
-

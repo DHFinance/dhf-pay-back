@@ -1,12 +1,15 @@
 ## DHF PAY
 The crypto currency payment gateway on the CSPR blockchain. Made for pay and be paid easy and chill with blockchain and Casper Network.
-System composet from 3 service:
+System composed of 3 services:
 
 |       Name         |            Link              |        Description                 |
- |----------------|-------------------------------|-----------------------------|
+|----------------|-------------------------------|-----------------------------|
 |Backend  |<https://github.com/DHFinance/dhf-pay-back>            | Service backend            |
 |Frontend          |<https://github.com/DHFinance/dhf-pay-front>            |Service frontend            |
 |Processor          |<https://github.com/DHFinance/dhf-pay-processor>| Process a background tasks|
+
+## Usage Guide 
+See https://github.com/DHFinance/dhf-pay-front/blob/main/UserGuide.pdf
 
 ## Installation using docker
 See https://github.com/DHFinance/dhf-pay-deploy
@@ -112,3 +115,15 @@ GET /transaction (Authorization: Bearer *store ApiKey*) - transactions list
 ```
 ## Swagger
 You can see swagger here /api/swagger/.
+
+## Run a specific test file
+To run a separate file with tests, for example user.service.spec.ts in the user folder
+```bash
+jest src/user/user.service.spec.ts
+```
+
+## Run tests
+To run the tests, enter at the root of the project
+```bash
+npm run test
+```
