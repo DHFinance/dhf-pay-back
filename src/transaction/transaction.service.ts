@@ -18,18 +18,24 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
     try {
       const activeTransaction = await this.repo.findOne({
         where: {
-          payment: transaction.payment.id,
+          payment: transaction?.payment?.id,
           status: 'processing'
         }
       })
 
       if (activeTransaction) {
+        console.log("activeTransaction", activeTransaction)
         throw new HttpException('Current payment transaction is already being processed', HttpStatus.BAD_REQUEST);
       }
 
-      const res = this.repo.save({ ...transaction, amount: transaction.payment.amount, updated: new Date() })
+
+      const res = this.repo.save({
+        ...transaction,
+        amount: transaction?.payment?.amount || 0,
+        updated: new Date() })
       return res
     } catch (err) {
+      console.log(err.message)
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
