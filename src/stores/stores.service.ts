@@ -30,6 +30,10 @@ export class StoresService extends TypeOrmCrudService<Stores> {
         apiKey
       }
     })
+
+
+
+
     if (store?.blocked === true) {
       throw new BadRequestException('store', 'Store is blocked');
     }
