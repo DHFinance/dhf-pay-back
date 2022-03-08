@@ -53,7 +53,7 @@ export class User extends BaseEntity {
     description: 'User role: admin or customer',
     default: 'customer',
   })
-  role: 'admin' | 'customer';
+  role: string //'admin' | 'customer';
 
   @Column()
   @ApiProperty({

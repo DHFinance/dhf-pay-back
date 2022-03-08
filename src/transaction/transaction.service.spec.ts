@@ -1,100 +1,65 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TransactionService } from './transaction.service';
-import {ConfigModule, ConfigService} from "nestjs-config";
-import {TypeOrmModule} from "@nestjs/typeorm";
-import {MailerModule, MailerService} from "@nest-modules/mailer";
-import * as path from "path";
+import {Connection, Repository} from 'typeorm'
+import {TransactionService} from './transaction.service';
 import {StoresService} from "../stores/stores.service";
 import {HttpService} from "@nestjs/axios";
+import {MailerService} from "@nest-modules/mailer";
+const nodemailerMock = require('nodemailer-mock');
+import {createMemDB} from "../utils/createMemDB";
 import {Transaction} from "./entities/transaction.entity";
 import {Stores} from "../stores/entities/stores.entity";
+import {User} from "../user/entities/user.entity";
+import {Payment} from "../payment/entities/payment.entity";
 
-const dotEnvPath = path.resolve(__dirname, '..', '.env');
+describe('Transaction Service', () => {
+    let db: Connection
+    let transactionService: TransactionService
+    let storesService: StoresService
+    let transactionRepo: Repository<Transaction>
+    let storesRepo: Repository<Stores>
+    let httpService: HttpService
+    let mailerService: MailerService
 
-const transaction = {
-  "status": "processing",
-  "email": "ermachenkovvova@gmail.com",
-  "txHash": "16ae42729a88a4df9519a8e08807d68856070d93cf162898948b7de57e1a3368",
-  "payment": {
-    id:142,
-    amount: "2500000000"
-  },
-  "sender": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
-}
+    beforeAll(async () => {
+        const transport = nodemailerMock.createTransport({
+            host: '127.0.0.1',
+            port: -100,
+        });
 
-describe('TransactionService', () => {
-  let service: TransactionService;
-  let mailerService: MailerService;
+        db = await createMemDB([Transaction, Stores, User, Payment])
+        transactionRepo = await db.getRepository(Transaction)
+        storesRepo = await db.getRepository(Stores)
+        storesService = new StoresService(storesRepo)
+        httpService = new HttpService();
+        mailerService = new MailerService({
+            transport: transport
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.load(
-            path.resolve(__dirname, 'config', '**!(*.d).config.{ts,js}'),
-            {
-              path: dotEnvPath,
-            },
-        ), //ci
-        TypeOrmModule.forRootAsync({
-          useFactory: (config: ConfigService) => {
-            return {
-              ...config.get('database.config'),
-              entities: [path.join(__dirname, '**', '*.entity.{ts,js}')],
-              keepConnectionAlive: true
-            };
-          },
-          inject: [ConfigService],
-        }),
-        TypeOrmModule.forFeature([Transaction, Stores]),
-       MailerModule
-      ],
-      providers: [
-        TransactionService,StoresService,
-        {
-          provide: HttpService,
-          useValue: {
-            get: jest.fn(async () => {
-            }),
-            // really it can be anything, but the closer to your actual logic the better
-          }
-        },
-        {
-          provide: MailerService,
-          useValue: {
-            get: jest.fn(async () => {
-            }),
-            // really it can be anything, but the closer to your actual logic the better
-          }
+        })
+        transactionService = new TransactionService(transactionRepo, storesService, httpService, mailerService)
+
+        await Transaction.delete({})
+
+    })
+
+    afterAll(() => db.close())
+
+    it('should create a transaction', async () => {
+
+
+        const transaction = {
+            "status": "processing",
+            "email": "ermachenkovvova@gmail.com",
+            "txHash": "16ae42729a88a4df9519a8e08807d68856070d93cf162898948b7de57e1a3368",
+            "sender": "01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9",
+
         }
-      ],
-    }).compile();
 
-    service = module.get<TransactionService>(TransactionService);
-    mailerService = module.get<MailerService>(MailerService);
+        const newTransaction = await transactionService.create(transaction);
 
-  });
+        expect(newTransaction).toHaveProperty("id")
+        expect(newTransaction.status).toEqual("processing")
+        expect(newTransaction.email).toEqual("ermachenkovvova@gmail.com")
+        expect(newTransaction.txHash).toEqual("16ae42729a88a4df9519a8e08807d68856070d93cf162898948b7de57e1a3368")
+        expect(newTransaction.sender).toEqual("01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9")
 
-  it('create transaction', async () => {
-    const createdTransaction = await service.create(transaction);
-    const res = Transaction.findOne({
-      id: createdTransaction.id
-    });
-
-    expect(res).toBeDefined();
-  });
-
-  it('should get error the same transaction', async () => {
-    await expect(async ()=> await service.create(transaction)).rejects.toThrow();
-  });
-
-  afterAll(async ()=>{
-    const res = await Transaction.findOne({
-      where: {
-        email: transaction.email
-      }
-    });
-    // @ts-ignore
-    await Transaction.remove({...res});
-  })
-
-});
+    })
+})
