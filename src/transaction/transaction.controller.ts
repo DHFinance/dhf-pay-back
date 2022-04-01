@@ -69,6 +69,29 @@ export class TransactionController implements CrudController<Transaction> {
     }
   }
 
+  // @Get(':id')
+  // async getInvoices(@Param() id, @Headers() token) {
+  //   const user = await this.userService.findByToken(token['authorization'].split(' ')[1])
+  //
+  //   if (!user) {
+  //     return false
+  //   }
+  //   try {
+  //     const transaction = await this.service.findOne({
+  //       where: {
+  //         txHash: token.txHash,
+  //       }
+  //     })
+  //     if (!transaction) {
+  //       throw new HttpException('Invoices not exist', HttpStatus.BAD_REQUEST);
+  //     }
+  //
+  //     return transaction
+  //   } catch (err) {
+  //     throw new HttpException('This store does not have such a transaction', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+
 
   /**
    * @description search by txHash for transaction
@@ -78,7 +101,11 @@ export class TransactionController implements CrudController<Transaction> {
 
 
 
-    const user = await this.userService.findByToken(headers['authorization'])
+    const user = await this.userService.findByToken(headers['authorization'].split(' ')[1])
+
+    if (!user) {
+      return false
+    }
 
     try {
       const transaction = await this.service.findOne({

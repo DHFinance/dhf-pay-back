@@ -20,7 +20,7 @@ export class User extends BaseEntity {
   })
   lastName: string;
 
-  @Column()
+  @Column({select: false})
   @ApiProperty({
     description: 'Encrypted password. Current value - admin',
     default: '$2b$07$PUx7RK/NjXwo7i9xpYT2vejPjU3A4hxCCvYYkDbZ/fcfgyFnCw9f.',

@@ -1,9 +1,8 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { User } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IUser } from './interfaces/user.interface';
-import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
-import { MailerService } from '@nest-modules/mailer';
+import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {User} from './entities/user.entity';
+import {InjectRepository} from '@nestjs/typeorm';
+import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
+import {MailerService} from '@nest-modules/mailer';
 
 function randomString(len) {
   const charSet =
@@ -77,6 +76,7 @@ export class UserService extends TypeOrmCrudService<User> {
       where: {
         email,
       },
+      select: ['id', 'name', "lastName", 'password', 'email', 'role', 'company', 'token', 'blocked', 'restorePasswordCode', 'emailVerification']
     });
     if (user?.blocked === true) {
       throw new BadRequestException('email', 'User is blocked');
@@ -116,7 +116,7 @@ export class UserService extends TypeOrmCrudService<User> {
         throw new HttpException(err, HttpStatus.BAD_REQUEST);
       }
     } else {
-       await this.mailerService.sendMail({
+      await this.mailerService.sendMail({
         to: user.email,
         from: process.env.MAILER_EMAIL,
         subject: 'Registration confirmation code',
@@ -194,6 +194,7 @@ export class UserService extends TypeOrmCrudService<User> {
     if (!user)  {
       throw new BadRequestException('token', 'User not exist');
     }
+    delete user.password
     return user
   }
 

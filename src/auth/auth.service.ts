@@ -88,10 +88,11 @@ export class AuthService {
       /**
        * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
        */
-      const match = await bcrypt.compare(loginUserDto.password, user.password)
-      if (match) {
+      try {
+        await bcrypt.compare(loginUserDto.password, user.password)
+        delete user.password
         return user
-      } else {
+      } catch (e) {
         throw new BadRequestException('password', 'wrong password')
       }
     } else {
