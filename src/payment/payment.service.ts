@@ -1,11 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Payment } from "./entities/payment.entity";
-import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
-import { Interval } from "@nestjs/schedule";
-import { Transaction } from "../transaction/entities/transaction.entity";
-import { TransactionService } from "../transaction/transaction.service";
-import { MailerService } from "@nest-modules/mailer";
+import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Payment} from "./entities/payment.entity";
+import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
+import {TransactionService} from "../transaction/transaction.service";
+import {MailerService} from "@nest-modules/mailer";
 import {Stores} from "../stores/entities/stores.entity";
 
 @Injectable()
@@ -64,5 +62,13 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     } catch (err) {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async findById(id) {
+    return await this.repo.findOne({
+      where: {
+        id: id
+      }, relations: ['store']
+    });
   }
 }
