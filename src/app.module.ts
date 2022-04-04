@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { TransactionModule } from './transaction/transaction.module';
 // import { HandlebarsAdapter, MailerModule } from "@nest-modules/mailer";
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import {  MailerModule } from "@nestjs-modules/mailer";
 import { StoresModule } from "./stores/stores.module";
 const isProduction = process.env.npm_lifecycle_event === 'start:prod';
@@ -47,7 +48,7 @@ const env = require('dotenv').config().parsed
       },
       template: {
         dir: __dirname + '/../src/mail-templates',
-        // adapter: new HandlebarsAdapter(), // or new PugAdapter()
+        adapter: new HandlebarsAdapter(), // or new PugAdapter()
         options: {
           strict: true,
         },
