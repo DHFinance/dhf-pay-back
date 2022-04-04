@@ -2,7 +2,7 @@ import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestj
 import {User} from './entities/user.entity';
 import {InjectRepository} from '@nestjs/typeorm';
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
-import {MailerService} from '@nest-modules/mailer';
+import {MailerService} from '@nestjs-modules/mailer';
 
 function randomString(len) {
   const charSet =

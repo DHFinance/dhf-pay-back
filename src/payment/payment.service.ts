@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Payment} from "./entities/payment.entity";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {TransactionService} from "../transaction/transaction.service";
-import {MailerService} from "@nest-modules/mailer";
+import {MailerService} from "@nestjs-modules/mailer";
 import {Stores} from "../stores/entities/stores.entity";
 
 @Injectable()

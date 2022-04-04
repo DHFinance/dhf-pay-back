@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Transaction } from "./entities/transaction.entity";
 import { Interval } from "@nestjs/schedule";
 import { HttpModule, HttpService } from "@nestjs/axios";
-import { MailerService } from "@nest-modules/mailer";
+import { MailerService } from "@nestjs-modules/mailer";
 import { StoresService } from "../stores/stores.service";
 import e from "express";
 
