@@ -2,7 +2,8 @@ import {Connection, Repository} from 'typeorm'
 import {TransactionService} from './transaction.service';
 import {StoresService} from "../stores/stores.service";
 import {HttpService} from "@nestjs/axios";
-import {MailerService} from "@nest-modules/mailer";
+import {MailerModule, MailerService} from "@nestjs-modules/mailer";
+
 const nodemailerMock = require('nodemailer-mock');
 import {createMemDB} from "../utils/createMemDB";
 import {Transaction} from "./entities/transaction.entity";
@@ -17,7 +18,7 @@ describe('Transaction Service', () => {
     let transactionRepo: Repository<Transaction>
     let storesRepo: Repository<Stores>
     let httpService: HttpService
-    let mailerService: MailerService
+    let mailerService: any
 
     beforeAll(async () => {
         const transport = nodemailerMock.createTransport({
@@ -30,10 +31,13 @@ describe('Transaction Service', () => {
         storesRepo = await db.getRepository(Stores)
         storesService = new StoresService(storesRepo)
         httpService = new HttpService();
-        mailerService = new MailerService({
-            transport: transport
+        // mailerService = new MailerService({
+        //     transport: transport
+        //
+        // })
+        mailerService = {}
+        mailerService.sendMail = jest.fn();
 
-        })
         transactionService = new TransactionService(transactionRepo, storesService, httpService, mailerService)
 
         await Transaction.delete({})

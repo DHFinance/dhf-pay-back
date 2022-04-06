@@ -3,7 +3,9 @@ import {Connection, Repository} from 'typeorm'
 import {UserService} from './user.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {User} from "./entities/user.entity";
-import {MailerModule, MailerService} from "@nest-modules/mailer";
+// import {MailerModule, MailerService} from "@nest-modules/mailer";
+import {MailerModule, MailerService} from "@nestjs-modules/mailer";
+
 import {ConfigModule, ConfigService} from "nestjs-config";
 import * as path from "path";
 
