@@ -77,8 +77,8 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   @Get(':id')
-  async getPayment(@Param() id) {
-    return await this.service.findById(id.id);
+  async getPayment(@Param() id, @Headers() token) {
+    return await this.service.findById(id.id, token.authorization.split(' ')[1]);
   }
 
   get base(): CrudController<Payment> {

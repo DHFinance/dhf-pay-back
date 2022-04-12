@@ -5,11 +5,13 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {TransactionService} from "../transaction/transaction.service";
 import {MailerService} from "@nestjs-modules/mailer";
 import {Stores} from "../stores/entities/stores.entity";
+import {StoresService} from "../stores/stores.service";
 
 @Injectable()
 export class PaymentService extends TypeOrmCrudService<Payment> {
   constructor(@InjectRepository(Payment) repo,
               private readonly transactionService: TransactionService,
+              private readonly storeService: StoresService,
               private mailerService: MailerService
   ) {
     super(repo);
@@ -64,11 +66,17 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     }
   }
 
-  async findById(id) {
-    return await this.repo.findOne({
+  async findById(id, token) {
+    const payment = await this.repo.findOne({
       where: {
         id: id
       }, relations: ['store']
     });
+    // const store = await this.storeService.getAllStore(token)
+    // if (!store.find((el) => el.id === payment.store.id)) {
+    //   throw new HttpException('no access to this payment', HttpStatus.CONFLICT)
+    // }
+    delete payment.store.apiKey
+    return payment
   }
 }

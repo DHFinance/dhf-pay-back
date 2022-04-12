@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Headers, HttpException, HttpStatus, Param, Post } from "@nestjs/common";
+import {Body, Controller, Get, Headers, HttpException, HttpStatus, Param, Post, Res} from "@nestjs/common";
 import { Crud, CrudController } from "@nestjsx/crud";
 import { Transaction } from "./entities/transaction.entity";
 import { TransactionService } from "./transaction.service";
 import { UserService } from "../user/user.service";
 import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
+import {StoresService} from "../stores/stores.service";
 
 @Crud({
   model: {
@@ -25,6 +26,7 @@ export class TransactionController implements CrudController<Transaction> {
   constructor(
     public readonly service: TransactionService,
     public readonly userService: UserService,
+    public readonly storeService: StoresService,
     public readonly TransactionService: TransactionService,
   ) {}
 
@@ -99,12 +101,16 @@ export class TransactionController implements CrudController<Transaction> {
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers) {
 
-
-
     const user = await this.userService.findByToken(headers['authorization'].split(' ')[1])
 
     if (!user) {
       return false
+    }
+
+    const store = await this.storeService.getAllStore(headers['authorization'].split(' ')[1])
+
+    if (!store) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND)
     }
 
     try {
@@ -117,6 +123,12 @@ export class TransactionController implements CrudController<Transaction> {
         throw new HttpException('Transaction not exist', HttpStatus.BAD_REQUEST);
       }
 
+      if (!store.find((el) => el.id === transaction.payment.store.id)) {
+        //return response.status(HttpStatus.CONFLICT).send('No access to this transaction')
+        // return false
+        throw new HttpException('No access to this transaction', HttpStatus.CONFLICT)
+      }
+      delete transaction.payment.store.apiKey;
       return transaction
     } catch (err) {
       throw new HttpException('This store does not have such a transaction', HttpStatus.BAD_REQUEST);

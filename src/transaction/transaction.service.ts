@@ -14,6 +14,24 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
     super(repo);
   }
 
+  async sendMail(transaction) {
+    try {
+      await this.mailerService.sendMail({
+        to: transaction.email,
+        from: process.env.MAILER_EMAIL,
+        subject: `Payment to store ${transaction.payment.store.name}`,
+        template: 'create-transaction',
+        context: {
+          email: transaction.email,
+          store: transaction.payment.store.name,
+          status: transaction.status,
+        },
+      });
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   async create(transaction) {
     try {
       const activeTransaction = await this.repo.findOne({
@@ -33,6 +51,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         ...transaction,
         amount: transaction?.payment?.amount || 0,
         updated: new Date() })
+      await this.sendMail(transaction);
       return res
     } catch (err) {
       console.log(err.message)

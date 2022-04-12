@@ -56,7 +56,6 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       throw new HttpException('store not found', HttpStatus.NOT_FOUND)
     }
     if (store[0].user.token === token) {
-      console.log('here')
       delete store[0].user.token
       return store[0];
     }
