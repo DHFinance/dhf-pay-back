@@ -44,7 +44,16 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       relations: ['user']
     })
     const filteredStores = store.filter((store) => store.user.token === token)
-    return filteredStores
+    if (filteredStores.length) {
+      filteredStores.forEach((store) => {
+        delete store.user.token
+        delete store.user.restorePasswordCode
+        delete store.user.emailVerification
+        return store
+      })
+      return filteredStores
+    }
+    throw new HttpException('stores not found', HttpStatus.NOT_FOUND);
   }
 
   async getUserStores(id, token) {
@@ -56,8 +65,9 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       throw new HttpException('store not found', HttpStatus.NOT_FOUND)
     }
     if (store[0].user.token === token) {
-      console.log('here')
       delete store[0].user.token
+      delete store[0].user.restorePasswordCode
+      delete store[0].user.emailVerification
       return store[0];
     }
     throw new HttpException('you are not the creator of the store', HttpStatus.CONFLICT);
