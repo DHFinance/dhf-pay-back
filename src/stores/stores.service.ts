@@ -64,12 +64,13 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     if (!store.length) {
       throw new HttpException('store not found', HttpStatus.NOT_FOUND)
     }
-    if (store[0].user.token === token) {
+    if (store[0].user.token === token || store[0].apiKey === token) {
       delete store[0].user.token
       delete store[0].user.restorePasswordCode
       delete store[0].user.emailVerification
       return store[0];
     }
+
     throw new HttpException('you are not the creator of the store', HttpStatus.CONFLICT);
   }
 
