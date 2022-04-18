@@ -2,6 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
 import { Stores } from "./entities/stores.entity";
+import {deepEqual} from "../utils/deepEqual";
 
 @Injectable()
 export class StoresService extends TypeOrmCrudService<Stores> {
@@ -10,14 +11,25 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     super(repo);
   }
 
-  async changeBlockStore(id, blocked) {
+  async create(store) {
+    try {
+      return await this.repo.save(store);
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async changeBlockStore(id, status) {
     const store = await this.repo.findOne({
       where: {
         id
       }
     })
+    if (!store) {
+      throw new HttpException('store not found', HttpStatus.NOT_FOUND)
+    }
     try {
-      const blockedStore = await this.repo.save({...store, blocked})
+      const blockedStore = await this.repo.save({...store, blocked: status})
       return blockedStore
     } catch (e) {
       throw new HttpException(e, HttpStatus.BAD_REQUEST);
@@ -78,9 +90,21 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       where: {id: id.id},
       relations: ['user']
     })
+
+    if (body?.user) {
+      if (!deepEqual(body?.user, store[0].user)) {
+        throw new HttpException('you cant change user', HttpStatus.BAD_REQUEST)
+      }
+    }
+    if (body?.id !== store[0].id) {
+      throw new HttpException('you cant change ID', HttpStatus.BAD_REQUEST)
+    }
+    if (body.blocked !== store[0].blocked) {
+      throw new HttpException('you cant change blocked status', HttpStatus.BAD_REQUEST)
+    }
     if (store[0].user.token === header) {
       return this.repo.save(body);
     }
-    return false
+    throw new HttpException('You cant change this store', HttpStatus.BAD_REQUEST);
   }
 }
