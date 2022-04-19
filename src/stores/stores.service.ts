@@ -3,10 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
 import { Stores } from "./entities/stores.entity";
 import {deepEqual} from "../utils/deepEqual";
+import {UserService} from "../user/user.service";
 
 @Injectable()
 export class StoresService extends TypeOrmCrudService<Stores> {
-  constructor(@InjectRepository(Stores) repo
+  constructor(@InjectRepository(Stores) repo, private readonly userService: UserService
   ) {
     super(repo);
   }
@@ -68,11 +69,15 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     throw new HttpException('stores not found', HttpStatus.NOT_FOUND);
   }
 
-  async getUserStores(id, token) {
+  async getUserStore(id, token) {
     const store = await this.repo.find({
       where: {id: id.id},
       relations: ['user']
     })
+    const user = await this.userService.findByToken(token);
+    if (user.role === 'admin') {
+      return store;
+    }
     if (!store.length) {
       throw new HttpException('store not found', HttpStatus.NOT_FOUND)
     }

@@ -1,4 +1,4 @@
-import {IsNotEmpty, MaxLength, MinLength} from 'class-validator';
+import {IsNotEmpty, MaxLength, Min, MinLength} from 'class-validator';
 
 interface userInterface {
   id: number
@@ -20,6 +20,9 @@ export class CreateStoreDto {
   @IsNotEmpty({
     message: 'wallet cant be empty'
   })
+  @MinLength(20, {
+    message: 'wallet is too short. Minimal length is $constraint1 characters'
+  })
   wallet: string
 
 
@@ -33,6 +36,5 @@ export class CreateStoreDto {
 
   blocked?: boolean
 
-  @IsNotEmpty()
-  user: userInterface
+  user?: userInterface
 }

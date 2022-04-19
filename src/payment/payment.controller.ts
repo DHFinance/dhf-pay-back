@@ -111,6 +111,9 @@ export class PaymentController implements CrudController<Payment> {
   @Override()
   @Get(':id')
   async getPayment(@Param() id, @Headers() token) {
+    if (!token['authorization'].split(' ')[1]) {
+      throw new HttpException('unauthorized', HttpStatus.UNAUTHORIZED)
+    }
     const user = await this.userService.findByToken(token['authorization'].split(' ')[1])
     return await this.service.findById(id.id, user);
   }
