@@ -43,7 +43,7 @@ export class Payment extends BaseEntity {
   })
   status: 'Not_paid' | 'Particularly_paid' | 'Paid';
 
-  @Column()
+  @Column({nullable: true})
   @ApiProperty({
     description: 'Payment comment',
     default: 'Tips',

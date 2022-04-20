@@ -1,4 +1,16 @@
-import {Controller, Get, Headers, HttpException, HttpStatus, Inject, Param, Post, Response} from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Param,
+  Patch,
+  Post, Put,
+  Res
+} from "@nestjs/common";
 import {
   Crud,
   CrudController,
@@ -15,6 +27,7 @@ import { SCondition } from "@nestjsx/crud-request";
 import { UserService } from "../user/user.service";
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {CreateOnePaymentDto} from "./dto/createOnePayment.dto";
+import { Response } from 'express';
 import {StoresService} from "../stores/stores.service";
 
 @Crud({
@@ -51,23 +64,30 @@ export class PaymentController implements CrudController<Payment> {
   ) {}
 
 
+  @Override()
   @Get()
   async getAllByStore(@Headers() headers) {
     /**
      * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on this store
      */
     if (!headers['authorization']) {
-      const payments = await this.service.find()
-      return payments
+      throw new HttpException('not found Bearer token', HttpStatus.BAD_REQUEST);
     } else {
+      const user = await this.userService.findByToken(headers['authorization'].split(' ')[1])
+      if (user?.role === 'admin') {
+        return await this.service.find({
+          relations: ['store']
+        })
+      }
       try {
         const payments = await this.service.find({
           where: {
             store: {
-              apiKey: headers.authorization.slice(7)
+              apiKey: headers.authorization.split(' ')[1]
             }
           }, relations: ['store']
         })
+        console.log(payments);
         return payments
       } catch (err) {
         throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
@@ -76,9 +96,26 @@ export class PaymentController implements CrudController<Payment> {
   }
 
   @Override()
+  @Patch(':id')
+  async updatePatchPayment(@Param() id) {
+    throw new HttpException('Error', HttpStatus.BAD_REQUEST)
+  }
+
+
+  @Override()
+  @Put(':id')
+  async updatePutPayment(@Param() id) {
+    throw new HttpException('Error', HttpStatus.BAD_REQUEST)
+  }
+
+  @Override()
   @Get(':id')
-  async getPayment(@Param() id) {
-    return await this.service.findById(id.id);
+  async getPayment(@Param() id, @Headers() token) {
+    if (!token['authorization'].split(' ')[1]) {
+      throw new HttpException('unauthorized', HttpStatus.UNAUTHORIZED)
+    }
+    const user = await this.userService.findByToken(token['authorization'].split(' ')[1])
+    return await this.service.findById(id.id, user);
   }
 
   get base(): CrudController<Payment> {
@@ -93,13 +130,14 @@ export class PaymentController implements CrudController<Payment> {
     return this.base.getManyBase(req);
   }
 
+  @Post()
   @Override()
   @ApiResponse({
     status: 201, description: 'Get create one base response', type: CreateOnePaymentDto })
   async createOne(
-      @ParsedRequest() req: CrudRequest,
-      @ParsedBody() dto: Payment,
-      @Headers() headers
+      @Body() dto: CreateOnePaymentDto,
+      @Headers() headers,
+      @Res({ passthrough: true }) res: Response
   ) {
     try {
       /**
@@ -107,14 +145,21 @@ export class PaymentController implements CrudController<Payment> {
        * @data {amount: {number}, comment: {string}, apiKey: {string}}
        * @return {id: {number}}
        */
-      const res = await this.service.create(dto, headers.authorization.slice(7));
-      return {id: res.id};
+      const findPayment = await this.service.findOne({
+        where: {
+          id: dto.id
+        }
+      })
+      if (findPayment) {
+        res.status(HttpStatus.BAD_REQUEST).send('payment already exists');
+        return;
+      }
+      const response = await this.service.create(dto, headers.authorization.slice(7));
+      return {id: response.id};
     } catch (err) {
       console.log("error");
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
-
-
     // return this.base.createOneBase(req, dto);
   }
 

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ApiBearerAuth, DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Transport } from '@nestjs/microservices'
 import { checkAuth } from "./middlewares/checkAuth.middleware";
+import {ValidationPipe} from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true })
@@ -11,6 +12,8 @@ async function bootstrap() {
     methods: 'GET, PUT, POST, DELETE, PATCH',
   });
   app.setGlobalPrefix('api');
+
+  app.useGlobalPipes(new ValidationPipe());
   /**
    * @description this middleware is responsible for authorization and verification of tokens
    */

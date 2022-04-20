@@ -23,7 +23,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         }
       })
 
-      if (activeTransaction) {
+      if (activeTransaction.payment.type !== 2) {
         console.log("activeTransaction", activeTransaction)
         throw new HttpException('Current payment transaction is already being processed', HttpStatus.BAD_REQUEST);
       }
