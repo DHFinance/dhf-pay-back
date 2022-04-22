@@ -15,6 +15,24 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
     super(repo);
   }
 
+  async sendMail(transaction) {
+    try {
+      await this.mailerService.sendMail({
+        to: transaction.email,
+        from: process.env.MAILER_EMAIL,
+        subject: `Payment to store ${transaction.payment.store.name}`,
+        template: 'create-transaction',
+        context: {
+          email: transaction.email,
+          store: transaction.payment.store.name,
+          status: transaction.status,
+        },
+      });
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   async create(transaction) {
       const findTransaction = await this.repo.findOne({
         where: {
@@ -32,7 +50,6 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         throw new HttpException('payment ID incorrect', HttpStatus.BAD_REQUEST);
       }
 
-    console.log(findPayment);
 
       if (findPayment.type === null && findPayment.status === 'Paid') {
         throw new HttpException('payment already completed', HttpStatus.BAD_REQUEST);
@@ -65,6 +82,11 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
             id: res.payment.store.id
           }
         }
+      }
+      try {
+        await this.sendMail(sendTransaction);
+      } catch (e) {
+        console.log(e)
       }
       return sendTransaction
     }
