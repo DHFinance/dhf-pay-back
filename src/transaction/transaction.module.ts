@@ -8,9 +8,10 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { TransactionStoreController } from "./transaction.store.controller";
 import { StoresModule } from "../stores/stores.module";
 import { UserModule } from "../user/user.module";
+import {PaymentModule} from "../payment/payment.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction]), StoresModule, UserModule, HttpModule, ScheduleModule.forRoot()],
+  imports: [TypeOrmModule.forFeature([Transaction]), StoresModule, PaymentModule, UserModule, HttpModule, ScheduleModule.forRoot()],
   controllers: [TransactionController, TransactionStoreController],
   providers: [TransactionService],
   exports: [TransactionService],

@@ -1,11 +1,12 @@
 import {Body, Controller, Get, Headers, HttpException, HttpStatus, Param, Patch, Post, Put, Res} from "@nestjs/common";
 import {Crud, CrudController, Override} from "@nestjsx/crud";
-import { Transaction } from "./entities/transaction.entity";
-import { TransactionService } from "./transaction.service";
-import { UserService } from "../user/user.service";
-import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
+import {Transaction} from "./entities/transaction.entity";
+import {TransactionService} from "./transaction.service";
+import {UserService} from "../user/user.service";
+import {ApiBearerAuth, ApiTags} from "@nestjs/swagger";
 import {StoresService} from "../stores/stores.service";
 import {Response} from "express";
+import {CreateTransactionDto} from "./dto/createTransaction.dto";
 
 @Crud({
   model: {
@@ -40,15 +41,13 @@ export class TransactionController implements CrudController<Transaction> {
     const user = await this.userService.findByToken(headers['authorization'].slice(7))
 
     if (user?.role === 'admin') {
-      const transactions = await this.service.find()
-      return transactions
+      return await this.service.find()
     }
     try {
-      const transactions = await this.service.find()
-      const filterByApi = transactions.filter((transaction) => {
-        return transaction.payment.store.apiKey === headers.authorization.slice(7)
+      const transactions = await this.service.find({})
+      return transactions.filter((transaction) => {
+        return transaction.payment?.store?.apiKey === headers.authorization.split(' ')[1];
       })
-      return filterByApi
     } catch (err) {
       throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
     }
@@ -115,6 +114,7 @@ export class TransactionController implements CrudController<Transaction> {
   /**
    * @description search by txHash for transaction
    */
+  @Override()
   @Get(':txHash')
   async getOneByStore(@Param() param, @Headers() headers, @Res({ passthrough: true }) res: Response) {
 
@@ -137,6 +137,10 @@ export class TransactionController implements CrudController<Transaction> {
         return;
       }
 
+      if (user.role === 'admin') {
+        return transaction
+      }
+
       const store = await this.storeService.findOne({
         where: {
           id: transaction.payment.store.id
@@ -157,8 +161,9 @@ export class TransactionController implements CrudController<Transaction> {
     }
   }
 
+  @Override()
   @Post()
-  async createByStore(@Param() param: {apiKey: string}, @Body() dto: Transaction) {
+  async createByStore(@Param() param: {apiKey: string}, @Body() dto: CreateTransactionDto) {
     const findTransaction = await this.service.findOne({
       where: {
         id: dto.id
@@ -169,8 +174,10 @@ export class TransactionController implements CrudController<Transaction> {
       throw new HttpException('transaction already exists', HttpStatus.BAD_REQUEST)
     }
 
-    if (dto.status !== 'progress') {
-      throw new HttpException('cant create transaction with status "success"', HttpStatus.BAD_REQUEST)
+    if (dto.status) {
+      if (dto.status !== 'processing') {
+        throw new HttpException('cant create transaction with incorrect status', HttpStatus.BAD_REQUEST)
+      }
     }
 
     if (!dto?.payment?.id) {

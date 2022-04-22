@@ -4,7 +4,6 @@ import { Payment } from './entities/payment.entity';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import { ClientsModule, Transport } from "@nestjs/microservices";
-import { TransactionModule } from "../transaction/transaction.module";
 import { PaymentStoreController } from "./payment.store.controller";
 import { UserModule } from "../user/user.module";
 
@@ -14,7 +13,7 @@ const env = require('dotenv').config().parsed
   /**
    * @description ClientsModule.register is responsible for communicating with dhf-pay-back. payment_queue is the queue through which payment will be created. Communication is carried out by url specified in RABBIT_MQ
    */
-  imports: [TypeOrmModule.forFeature([Payment]), TransactionModule, UserModule, ClientsModule.register([
+  imports: [TypeOrmModule.forFeature([Payment]), UserModule, ClientsModule.register([
     {
       name: 'PAYMENT_SERVICE',
       transport: Transport.RMQ,
