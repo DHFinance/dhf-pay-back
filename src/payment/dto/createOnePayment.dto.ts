@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {IsNotEmpty, IsNumberString, Min} from 'class-validator';
+import {IsNotEmpty, Min, MinLength} from 'class-validator';
 import {Type} from "class-transformer";
 
 export class CreateOnePaymentDto {
@@ -15,4 +15,6 @@ export class CreateOnePaymentDto {
     message: 'amount cant be empty'
   })
   amount: string
+
+  text?: string
 }

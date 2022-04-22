@@ -2,14 +2,12 @@ import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Payment} from "./entities/payment.entity";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
-import {TransactionService} from "../transaction/transaction.service";
 import {MailerService} from "@nestjs-modules/mailer";
 import {Stores} from "../stores/entities/stores.entity";
 
 @Injectable()
 export class PaymentService extends TypeOrmCrudService<Payment> {
   constructor(@InjectRepository(Payment) repo,
-              private readonly transactionService: TransactionService,
               private mailerService: MailerService
   ) {
     super(repo);
@@ -21,7 +19,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
         id: billMailDto.id
       }, relations: ['store']
     })
-    
+
     await this.mailerService.sendMail({
       to: billMailDto.email,
       from: process.env.MAILER_EMAIL,
@@ -67,6 +65,14 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     }
   }
 
+  async findPayment(id) {
+    return await this.repo.findOne({
+      where: {
+        id: id
+      }, relations: ['store']
+    })
+  }
+
   async findById(id, user) {
     const payment = await this.repo.findOne({
       where: {
@@ -76,10 +82,10 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     if (!payment) {
       throw new HttpException('payment nof found', HttpStatus.NOT_FOUND);
     }
-    if (user.role === 'admin') {
+    if (user?.role === 'admin') {
       return payment
     }
-      const returnInfo = {
+    return {
       id: payment.id,
       datetime: payment.datetime,
       amount: payment.amount,
@@ -92,6 +98,5 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
         wallet: payment.store.wallet
       }
     }
-    return returnInfo
   }
 }

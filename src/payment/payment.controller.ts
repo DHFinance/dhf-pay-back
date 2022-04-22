@@ -72,7 +72,7 @@ export class PaymentController implements CrudController<Payment> {
      */
     if (!headers['authorization']) {
       throw new HttpException('not found Bearer token', HttpStatus.BAD_REQUEST);
-    } else {
+    }
       const user = await this.userService.findByToken(headers['authorization'].split(' ')[1])
       if (user?.role === 'admin') {
         return await this.service.find({
@@ -87,12 +87,10 @@ export class PaymentController implements CrudController<Payment> {
             }
           }, relations: ['store']
         })
-        console.log(payments);
         return payments
       } catch (err) {
         throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
       }
-    }
   }
 
   @Override()
@@ -111,10 +109,7 @@ export class PaymentController implements CrudController<Payment> {
   @Override()
   @Get(':id')
   async getPayment(@Param() id, @Headers() token) {
-    if (!token['authorization'].split(' ')[1]) {
-      throw new HttpException('unauthorized', HttpStatus.UNAUTHORIZED)
-    }
-    const user = await this.userService.findByToken(token['authorization'].split(' ')[1])
+    const user = await this.userService.findByToken(token.authorization.split(' ')[1])
     return await this.service.findById(id.id, user);
   }
 

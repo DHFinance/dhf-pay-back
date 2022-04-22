@@ -6,11 +6,12 @@ import { Interval } from "@nestjs/schedule";
 import { HttpModule, HttpService } from "@nestjs/axios";
 import { MailerService } from "@nestjs-modules/mailer";
 import { StoresService } from "../stores/stores.service";
-import e from "express";
+import {PaymentService} from "../payment/payment.service";
 
 @Injectable()
 export class TransactionService extends TypeOrmCrudService<Transaction> {
-  constructor(@InjectRepository(Transaction) repo, private readonly storesService: StoresService, private httpService: HttpService, private mailerService: MailerService) {
+  constructor(@InjectRepository(Transaction) repo, private readonly paymentService: PaymentService, private readonly storesService: StoresService, private httpService: HttpService, private mailerService: MailerService,
+              ) {
     super(repo);
   }
 
@@ -33,30 +34,60 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
   }
 
   async create(transaction) {
-    try {
-      const activeTransaction = await this.repo.findOne({
+      const findTransaction = await this.repo.findOne({
         where: {
-          payment: transaction?.payment?.id,
-          status: 'processing'
+          txHash: transaction.txHash
         }
       })
 
-      if (activeTransaction.payment.type !== 2) {
-        console.log("activeTransaction", activeTransaction)
-        throw new HttpException('Current payment transaction is already being processed', HttpStatus.BAD_REQUEST);
+      if (findTransaction) {
+        throw new HttpException('transaction already exist', HttpStatus.BAD_REQUEST);
+      }
+
+      const findPayment = await this.paymentService.findPayment(transaction.payment.id);
+
+      if (!findPayment) {
+        throw new HttpException('payment ID incorrect', HttpStatus.BAD_REQUEST);
       }
 
 
-      const res = this.repo.save({
-        ...transaction,
-        amount: transaction?.payment?.amount || 0,
-        updated: new Date() })
-      await this.sendMail(transaction);
-      return res
-    } catch (err) {
-      console.log(err.message)
-      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
-    }
-  }
+      if (findPayment.type === null && findPayment.status === 'Paid') {
+        throw new HttpException('payment already completed', HttpStatus.BAD_REQUEST);
+      }
 
+      // if (activeTransaction.payment.type !== 2) {
+      //   console.log("activeTransaction", activeTransaction)
+      //   throw new HttpException('Current payment transaction is already being processed', HttpStatus.BAD_REQUEST);
+      // }
+
+
+      const res = await this.repo.save({
+        ...transaction,
+        amount: findPayment.amount,
+        status: 'processing',
+        updated: new Date(),
+        payment: findPayment
+      })
+      const sendTransaction = {
+        id: res.id,
+        email: res.email,
+        txHash: res.txHash,
+        sender: res.sender,
+        amount: res.amount,
+        payment: {
+          id: res.payment.id,
+          datetime: res.payment.datetime,
+          status: res.payment.status,
+          store: {
+            id: res.payment.store.id
+          }
+        }
+      }
+      try {
+        await this.sendMail(sendTransaction);
+      } catch (e) {
+        console.log(e)
+      }
+      return sendTransaction
+    }
 }
