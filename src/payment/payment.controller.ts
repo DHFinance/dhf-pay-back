@@ -109,6 +109,9 @@ export class PaymentController implements CrudController<Payment> {
   @Override()
   @Get(':id')
   async getPayment(@Param() id, @Headers() token) {
+    if (!token?.authorization) {
+      return await this.service.findById(id.id, token);
+    }
     const user = await this.userService.findByToken(token.authorization.split(' ')[1])
     return await this.service.findById(id.id, user);
   }
@@ -125,8 +128,8 @@ export class PaymentController implements CrudController<Payment> {
     return this.base.getManyBase(req);
   }
 
-  @Post()
   @Override()
+  @Post()
   @ApiResponse({
     status: 201, description: 'Get create one base response', type: CreateOnePaymentDto })
   async createOne(
