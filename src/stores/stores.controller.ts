@@ -22,6 +22,7 @@ import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
 import { BlockStoreDto } from "./dto/block.dto";
 import { randomString } from "../utils/randomString";
 import {CreateStoreDto} from "./dto/createStore.dto";
+import {UpdateStoreDto} from "./dto/updateStore.dto";
 
 @Crud({
   model: {
@@ -189,7 +190,7 @@ export class StoresController implements CrudController<Stores> {
   @Override()
   @Put(':id')
   @ApiProperty()
-  async putUpdateStore(@Body() body, @Param() id, @Headers() header) {
+  async putUpdateStore(@Body() body: UpdateStoreDto, @Param() id, @Headers() header) {
     if(!header.authorization){
       throw new UnauthorizedException()
     }

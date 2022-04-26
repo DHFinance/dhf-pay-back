@@ -84,7 +84,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         }
       }
       try {
-        await this.sendMail(sendTransaction);
+        await this.sendMail(res);
       } catch (e) {
         console.log(e)
       }
