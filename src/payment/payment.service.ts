@@ -56,7 +56,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
         }
       })
       if (!store) {
-        throw new HttpException('store not found', HttpStatus.BAD_REQUEST);
+        throw new HttpException('store not found', HttpStatus.NOT_FOUND);
       }
       const payment = await this.repo.save({...dto, status: 'Not_paid', datetime: new Date(), store});
       return payment

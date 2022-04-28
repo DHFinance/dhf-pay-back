@@ -96,18 +96,28 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       where: {id: id.id},
       relations: ['user']
     })
-
+    const user = await this.userService.findByTokenSelected(header)
     if (body?.user) {
       if (!deepEqual(body?.user, store[0].user)) {
         throw new HttpException('you cant change user', HttpStatus.BAD_REQUEST)
       }
     }
-    if (body?.id !== store[0].id) {
-      throw new HttpException('you cant change ID', HttpStatus.BAD_REQUEST)
+    if (body?.id) {
+      if (body.id !== store[0].id) {
+        throw new HttpException('you cant change ID', HttpStatus.CONFLICT)
+      }
+    } else {
+      body = {...body, id: +id.id}
     }
-    if (body.blocked !== store[0].blocked) {
-      throw new HttpException('you cant change blocked status', HttpStatus.BAD_REQUEST)
+    if (body?.blocked) {
+      if (body.blocked !== store[0].blocked) {
+        throw new HttpException('you cant change blocked status', HttpStatus.CONFLICT)
+      }
     }
+    if (!body.user) {
+      body = {...body, user: user}
+    }
+    console.log(body);
     if (store[0].user.token === header) {
       return this.repo.save(body);
     }

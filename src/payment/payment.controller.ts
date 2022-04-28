@@ -25,32 +25,42 @@ import { PaymentService } from "./payment.service";
 import { ClientProxy } from "@nestjs/microservices";
 import { SCondition } from "@nestjsx/crud-request";
 import { UserService } from "../user/user.service";
-import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOkResponse,
+  ApiOperation,
+  ApiProperty,
+  ApiResponse,
+  ApiTags
+} from "@nestjs/swagger";
 import {CreateOnePaymentDto} from "./dto/createOnePayment.dto";
 import { Response } from 'express';
 import {StoresService} from "../stores/stores.service";
+import {returnCreatePaymentDto, ReturnPaymentDto} from "./dto/returnPayment.dto";
+import {GetPaymentDto} from "./dto/getPayment.dto";
 
-@Crud({
-  model: {
-    type: Payment,
-  },
-  params: {
-    apiKey: {
-      field: 'apiKey',
-      type: "string",
-    },
-  },
-  query: {
-    join: {
-      store: {
-        eager: true,
-      },
-      transaction: {
-        eager: true,
-      },
-    },
-  },
-})
+// @Crud({
+//   model: {
+//     type: Payment,
+//   },
+//   params: {
+//     apiKey: {
+//       field: 'apiKey',
+//       type: "string",
+//     },
+//   },
+//   query: {
+//     join: {
+//       store: {
+//         eager: true,
+//       },
+//       transaction: {
+//         eager: true,
+//       },
+//     },
+//   },
+// })
 
 
 @ApiTags('payment')
@@ -63,9 +73,24 @@ export class PaymentController implements CrudController<Payment> {
       @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
   ) {}
 
-
   @Override()
   @Get()
+  @ApiOperation({
+    summary: 'Get all payment for store'
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: 'not found Bearer token'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'This store does not have such a payments'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, description: '', type: ReturnPaymentDto
+  })
+  @ApiHeader({
+    name: 'apiKey store',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
   async getAllByStore(@Headers() headers) {
     /**
      * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on this store
@@ -95,6 +120,12 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update payment by id'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'Error'
+  })
   async updatePatchPayment(@Param() id) {
     throw new HttpException('Error', HttpStatus.BAD_REQUEST)
   }
@@ -102,13 +133,28 @@ export class PaymentController implements CrudController<Payment> {
 
   @Override()
   @Put(':id')
+  @ApiOperation({
+    summary: 'Update payment by id'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'Error'
+  })
   async updatePutPayment(@Param() id) {
     throw new HttpException('Error', HttpStatus.BAD_REQUEST)
   }
 
   @Override()
   @Get(':id')
-  async getPayment(@Param() id, @Headers() token) {
+  @ApiOperation({
+    summary: 'Get payment by id'
+  })
+  @ApiResponse({
+    status: HttpStatus.OK, type: ReturnPaymentDto
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND, description: 'payment not found'
+  })
+  async getPayment(@Param() id: GetPaymentDto, @Headers() token) {
     if (!token?.authorization) {
       return await this.service.findById(id.id, token);
     }
@@ -116,22 +162,36 @@ export class PaymentController implements CrudController<Payment> {
     return await this.service.findById(id.id, user);
   }
 
-  get base(): CrudController<Payment> {
-    return this;
-  }
+  // get base(): CrudController<Payment> {
+  //   return this;
+  // }
 
-  @Override()
-  getMany(
-      @ParsedRequest() req: CrudRequest,
-  ) {
-    // const user = this.userService.findByToken()
-    return this.base.getManyBase(req);
-  }
+  // @Override()
+  // getMany(
+  //     @ParsedRequest() req: CrudRequest,
+  // ) {
+  //   // const user = this.userService.findByToken()
+  //   return this.base.getManyBase(req);
+  // }
 
   @Override()
   @Post()
+  @ApiOperation({
+    summary: 'Create new payment'
+  })
+  @ApiOkResponse({
+    description: 'create one payment', type: returnCreatePaymentDto
+  })
   @ApiResponse({
-    status: 201, description: 'Get create one base response', type: CreateOnePaymentDto })
+    status: HttpStatus.BAD_REQUEST, description: 'payment already exists'
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND, description: 'store not found'
+  })
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
   async createOne(
       @Body() dto: CreateOnePaymentDto,
       @Headers() headers,
@@ -152,6 +212,7 @@ export class PaymentController implements CrudController<Payment> {
         res.status(HttpStatus.BAD_REQUEST).send('payment already exists');
         return;
       }
+      dto = {...dto, amount: (+dto.amount * 1000000000).toString()}
       const response = await this.service.create(dto, headers.authorization.slice(7));
       return {id: response.id};
     } catch (err) {
@@ -163,41 +224,41 @@ export class PaymentController implements CrudController<Payment> {
 
 
 
-  @Override('getOneBase')
-  getOneAndDoStuff(
-    @ParsedRequest() req: CrudRequest,
-  ) {
-    return this.base.getOneBase(req);
-  }
+  // @Override('getOneBase')
+  // getOneAndDoStuff(
+  //   @ParsedRequest() req: CrudRequest,
+  // ) {
+  //   return this.base.getOneBase(req);
+  // }
 
-  @Override()
-  createMany(
-      @ParsedRequest() req: CrudRequest,
-      @ParsedBody() dto: CreateManyDto<Payment>
-  ) {
-    return this.base.createManyBase(req, dto);
-  }
-
-  @Override('updateOneBase')
-  coolFunction(
-      @ParsedRequest() req: CrudRequest,
-      @ParsedBody() dto: Payment,
-  ) {
-    return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('replaceOneBase')
-  awesomePUT(
-      @ParsedRequest() req: CrudRequest,
-      @ParsedBody() dto: Payment,
-  ) {
-    return this.base.replaceOneBase(req, dto);
-  }
-
-  @Override()
-  async deleteOne(
-      @ParsedRequest() req: CrudRequest,
-  ) {
-    return this.base.deleteOneBase(req);
-  }
+  // @Override()
+  // createMany(
+  //     @ParsedRequest() req: CrudRequest,
+  //     @ParsedBody() dto: CreateManyDto<Payment>
+  // ) {
+  //   return this.base.createManyBase(req, dto);
+  // }
+  //
+  // @Override('updateOneBase')
+  // coolFunction(
+  //     @ParsedRequest() req: CrudRequest,
+  //     @ParsedBody() dto: Payment,
+  // ) {
+  //   return this.base.updateOneBase(req, dto);
+  // }
+  //
+  // @Override('replaceOneBase')
+  // awesomePUT(
+  //     @ParsedRequest() req: CrudRequest,
+  //     @ParsedBody() dto: Payment,
+  // ) {
+  //   return this.base.replaceOneBase(req, dto);
+  // }
+  //
+  // @Override()
+  // async deleteOne(
+  //     @ParsedRequest() req: CrudRequest,
+  // ) {
+  //   return this.base.deleteOneBase(req);
+  // }
 }

@@ -7,10 +7,15 @@ export class CreateOnePaymentDto {
         description: 'Payment id',
         default: 4,
     })
-    id: number
+    id?: number
 
+  @ApiProperty({
+    description: 'amount cspr',
+    default: "2.5",
+    required: true
+  })
   @Type(() => Number)
-  @Min(2500000000)
+  @Min(2.5)
   @IsNotEmpty({
     message: 'amount cant be empty'
   })

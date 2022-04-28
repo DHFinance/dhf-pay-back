@@ -45,6 +45,15 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
+  async findByTokenSelected(token) {
+    return await this.repo.findOne({
+      where: {
+        token
+      },
+      select: ['id', 'role']
+    })
+  }
+
 
   /**
    * @description checks the code received from the front and the code from the database. If they are the same, it sends an email about successful registration and removes the code from the user record (the user with the code in the emailVerification field cannot be authorized). Sends a user record to the front
