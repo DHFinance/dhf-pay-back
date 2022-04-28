@@ -9,11 +9,11 @@ import { UserService } from "./user.service";
 import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
 import { BlockUserDto } from "./dto/block.dto";
 
-@Crud({
-  model: {
-    type: User,
-  },
-})
+// @Crud({
+//   model: {
+//     type: User,
+//   },
+// })
 
 @ApiTags('user')
 @Controller('user')

@@ -12,3 +12,41 @@ export class BlockStoreDto {
   })
   blocked: boolean
 }
+
+export class ReturnBlockStoreDto {
+  @ApiProperty({
+    default: 1
+  })
+  id: number
+
+  @ApiProperty({
+    default: 'test url'
+  })
+  url: string
+
+  @ApiProperty({
+    default: 'test name'
+  })
+  name: string
+
+  @ApiProperty({
+    default: 'wallet'
+  })
+  wallet: string
+
+  @ApiProperty({
+    default: 'description'
+  })
+  description: string
+
+  @ApiProperty({
+    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE'
+  })
+  apiKey: string
+
+  @ApiProperty({
+    description: 'Block status (false/true)',
+    default: true
+  })
+  blocked: boolean
+}

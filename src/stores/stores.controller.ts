@@ -18,28 +18,38 @@ import {
 import { StoresService } from "./stores.service";
 import { Stores } from "./entities/stores.entity";
 import { UserService } from "../user/user.service";
-import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
-import { BlockStoreDto } from "./dto/block.dto";
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiNotFoundResponse,
+  ApiOkResponse, ApiOperation,
+  ApiProperty,
+  ApiResponse,
+  ApiTags
+} from "@nestjs/swagger";
+import {BlockStoreDto, ReturnBlockStoreDto} from "./dto/block.dto";
 import { randomString } from "../utils/randomString";
 import {CreateStoreDto} from "./dto/createStore.dto";
-import {UpdateStoreDto} from "./dto/updateStore.dto";
+import {ReturnUpdateStoreDto, UpdateStoreDto} from "./dto/updateStore.dto";
+import {ReturnCreateStoreDto, ReturnGetAllStoreDto} from "./dto/returnCreateStore.dto";
+import {GetStoreDto} from "./dto/getStore.dto";
 
-@Crud({
-  model: {
-    type: Stores,
-  },
-  query: {
-    join: {
-      user: {
-        eager: true,
-        exclude: ["password", "restorePasswordCode", "token"]
-      },
-      transaction: {
-        eager: true,
-      },
-    },
-  },
-})
+// @Crud({
+//   model: {
+//     type: Stores,
+//   },
+//   query: {
+//     join: {
+//       user: {
+//         eager: true,
+//         exclude: ["password", "restorePasswordCode", "token"]
+//       },
+//       transaction: {
+//         eager: true,
+//       },
+//     },
+//   },
+// })
 
 @ApiTags('store')
 @Controller('store')
@@ -64,8 +74,33 @@ export class StoresController implements CrudController<Stores> {
 
 
 
+
   @Override()
   @Post()
+  @ApiOperation({summary: 'Create new store'})
+  @ApiProperty({description: 'create new store'})
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'admin cant create store'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'store already exist'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'you can\'t create store with incorrect blocked status'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'you cant create store'
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND, description: 'store not found'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: ReturnCreateStoreDto
+  })
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
   async createOne(
       @Body() dto: CreateStoreDto,
       @Headers() token
@@ -73,7 +108,7 @@ export class StoresController implements CrudController<Stores> {
     if(!token?.authorization){
       throw new UnauthorizedException()
     }
-    const user = await this.userService.findByToken(token.authorization.split(' ')[1])
+    const user = await this.userService.findByTokenSelected(token.authorization.split(' ')[1])
     if (user.role === 'admin') {
       throw new HttpException('admin cant create store', HttpStatus.BAD_REQUEST);
     }
@@ -140,14 +175,36 @@ export class StoresController implements CrudController<Stores> {
 
 
   @Post('block')
-  @ApiProperty({ type: BlockStoreDto })
+  @ApiProperty({ type: BlockStoreDto, description: 'block store' })
+  @ApiOperation({summary: 'block store'})
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: 'There is no admin with this token'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: ReturnBlockStoreDto
+  })
   async storeBlock(@Body() body: BlockStoreDto) {
     return this.service.changeBlockStore(body.id, true)
   }
 
   @Post('unblock')
-  @ApiProperty()
-  async storeUnblock(@Body() body) {
+  @ApiProperty({type: BlockStoreDto, description: 'unblock store'})
+  @ApiOperation({summary: 'unblock store'})
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: 'There is no admin with this token'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: ReturnBlockStoreDto
+  })
+  async storeUnblock(@Body() body: BlockStoreDto) {
     return this.service.changeBlockStore(body.id, false)
   }
 
@@ -163,24 +220,63 @@ export class StoresController implements CrudController<Stores> {
 
   @Override()
   @Get()
+  @ApiProperty({description: 'get all stores'})
+  @ApiOperation({summary: 'get all stores'})
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized'
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND, description: 'user not found'
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND, description: 'stores not found'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: [ReturnGetAllStoreDto]
+  })
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
   async getStores(@Headers() token) {
     if(!token?.authorization){
       throw new UnauthorizedException()
     }
     const user = await this.userService.findByToken(token.authorization.split(' ')[1]);
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND)
+    }
     if (user.role === 'admin') {
       return await this.service.find({relations: ['user']})
     }
-    if (user) {
-      return this.service.getAllStore(token.authorization.split(' ')[1])
-    }
+    return this.service.getAllStore(token.authorization.split(' ')[1])
   }
 
   @Override()
   @Get(':id')
-  @ApiProperty()
-  async getUserStores(@Param() id, @Headers() token) {
-    console.log(token.authorization);
+  @ApiProperty({
+    description: 'get store by id'
+  })
+  @ApiOperation({
+    summary: 'Get store by id'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: ReturnGetAllStoreDto
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: "Unauthorized"
+  })
+  @ApiOkResponse({
+    status: HttpStatus.NOT_FOUND, description: 'store not found'
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'you are not the creator of the store'
+  })
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
+  async getUserStores(@Param() id: GetStoreDto, @Headers() token) {
     if(!token?.authorization){
       throw new UnauthorizedException()
     }
@@ -189,7 +285,31 @@ export class StoresController implements CrudController<Stores> {
 
   @Override()
   @Put(':id')
-  @ApiProperty()
+  @ApiProperty({
+    description: 'update store by id'
+  })
+  @ApiOperation({
+    summary: 'Update store by id'
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: "Unauthorized"
+  })
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'you cant change user'
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'you cant change ID'
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'you cant change blocked status'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: ReturnUpdateStoreDto
+  })
   async putUpdateStore(@Body() body: UpdateStoreDto, @Param() id, @Headers() header) {
     if(!header.authorization){
       throw new UnauthorizedException()
@@ -199,8 +319,32 @@ export class StoresController implements CrudController<Stores> {
 
   @Override()
   @Patch(':id')
-  @ApiProperty()
-  async updateStore(@Body() body, @Param() id, @Headers() header) {
+  @ApiProperty({
+    description: 'update store by id'
+  })
+  @ApiOperation({
+    summary: 'Update store by id'
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: "Unauthorized"
+  })
+  @ApiHeader({
+    name: 'auth token',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST, description: 'you cant change user'
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'you cant change ID'
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'you cant change blocked status'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK, type: ReturnUpdateStoreDto
+  })
+  async updateStore(@Body() body: UpdateStoreDto, @Param() id, @Headers() header) {
     if(!header.authorization){
       throw new UnauthorizedException()
     }
