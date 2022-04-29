@@ -3,10 +3,6 @@ import {IsNotEmpty, Min, MinLength} from 'class-validator';
 import {Type} from "class-transformer";
 
 export class CreateOnePaymentDto {
-    @ApiProperty({
-        description: 'Payment id',
-        default: 4,
-    })
     id?: number
 
   @ApiProperty({
@@ -20,6 +16,8 @@ export class CreateOnePaymentDto {
     message: 'amount cant be empty'
   })
   amount: string
+
+  cancelled?: boolean
 
   text?: string
 }

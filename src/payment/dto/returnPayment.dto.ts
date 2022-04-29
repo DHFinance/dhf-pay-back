@@ -42,6 +42,11 @@ export class ReturnPaymentDto {
   text: string
 
   @ApiProperty({
+    default: false
+  })
+  cancelled?: boolean
+
+  @ApiProperty({
     default: {
       id: 1,
       wallet: 'wallet'

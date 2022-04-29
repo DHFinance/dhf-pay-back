@@ -75,8 +75,10 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       relations: ['user']
     })
     const user = await this.userService.findByToken(token);
-    if (user.role === 'admin') {
-      return store[0];
+    if (user) {
+      if (user.role === 'admin') {
+        return store[0];
+      }
     }
     if (!store.length) {
       throw new HttpException('store not found', HttpStatus.NOT_FOUND)

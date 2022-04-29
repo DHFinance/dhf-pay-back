@@ -130,6 +130,45 @@ export class PaymentController implements CrudController<Payment> {
     throw new HttpException('Error', HttpStatus.BAD_REQUEST)
   }
 
+  @Override()
+  @Put('cancel/:id')
+  @ApiOperation({
+    summary: 'Change cancelled status'
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED, description: 'token not found'
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND, description: 'user not found'
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'you cant change cancel status'
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK
+  })
+  async updateCancelledStatus(@Param() id, @Headers() token) {
+    console.log(token.authorization);
+    if (!token.authorization) {
+      throw new HttpException('token not found', HttpStatus.UNAUTHORIZED)
+    }
+    const user = await this.userService.findByToken(token.authorization.split(' ')[1]);
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    }
+    const payment = await this.service.findPayment(id.id);
+    if (!payment) {
+      throw new HttpException('payment not found', HttpStatus.NOT_FOUND)
+    }
+    if (payment.status === "Paid") {
+      throw new HttpException('payment already completed', HttpStatus.BAD_REQUEST)
+    }
+    if (user.token === payment.store.user.token) {
+      return await this.service.save(payment);
+    }
+    throw new HttpException('you cant change cancel status', HttpStatus.CONFLICT)
+  }
+
 
   @Override()
   @Put(':id')
@@ -156,10 +195,15 @@ export class PaymentController implements CrudController<Payment> {
   })
   async getPayment(@Param() id: GetPaymentDto, @Headers() token) {
     if (!token?.authorization) {
-      return await this.service.findById(id.id, token);
+      return await this.service.findById(id.id);
     }
-    const user = await this.userService.findByToken(token.authorization.split(' ')[1])
-    return await this.service.findById(id.id, user);
+    const user = await this.userService.findByTokenSelected(token.authorization.split(' ')[1])
+    if (user) {
+      if (user?.role === 'admin') {
+        return await this.service.findPayment(id.id);
+      }
+    }
+    return await this.service.findById(id.id);
   }
 
   // get base(): CrudController<Payment> {
@@ -188,8 +232,11 @@ export class PaymentController implements CrudController<Payment> {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND, description: 'store not found'
   })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT, description: 'cant create payment with incorrect status'
+  })
   @ApiHeader({
-    name: 'auth token',
+    name: 'apiKey store',
     description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
   })
   async createOne(
@@ -212,7 +259,14 @@ export class PaymentController implements CrudController<Payment> {
         res.status(HttpStatus.BAD_REQUEST).send('payment already exists');
         return;
       }
-      dto = {...dto, amount: (+dto.amount * 1000000000).toString()}
+      console.log(dto);
+      if (dto?.cancelled) {
+        if (typeof dto.cancelled !== 'boolean' || dto.cancelled === true) {
+          res.status(HttpStatus.CONFLICT).send('cant create payment with incorrect status')
+          return;
+        }
+      }
+      dto = {...dto, amount: (+dto.amount * 1000000000).toString(), cancelled: false}
       const response = await this.service.create(dto, headers.authorization.slice(7));
       return {id: response.id};
     } catch (err) {
