@@ -55,11 +55,9 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         throw new HttpException('payment already completed', HttpStatus.BAD_REQUEST);
       }
 
-      // if (activeTransaction.payment.type !== 2) {
-      //   console.log("activeTransaction", activeTransaction)
-      //   throw new HttpException('Current payment transaction is already being processed', HttpStatus.BAD_REQUEST);
-      // }
-
+      if (findPayment.cancelled) {
+        throw new HttpException('payment already cancelled', HttpStatus.BAD_REQUEST);
+      }
 
       const res = await this.repo.save({
         ...transaction,

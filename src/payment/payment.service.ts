@@ -48,6 +48,10 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
   //   console.log(parentParent)
   // }
 
+  async save(dto) {
+    return this.repo.save({...dto, cancelled: true})
+  }
+
   async create(dto, apiKey) {
     try {
       const store = await Stores.findOne({
@@ -69,11 +73,11 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     return await this.repo.findOne({
       where: {
         id: id
-      }, relations: ['store']
+      }, relations: ['store', 'store.user']
     })
   }
 
-  async findById(id, user) {
+  async findById(id) {
     const payment = await this.repo.findOne({
       where: {
         id: id
@@ -82,9 +86,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     if (!payment) {
       throw new HttpException('payment nof found', HttpStatus.NOT_FOUND);
     }
-    if (user?.role === 'admin') {
-      return payment
-    }
+
     return {
       id: payment.id,
       datetime: payment.datetime,
@@ -93,6 +95,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
       comment: payment.comment,
       type: payment.type,
       text: payment.text,
+      cancelled: payment.cancelled,
       store: {
         id: payment.store.id,
         wallet: payment.store.wallet

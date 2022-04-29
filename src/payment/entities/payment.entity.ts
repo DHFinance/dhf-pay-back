@@ -66,4 +66,10 @@ export class Payment extends BaseEntity {
     default: 'Pay',
   })
   text: string;
+
+  @Column({nullable: false})
+  @ApiProperty({
+    default: false
+  })
+  cancelled: boolean
 }

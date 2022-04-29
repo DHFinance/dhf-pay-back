@@ -244,7 +244,7 @@ export class StoresController implements CrudController<Stores> {
     }
     const user = await this.userService.findByToken(token.authorization.split(' ')[1]);
     if (!user) {
-      throw new HttpException('user not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
     }
     if (user.role === 'admin') {
       return await this.service.find({relations: ['user']})
