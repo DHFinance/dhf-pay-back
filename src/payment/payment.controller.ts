@@ -39,6 +39,7 @@ import { Response } from 'express';
 import {StoresService} from "../stores/stores.service";
 import {returnCreatePaymentDto, ReturnPaymentDto} from "./dto/returnPayment.dto";
 import {GetPaymentDto} from "./dto/getPayment.dto";
+import {ReturnCancelledPaymentDto} from "./dto/returnCancelledPayment.dto";
 
 // @Crud({
 //   model: {
@@ -145,10 +146,13 @@ export class PaymentController implements CrudController<Payment> {
     status: HttpStatus.CONFLICT, description: 'you cant change cancel status'
   })
   @ApiOkResponse({
-    status: HttpStatus.OK
+    status: HttpStatus.OK, type: ReturnCancelledPaymentDto
+  })
+  @ApiHeader({
+    name: 'apiKey store',
+    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
   })
   async updateCancelledStatus(@Param() id, @Headers() token) {
-    console.log(token.authorization);
     if (!token.authorization) {
       throw new HttpException('token not found', HttpStatus.UNAUTHORIZED)
     }
@@ -164,7 +168,17 @@ export class PaymentController implements CrudController<Payment> {
       throw new HttpException('payment already completed', HttpStatus.BAD_REQUEST)
     }
     if (user.token === payment.store.user.token) {
-      return await this.service.save(payment);
+      const res = await this.service.save(payment);
+      return {
+        id: res.id,
+        datetime: res.datetime,
+        amount: res.amount,
+        status: res.status,
+        comment: res.comment,
+        type: res.type,
+        text: res.text,
+        cancelled: res.cancelled
+      }
     }
     throw new HttpException('you cant change cancel status', HttpStatus.CONFLICT)
   }
