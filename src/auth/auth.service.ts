@@ -1,14 +1,16 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
-import { UserService } from '../user/user.service';
-import { User } from '../user/entities/user.entity';
-import { createHmac } from "crypto";
-import { ensureProgram } from "ts-loader/dist/utils";
-import { StoresService } from "../stores/stores.service";
+import {BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException} from "@nestjs/common";
+import {UserService} from '../user/user.service';
+import {User} from '../user/entities/user.entity';
+import {createHmac} from "crypto";
+import {ensureProgram} from "ts-loader/dist/utils";
+import {StoresService} from "../stores/stores.service";
+
 const bcrypt = require("bcrypt");
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly storesService: StoresService) {}
+  constructor(private readonly userService: UserService, private readonly storesService: StoresService) {
+  }
 
   /**
    *
@@ -53,11 +55,11 @@ export class AuthService {
     return await this.userService.verifyUser(email, code);
   }
 
-  public async sendCode({ email }) {
+  public async sendCode({email}) {
     await this.userService.sendCode(email);
   }
 
-  public async checkCode({ code, email }) {
+  public async checkCode({code, email}) {
     return await this.userService.checkCode(code, email);
   }
 
@@ -65,7 +67,7 @@ export class AuthService {
     return await this.userService.reAuth(token);
   }
 
-  public async changePassword({ password, email }) {
+  public async changePassword({password, email}) {
     const encryptPassword = this.encryptPassword(password)
     return await this.userService.changePassword(encryptPassword, email);
   }
@@ -88,11 +90,11 @@ export class AuthService {
       /**
        * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
        */
-      try {
-        await bcrypt.compare(loginUserDto.password, user.password)
+      const res = await bcrypt.compare(loginUserDto.password, user.password)
+      if (res) {
         delete user.password
         return user
-      } catch (e) {
+      } else {
         throw new BadRequestException('password', 'wrong password')
       }
     } else {
