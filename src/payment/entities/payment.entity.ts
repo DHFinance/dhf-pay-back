@@ -10,6 +10,12 @@ import { Transaction } from "../../transaction/entities/transaction.entity";
 import { Stores } from "../../stores/entities/stores.entity";
 import { ApiProperty } from "@nestjs/swagger";
 
+export enum Status {
+  Not_paid = "Not_paid",
+  Paid = "Paid",
+  Particularly_paid = 'Particularly_paid'
+}
+
 @Entity()
 export class Payment extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -42,9 +48,9 @@ export class Payment extends BaseEntity {
   @Column()
   @ApiProperty({
     description: 'Payment status Not_paid when creating, Particularly_paid if not paid in full (maybe in theory), Paid - paid in full',
-    default: 'Not_paid',
+    default: Status.Not_paid,
   })
-  status: 'Not_paid' | 'Particularly_paid' | 'Paid';
+  status: Status;
 
   @Column({nullable: true})
   @ApiProperty({

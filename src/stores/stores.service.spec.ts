@@ -13,10 +13,12 @@ import {TransactionService} from "../transaction/transaction.service";
 import {PaymentService} from "../payment/payment.service";
 import {Payment} from "../payment/entities/payment.entity";
 import {DeepPartial} from "typeorm/common/DeepPartial";
+import {UserService} from "../user/user.service";
 
 describe('Store Service', () => {
     let db: Connection
     let paymentService: PaymentService
+    let userService: UserService
     let paymentRepo: Repository<Payment>
     let storeRepo: Repository<Stores>
     let userRepo: Repository<User>
@@ -51,9 +53,9 @@ describe('Store Service', () => {
         storeRepo = await db.getRepository(Stores)
         userRepo = await db.getRepository(User)
 
-        transactionService = new TransactionService(transactionRepo, storesService, httpService, mailerService)
-        paymentService = new PaymentService(paymentRepo, transactionService, mailerService)
-        storesService = new StoresService(storeRepo)
+        transactionService = new TransactionService(transactionRepo, paymentService, storesService, httpService, mailerService)
+        paymentService = new PaymentService(paymentRepo, mailerService)
+        storesService = new StoresService(storeRepo, userService)
 
 
         await Stores.delete({})
