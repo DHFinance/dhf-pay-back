@@ -7,6 +7,7 @@ import { HttpModule, HttpService } from "@nestjs/axios";
 import { MailerService } from "@nestjs-modules/mailer";
 import { StoresService } from "../stores/stores.service";
 import {PaymentService} from "../payment/payment.service";
+import {Payment} from "../payment/entities/payment.entity";
 
 @Injectable()
 export class TransactionService extends TypeOrmCrudService<Transaction> {
@@ -44,7 +45,11 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         throw new HttpException('transaction already exist', HttpStatus.BAD_REQUEST);
       }
 
-      const findPayment = await this.paymentService.findPayment(transaction.payment.id);
+      const findPayment = await Payment.findOne({
+        where: {
+          id: transaction.payment.id
+        }
+      });
 
       if (!findPayment) {
         throw new HttpException('payment ID incorrect', HttpStatus.BAD_REQUEST);
@@ -61,7 +66,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
 
       const res = await this.repo.save({
         ...transaction,
-        amount: findPayment.amount,
+        amount: findPayment.amount.toString(),
         status: 'processing',
         updated: new Date(),
         payment: findPayment
@@ -72,6 +77,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
         txHash: res.txHash,
         sender: res.sender,
         amount: res.amount,
+        status: res.status,
         payment: {
           id: res.payment.id,
           datetime: res.payment.datetime,
@@ -79,7 +85,7 @@ export class TransactionService extends TypeOrmCrudService<Transaction> {
           store: {
             id: res.payment.store.id
           }
-        }
+        },
       }
       try {
         await this.sendMail(res);

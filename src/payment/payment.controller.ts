@@ -149,7 +149,7 @@ export class PaymentController implements CrudController<Payment> {
     status: HttpStatus.OK, type: ReturnCancelledPaymentDto
   })
   @ApiHeader({
-    name: 'apiKey store',
+    name: 'Bearer token',
     description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
   })
   async updateCancelledStatus(@Param() id, @Headers() token) {
@@ -273,7 +273,6 @@ export class PaymentController implements CrudController<Payment> {
         res.status(HttpStatus.BAD_REQUEST).send('payment already exists');
         return;
       }
-      console.log(dto);
       if (dto?.cancelled) {
         if (typeof dto.cancelled !== 'boolean' || dto.cancelled === true) {
           res.status(HttpStatus.CONFLICT).send('cant create payment with incorrect status')
