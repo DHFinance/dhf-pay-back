@@ -11,4 +11,7 @@ export class LoginDto {
     default: '1234',
   })
   password: string;
+
+  @ApiProperty()
+  captchaToken?: string
 }

@@ -45,6 +45,16 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
+  async clearToken(email) {
+    const user = await this.findByEmail(email);
+    return await this.repo.save({ ...user, token: '' });
+  }
+
+  async setToken(email) {
+    const user = await this.findByEmail(email);
+    return await this.repo.save({...user, token: randomString(36)})
+  }
+
   async findByTokenSelected(token) {
     return await this.repo.findOne({
       where: {
@@ -155,10 +165,10 @@ export class UserService extends TypeOrmCrudService<User> {
   async sendCode(email) {
     const user = await this.findByEmail(email);
     if (user?.emailVerification !== null) {
-      throw new BadRequestException('email', 'User is not exist');
+      throw new BadRequestException('email', 'Incorrect email');
     }
     if (!user) {
-      throw new BadRequestException('email', 'User with this email does not exist');
+      throw new BadRequestException('email', 'Incorrect email');
     }
     const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
     user.restorePasswordCode = code;

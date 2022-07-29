@@ -3,19 +3,23 @@ import {
   Controller, Get,
   HttpException,
   HttpStatus, Param,
-  Post, Query
+  Post, Query,
+  Res
 } from "@nestjs/common";
+import { Response } from 'express';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from "./dto/login.dto";
 import { ChangePasswordDto, ResetCodeDto, ResetEmailDto } from "./dto/reset.dto";
 import { VerifyDto } from "./dto/verify.dto";
 import { ApiProperty, ApiTags } from "@nestjs/swagger";
+import { LogoutDto } from "./dto/logout.dto";
+import { UserService } from "../user/user.service";
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
   /**
    *
@@ -27,8 +31,11 @@ export class AuthController {
   public async register(@Body() registerUserDto: RegisterDto) {
     try {
       // console.log(await this.authService.register(registerUserDto))
-
-      return await this.authService.register(registerUserDto);
+      if (await this.authService.checkCaptcha(registerUserDto.captchaToken)) {
+        return await this.authService.register(registerUserDto);
+      } else {
+        throw new HttpException("Set Captcha", HttpStatus.BAD_REQUEST);
+      }
     } catch (err) {
       console.log(err)
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
@@ -50,6 +57,19 @@ export class AuthController {
     }
   }
 
+  @Post('logout')
+  @ApiProperty({type: LogoutDto})
+  async logout(@Body() logoutUser: LogoutDto) {
+    const user = await this.userService.findByToken(logoutUser.token);
+    console.log('user', user);
+    if (user) {
+      await this.userService.clearToken(logoutUser.email);
+    } else {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
+
+  }
+
   /**
    *
    * @param loginUserDto {LoginDto}
@@ -68,16 +88,20 @@ export class AuthController {
   }
   /**
    *
-   * @param loginUserDto {LoginDto}
    * @description Password recovery stage 1. searches for a user by email sends a code to the mail. Return true to move to the next step
    * @return true
    */
   @Post('send-code')
   @ApiProperty({ type: ResetEmailDto })
-  public async sendCode(@Body() resetUserDto: ResetEmailDto) {
+  async sendCode(@Res({passthrough: true}) response: Response, @Body() resetUserDto: ResetEmailDto) {
     try {
-      await this.authService.sendCode(resetUserDto);
-      return true;
+      if (await this.authService.checkCaptcha(resetUserDto.captchaToken)) {
+        await this.authService.sendCode(resetUserDto);
+        return true
+      } else {
+        response.status(HttpStatus.BAD_REQUEST).send("Set Captcha");
+        return;
+      }
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
@@ -85,15 +109,15 @@ export class AuthController {
 
   /**
    *
-   * @param query {token: string}
+   * @param token {token: string}
    * @description check if the user exists in the database. Occurs every time the page is reloaded
    */
-  @Get('reAuth')
+  @Post('reAuth')
   @ApiProperty()
-  public async reAuth(@Query() query) {
-
+  public async reAuth(@Body() token) {
+    console.log(token);
     try {
-      return await this.authService.reAuth(query.token);
+      return await this.authService.reAuth(token.token);
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
