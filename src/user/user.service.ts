@@ -55,6 +55,28 @@ export class UserService extends TypeOrmCrudService<User> {
     return await this.repo.save({...user, token: randomString(36)})
   }
 
+  async setAttempts(email, fail) {
+    const user = await this.findByEmail(email);
+    if (user) {
+      if (user.loginAttempts === 2) {
+        return await this.setLoginTimeBlock(email);
+      }
+      if (fail) {
+        return await this.repo.save({...user, loginAttempts: +user.loginAttempts + 1})
+      } else {
+        return await this.repo.save({...user, loginAttempts: 0})
+      }
+    }
+  }
+
+  async setLoginTimeBlock(email) {
+    const user = await this.findByEmail(email);
+    const old = new Date();
+    const newDate = new Date();
+    newDate.setMinutes(old.getMinutes() + 3);
+    return await this.repo.save({...user, timeBlockLogin: newDate.toISOString(), loginAttempts: 0});
+  }
+
   async findByTokenSelected(token) {
     return await this.repo.findOne({
       where: {
@@ -95,7 +117,7 @@ export class UserService extends TypeOrmCrudService<User> {
       where: {
         email,
       },
-      select: ['id', 'name', "lastName", 'password', 'email', 'role', 'company', 'token', 'blocked', 'restorePasswordCode', 'emailVerification']
+      select: ['id', 'name', "lastName", 'password', 'email', 'role', 'company', 'token', 'blocked', 'restorePasswordCode', 'emailVerification', 'loginAttempts', 'timeBlockLogin']
     });
     if (user?.blocked === true) {
       throw new BadRequestException('email', 'User is blocked');
@@ -170,6 +192,10 @@ export class UserService extends TypeOrmCrudService<User> {
     if (!user) {
       throw new BadRequestException('email', 'Incorrect email');
     }
+    if (new Date(user.timeBlockLogin) > new Date()) {
+      throw new BadRequestException('email', 'try again latter');
+    }
+    await this.setAttempts(email, false);
     const code = Math.floor(9999999 + Math.random() * (9999999 + 1 - 1000000));
     user.restorePasswordCode = code;
     await user.save();
@@ -194,7 +220,11 @@ export class UserService extends TypeOrmCrudService<User> {
    */
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
+    if (new Date(user.timeBlockLogin) > new Date()) {
+      throw new BadRequestException('code', 'try again latter');
+    }
     if (!user || user.restorePasswordCode !== +code)  {
+      await this.setAttempts(email, false);
       throw new BadRequestException('code', 'Wrong restore code');
     }
     return user

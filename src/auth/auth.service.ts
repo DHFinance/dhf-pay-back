@@ -50,7 +50,9 @@ export class AuthService {
       email: userDto.email,
       role: 'customer',
       blocked: userDto.blocked,
-      password: this.encryptPassword(userDto.password)
+      password: this.encryptPassword(userDto.password),
+      loginAttempts: 0,
+      timeBlockLogin: null,
     }
 
     await this.userService.create(user);
@@ -90,22 +92,28 @@ export class AuthService {
     if (!captcha) {
       throw new HttpException('set Captcha', HttpStatus.BAD_REQUEST);
     }
-    /**
-     * @description if the user has not yet entered his code that was sent to him by email - he is not considered verified
-     */
-    if (user?.emailVerification !== null) {
-      throw new BadRequestException('email or password', 'email or password incorrect');
-    }
     if (user) {
+      /**
+       * @description if the user has not yet entered his code that was sent to him by email - he is not considered verified
+       */
+      if (new Date(user?.timeBlockLogin) > new Date()) {
+        throw new BadRequestException('email or password', 'try again latter');
+      }
+      if (user?.emailVerification !== null) {
+        await this.userService.setAttempts(user.email, true);
+        throw new BadRequestException('email or password', 'email or password incorrect');
+      }
       /**
        * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
        */
       const res = await bcrypt.compare(loginUserDto.password, user.password);
       if (res) {
+        await this.userService.setAttempts(user.email, false);
         const userData = await this.userService.setToken(user.email);
         delete userData.password
         return userData
       } else {
+        await this.userService.setAttempts(user.email, true);
         throw new BadRequestException('email or password', 'email or password incorrect')
       }
     } else {
