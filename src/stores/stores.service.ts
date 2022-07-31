@@ -119,7 +119,6 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     if (!body.user) {
       body = {...body, user: user}
     }
-    console.log(body);
     if (store[0].user.token === header) {
       return this.repo.save(body);
     }

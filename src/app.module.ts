@@ -17,7 +17,6 @@ const dotEnvPath = isProduction
   ? path.resolve(__dirname, '..', '.env.staging')
   : path.resolve(__dirname, '..', '.env');
 // console.log(process.env.npm_lifecycle_event);
-const env = require('dotenv').config().parsed
 @Module({
   imports: [
     ConfigModule.load(
@@ -37,13 +36,13 @@ const env = require('dotenv').config().parsed
     }),
     MailerModule.forRoot({
       transport: {
-        host: env.MAILER_HOST,
-        SSL: !!env.MAILER_SSL,
-        QAuth: !!env.MAILER_QAUTH,
-        port: env.MAILER_PORT,
+        host: process.env.MAILER_HOST,
+        SSL: !!process.env.MAILER_SSL,
+        QAuth: !!process.env.MAILER_QAUTH,
+        port: process.env.MAILER_PORT,
         auth: {
-          user: env.MAILER_EMAIL,
-          pass: env.MAILER_PASSWORD,
+          user: process.env.MAILER_EMAIL,
+          pass: process.env.MAILER_PASSWORD,
         },
       },
       template: {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity()
@@ -23,7 +23,7 @@ export class User extends BaseEntity {
   @Column({select: false})
   @ApiProperty({
     description: 'Encrypted password. Current value - admin',
-    default: '$2b$07$PUx7RK/NjXwo7i9xpYT2vejPjU3A4hxCCvYYkDbZ/fcfgyFnCw9f.',
+    default: '$2b$07$n2L5W1iaZwRHyQO2YK72NOibkpofUQBBMCGHboosUWD0VI4NUyW1C',
   })
   password: string;
 
@@ -65,7 +65,7 @@ export class User extends BaseEntity {
   @Column()
   @ApiProperty({
     description: 'Bearer user token',
-    default: '5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v',
+    default: 'vNRszdkcktWZhQlZt0qjhAE4334oIq07s4OM',
   })
   token: string;
 
@@ -75,4 +75,16 @@ export class User extends BaseEntity {
     default: false,
   })
   blocked: boolean;
+
+  @Column()
+  @ApiProperty({
+    default: 0
+  })
+  loginAttempts: number
+
+  @CreateDateColumn({nullable: true})
+  @ApiProperty({
+    default: '2022-11-01T04:45:32.044Z'
+  })
+  timeBlockLogin: Date
 }

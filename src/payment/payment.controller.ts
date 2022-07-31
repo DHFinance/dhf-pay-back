@@ -90,7 +90,7 @@ export class PaymentController implements CrudController<Payment> {
   })
   @ApiHeader({
     name: 'apiKey store',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async getAllByStore(@Headers() headers) {
     /**
@@ -150,7 +150,7 @@ export class PaymentController implements CrudController<Payment> {
   })
   @ApiHeader({
     name: 'Bearer token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async updateCancelledStatus(@Param() id, @Headers() token) {
     if (!token.authorization) {
@@ -251,7 +251,7 @@ export class PaymentController implements CrudController<Payment> {
   })
   @ApiHeader({
     name: 'apiKey store',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async createOne(
       @Body() dto: CreateOnePaymentDto,

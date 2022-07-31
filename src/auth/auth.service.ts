@@ -4,12 +4,13 @@ import {User} from '../user/entities/user.entity';
 import {createHmac} from "crypto";
 import {ensureProgram} from "ts-loader/dist/utils";
 import {StoresService} from "../stores/stores.service";
+import { HttpService } from "@nestjs/axios";
 
 const bcrypt = require("bcrypt");
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly storesService: StoresService) {
+  constructor(private readonly userService: UserService, private readonly storesService: StoresService, private readonly httpService: HttpService) {
   }
 
   /**
@@ -22,6 +23,11 @@ export class AuthService {
     const hashed = bcrypt.hashSync(password, salt); // GOOD
     return hashed;
   };
+
+  public async checkCaptcha(token: string) {
+    const result = await this.httpService.post(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${token}`).toPromise();
+    return result.data.success
+  }
 
   public async validate(token, as) {
     if (as === 'user') {
@@ -44,7 +50,9 @@ export class AuthService {
       email: userDto.email,
       role: 'customer',
       blocked: userDto.blocked,
-      password: this.encryptPassword(userDto.password)
+      password: this.encryptPassword(userDto.password),
+      loginAttempts: 0,
+      timeBlockLogin: null,
     }
 
     await this.userService.create(user);
@@ -80,25 +88,36 @@ export class AuthService {
    */
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
-    /**
-     * @description if the user has not yet entered his code that was sent to him by email - he is not considered verified
-     */
-    if (user?.emailVerification !== null) {
-      throw new BadRequestException('email', 'User is not exist');
+    const captcha = this.checkCaptcha(loginUserDto.captchatoken);
+    if (!captcha) {
+      throw new HttpException('set Captcha', HttpStatus.BAD_REQUEST);
     }
     if (user) {
       /**
+       * @description if the user has not yet entered his code that was sent to him by email - he is not considered verified
+       */
+      if (new Date(user?.timeBlockLogin) > new Date()) {
+        throw new BadRequestException('email or password', 'try again latter');
+      }
+      if (user?.emailVerification !== null) {
+        await this.userService.setAttempts(user.email, true);
+        throw new BadRequestException('email or password', 'email or password incorrect');
+      }
+      /**
        * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
        */
-      const res = await bcrypt.compare(loginUserDto.password, user.password)
+      const res = await bcrypt.compare(loginUserDto.password, user.password);
       if (res) {
-        delete user.password
-        return user
+        await this.userService.setAttempts(user.email, false);
+        const userData = await this.userService.setToken(user.email);
+        delete userData.password
+        return userData
       } else {
-        throw new BadRequestException('password', 'wrong password')
+        await this.userService.setAttempts(user.email, true);
+        throw new BadRequestException('email or password', 'email or password incorrect')
       }
     } else {
-      throw new BadRequestException('email', 'user with this email does not exist');
+      throw new BadRequestException('email or password', 'email or password incorrect');
     }
   }
 }

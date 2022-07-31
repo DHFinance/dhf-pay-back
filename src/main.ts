@@ -8,7 +8,14 @@ import {ValidationPipe} from "@nestjs/common";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true })
   app.enableCors({
-    origin: '*',
+    origin: [
+      'http://localhost:4000',
+      'https://dhfi.online/',
+      'https://dhfi.online/',
+      'https://dhfi.io/',
+      'https://Pay.dhfi/',
+      "https://App.dhfi/"
+    ],
     methods: 'GET, PUT, POST, DELETE, PATCH',
   });
   app.setGlobalPrefix('api');
