@@ -220,12 +220,12 @@ export class UserService extends TypeOrmCrudService<User> {
    */
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
-    if (new Date(user.timeBlockLogin) > new Date()) {
-      throw new BadRequestException('code', 'try again latter');
-    }
     if (!user || user.restorePasswordCode !== +code)  {
       await this.setAttempts(email, false);
       throw new BadRequestException('code', 'Wrong restore code');
+    }
+    if (new Date(user.timeBlockLogin) > new Date()) {
+      throw new BadRequestException('code', 'try again latter');
     }
     return user
   }

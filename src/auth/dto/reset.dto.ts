@@ -1,11 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Matches } from "class-validator";
+import { IsEmail, Matches } from "class-validator";
 
 export class ResetEmailDto {
   @ApiProperty({
     description: 'Email of the user who lost the password',
     default: 'kriruban1@gmail.com',
   })
+  @IsEmail()
   email: string;
 
   @ApiProperty()
@@ -17,6 +18,7 @@ export class ResetCodeDto {
     description: 'User email specified in the previous step (reset)',
     default: 'kriruban1@gmail.com',
   })
+  @IsEmail()
   email: string;
   @ApiProperty({
     description: 'Code sent by email',
@@ -38,5 +40,6 @@ export class ChangePasswordDto {
     description: 'User email specified in the previous step (reset)',
     default: 'kriruban1@gmail.com',
   })
+  @IsEmail()
   email: string;
 }

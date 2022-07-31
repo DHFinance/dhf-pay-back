@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsBoolean } from "class-validator";
 
 export class BlockStoreDto {
   @ApiProperty({
@@ -10,6 +11,7 @@ export class BlockStoreDto {
     description: 'Block status (false/true)',
     default: true,
   })
+  @IsBoolean()
   blocked: boolean
 }
 
