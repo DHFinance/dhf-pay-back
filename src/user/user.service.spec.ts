@@ -20,7 +20,9 @@ const user = {
     // id: 60,
     password: "5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v",
     company: "mail.ru",
-    blocked: false
+    blocked: false,
+    loginAttempts: 0,
+    timeBlockLogin: null
 };
 
 describe('UserService', () => {
