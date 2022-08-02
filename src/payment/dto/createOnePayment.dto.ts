@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {IsNotEmpty, Min, MinLength} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString, Min } from "class-validator";
 import {Type} from "class-transformer";
 
 export class CreateOnePaymentDto {
@@ -17,7 +17,9 @@ export class CreateOnePaymentDto {
   })
   amount: string
 
+  @IsBoolean()
   cancelled?: boolean
 
+  @IsString()
   text?: string
 }

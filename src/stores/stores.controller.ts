@@ -99,7 +99,7 @@ export class StoresController implements CrudController<Stores> {
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async createOne(
       @Body() dto: CreateStoreDto,
@@ -179,7 +179,7 @@ export class StoresController implements CrudController<Stores> {
   @ApiOperation({summary: 'block store'})
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED, description: 'There is no admin with this token'
@@ -196,7 +196,7 @@ export class StoresController implements CrudController<Stores> {
   @ApiOperation({summary: 'unblock store'})
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED, description: 'There is no admin with this token'
@@ -236,7 +236,7 @@ export class StoresController implements CrudController<Stores> {
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async getStores(@Headers() token) {
     if(!token?.authorization){
@@ -274,7 +274,7 @@ export class StoresController implements CrudController<Stores> {
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async getUserStores(@Param() id: GetStoreDto, @Headers() token) {
     if(!token?.authorization){
@@ -296,7 +296,7 @@ export class StoresController implements CrudController<Stores> {
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST, description: 'you cant change user'
@@ -330,7 +330,7 @@ export class StoresController implements CrudController<Stores> {
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST, description: 'you cant change user'

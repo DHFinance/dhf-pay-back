@@ -48,6 +48,8 @@ MAILER_HOST = smtppro.zoho.com
 MAILER_SSL = 1,
 MAILER_QAUTH = 1,
 MAILER_PORT = 465,
+#Captcha Secret Key
+SECRET_KEY = captcha SECRET_KEY
 #RabbitMQ connection string
 RABBIT_MQ=amqps://tncqeoap:xg6g86QzZQw0SRnM8Zk6EZwu0_9wb9um@bonobo.rmq.cloudamqp.com/tncqeoap
 ```

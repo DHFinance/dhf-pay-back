@@ -68,7 +68,7 @@ export class TransactionController implements CrudController<Transaction> {
   })
   @ApiHeader({
     name: 'apiKey store',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async getAllByStore(@Param() param, @Headers() headers) {
     if (!headers.authorization) {
@@ -197,7 +197,7 @@ export class TransactionController implements CrudController<Transaction> {
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer 5ZlEqFyVD4XMnxJsSFZf2Yra1k3m44o1E59v'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
   })
   async getOneByStore(@Param() param: GetTransactionDto, @Headers() headers, @Res({ passthrough: true }) res: Response) {
 
