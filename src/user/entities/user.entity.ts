@@ -76,7 +76,7 @@ export class User extends BaseEntity {
   })
   blocked: boolean;
 
-  @Column()
+  @Column({nullable: true})
   @ApiProperty({
     default: 0
   })
@@ -84,7 +84,7 @@ export class User extends BaseEntity {
 
   @CreateDateColumn({nullable: true})
   @ApiProperty({
-    default: '2022-11-01T04:45:32.044Z'
+    default: null
   })
   timeBlockLogin: Date
 }
