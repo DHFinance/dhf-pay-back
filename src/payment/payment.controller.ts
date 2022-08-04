@@ -279,6 +279,12 @@ export class PaymentController implements CrudController<Payment> {
           return;
         }
       }
+      if (dto.text) {
+        if (typeof  dto.text !== 'string' || dto.text.length >= 255) {
+          res.status(HttpStatus.CONFLICT).send('cant create payment with incorrect comment')
+        }
+        return;
+      }
       dto = {...dto, amount: (+dto.amount * 1000000000).toString(), cancelled: false}
       const response = await this.service.create(dto, headers.authorization.slice(7));
       return {id: response.id};
