@@ -17,9 +17,7 @@ export class CreateOnePaymentDto {
   })
   amount: string
 
-  @IsBoolean()
   cancelled?: boolean
 
-  @IsString()
   text?: string
 }
