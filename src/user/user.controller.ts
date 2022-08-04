@@ -1,7 +1,8 @@
 import {
   Body,
-  Controller,
+  Controller, Get,
   Post,
+  Headers, BadRequestException, HttpException, HttpStatus
 } from "@nestjs/common";
 import { Crud, CrudController} from "@nestjsx/crud";
 import { User } from './entities/user.entity';
@@ -27,6 +28,17 @@ export class UserController implements CrudController<User> {
   @ApiProperty({ type: BlockUserDto })
   async storeBlock(@Body() body: BlockUserDto) {
     return this.service.changeBlockUser(body.id, body.blocked)
+  }
+
+  @Get()
+  @ApiProperty()
+  async getUsers(@Headers() headers) {
+    const user = await this.service.findByToken(headers['authorization'].split(' ')[1])
+    if (user?.role === 'admin') {
+      return await this.service.find({});
+    } else {
+      throw new HttpException('Your not admin', HttpStatus.BAD_REQUEST);
+    }
   }
 }
 
