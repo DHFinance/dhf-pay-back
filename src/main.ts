@@ -7,6 +7,8 @@ import {ValidationPipe} from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true })
+  app.getHttpAdapter().getInstance().disable('X-Powered-By');
+  app.getHttpAdapter().getInstance().disable('x-powered-by');
   app.enableCors({
     origin: [
       'http://localhost:4000',
