@@ -98,9 +98,16 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       where: {id: id.id},
       relations: ['user']
     })
-    const user = await this.userService.findByTokenSelected(header)
+    const testStore = store.map((el) => {
+      if (el?.user?.timeBlockLogin) {
+        //@ts-ignore
+        el?.user?.timeBlockLogin = new Date(el.user.timeBlockLogin).toISOString();
+      }
+      return el
+    });
+    const user = await this.userService.findByTokenSelected(header);
     if (body?.user) {
-      if (!deepEqual(body?.user, store[0].user)) {
+      if (!deepEqual(body?.user, testStore[0].user)) {
         throw new HttpException('you cant change user', HttpStatus.BAD_REQUEST)
       }
     }
