@@ -125,13 +125,18 @@ export class AuthController {
 
   /**
    *
+   * @param response
    * @param resetUserPasswordDto {ResetCodeDto}
    * @description Password recovery stage 2. Comparison of the code that came from the front and the code from the user's record. If the codes match, move on to the next step.
    */
   @Post('check-code')
   @ApiProperty({ type: ResetCodeDto })
-  public async checkCode(@Body() resetUserPasswordDto: ResetCodeDto) {
+  public async checkCode(@Res({passthrough: true}) response: Response, @Body() resetUserPasswordDto: ResetCodeDto) {
 
+    const captcha = await this.authService.checkCaptcha(resetUserPasswordDto.captchaToken);
+    if (!captcha) {
+      throw new HttpException('set Captcha', HttpStatus.BAD_REQUEST);
+    }
     try {
       const user = await this.authService.checkCode(resetUserPasswordDto);
       if (user) {
