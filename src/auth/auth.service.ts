@@ -26,6 +26,7 @@ export class AuthService {
 
   public async checkCaptcha(token: string) {
     const result = await this.httpService.post(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${token}`).toPromise();
+    console.log('result', result.data);
     return result.data.success
   }
 
@@ -88,7 +89,7 @@ export class AuthService {
    */
   public async login(loginUserDto) {
     const user = await this.userService.findByEmail(loginUserDto.email);
-    const captcha = this.checkCaptcha(loginUserDto.captchatoken);
+    const captcha = await this.checkCaptcha(loginUserDto.captchaToken);
     if (!captcha) {
       throw new HttpException('set Captcha', HttpStatus.BAD_REQUEST);
     }

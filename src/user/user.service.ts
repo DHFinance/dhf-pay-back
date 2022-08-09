@@ -95,6 +95,10 @@ export class UserService extends TypeOrmCrudService<User> {
 
     const userVerified = await this.findByEmail(email);
 
+    if (new Date(userVerified.timeBlockLogin) > new Date()) {
+      throw new BadRequestException('code', 'try again latter');
+    }
+
     if (userVerified.emailVerification == code) {
       await this.mailerService.sendMail({
         to: email,
@@ -108,6 +112,7 @@ export class UserService extends TypeOrmCrudService<User> {
       });
       return await this.repo.save({ ...userVerified, emailVerification: null });
     } else {
+      await this.setAttempts(email, true);
       throw new BadRequestException('code', 'Wrong code');
     }
   }
@@ -220,14 +225,16 @@ export class UserService extends TypeOrmCrudService<User> {
    */
   async checkCode(code, email) {
     const user = await this.findByEmail(email)
-    if (!user || user.restorePasswordCode !== +code)  {
-      await this.setAttempts(email, false);
-      throw new BadRequestException('code', 'Wrong restore code');
-    }
     if (new Date(user.timeBlockLogin) > new Date()) {
       throw new BadRequestException('code', 'try again latter');
     }
-    return user
+    if (!user || user.restorePasswordCode !== +code)  {
+      await this.setAttempts(email, true);
+      throw new BadRequestException('code', 'Wrong restore code');
+    } else {
+      await this.setAttempts(email, false);
+      return user
+    }
   }
 
   /**

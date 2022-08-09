@@ -12,11 +12,11 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:4000',
-      'https://dhfi.online/',
-      'https://dhfi.online/',
-      'https://dhfi.io/',
-      'https://Pay.dhfi/',
-      "https://App.dhfi/"
+      'https://dhfi.online',
+      'https://dhfi.online',
+      'https://dhfi.io',
+      'https://Pay.dhfi',
+      "https://App.dhfi"
     ],
     methods: 'GET, PUT, POST, DELETE, PATCH',
   });

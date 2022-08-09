@@ -25,6 +25,8 @@ export class ResetCodeDto {
     default: '12345678',
   })
   code: string;
+
+  captchaToken?: string;
 }
 
 export class ChangePasswordDto {
