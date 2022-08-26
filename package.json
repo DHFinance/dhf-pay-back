@@ -44,6 +44,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.2",
     "handlebars": "^4.7.7",
+    "helmet": "^5.1.1",
     "jsdoc": "^3.6.10",
     "nestjs-config": "^1.4.10",
     "nodemailer": "^6.7.2",

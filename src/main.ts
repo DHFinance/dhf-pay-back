@@ -4,6 +4,7 @@ import { ApiBearerAuth, DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Transport } from '@nestjs/microservices'
 import { checkAuth } from "./middlewares/checkAuth.middleware";
 import {ValidationPipe} from "@nestjs/common";
+import helmet from "helmet";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true })
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:4000',
+      'http://localhost:3000',
       'https://dhfi.online',
       'https://dhfi.online',
       'https://dhfi.io',
@@ -27,6 +29,11 @@ async function bootstrap() {
    * @description this middleware is responsible for authorization and verification of tokens
    */
   app.use(checkAuth);
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    })
+  );
   /**
    * @description swagger creation
    */
