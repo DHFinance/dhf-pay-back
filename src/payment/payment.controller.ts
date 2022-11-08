@@ -35,7 +35,7 @@ import { Payment } from './entities/payment.entity';
 import { PaymentService } from './payment.service';
 
 @ApiTags('payment')
-@Controller('v1/payment')
+@Controller('payment')
 @ApiBearerAuth('Bearer')
 export class PaymentController implements CrudController<Payment> {
   constructor(

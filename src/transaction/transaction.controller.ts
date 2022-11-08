@@ -36,7 +36,7 @@ import {
 import { ReturnNewTransactionDto } from './dto/returnNewTransaction.dto';
 
 @ApiTags('transaction')
-@Controller('v1/transaction')
+@Controller('transaction')
 @ApiBearerAuth('Bearer')
 export class TransactionController implements CrudController<Transaction> {
   constructor(

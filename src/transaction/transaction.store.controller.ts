@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { TransactionService } from './transaction.service';
 
 @ApiTags('transaction store')
-@Controller('v1/transaction')
+@Controller('transaction')
 @ApiBearerAuth('Bearer')
 export class TransactionStoreController {
   constructor(

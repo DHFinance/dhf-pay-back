@@ -15,7 +15,7 @@ import { LoginPosTerminalResponseDto } from './dtos/loginPosTerminal.response.dt
 import { LoginPosTerminalWithQRRequest } from './dtos/loginPosTerminalWithQR.request';
 import { LoginPosTerminalWithQRResponse } from './dtos/loginPosTerminalWithQR.response';
 
-@Controller('v2/merchant/pos')
+@Controller('merchant/pos')
 @ApiTags('pos')
 class PosController {
   @Post('auth')

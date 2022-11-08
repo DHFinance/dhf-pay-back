@@ -36,7 +36,7 @@ import { Stores } from './entities/stores.entity';
 import { StoresService } from './stores.service';
 
 @ApiTags('store')
-@Controller('v1/store')
+@Controller('store')
 @ApiBearerAuth('Bearer')
 export class StoresController implements CrudController<Stores> {
   constructor(
