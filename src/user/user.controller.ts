@@ -14,7 +14,7 @@ import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @ApiTags('user')
-@Controller('user')
+@Controller('v1/user')
 @ApiBearerAuth('Bearer')
 export class UserController implements CrudController<User> {
   constructor(public readonly service: UserService) {}

@@ -21,7 +21,7 @@ import {
 import { VerifyDto } from './dto/verify.dto';
 
 @ApiTags('auth')
-@Controller('auth')
+@Controller('v1/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

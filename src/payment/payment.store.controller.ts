@@ -13,7 +13,7 @@ import { BillMailDto } from './dto/billMail.dto';
 import { PaymentService } from './payment.service';
 
 @ApiTags('store payment')
-@Controller('/payment')
+@Controller('v1/payment')
 @ApiBearerAuth('Bearer')
 export class PaymentStoreController {
   constructor(
