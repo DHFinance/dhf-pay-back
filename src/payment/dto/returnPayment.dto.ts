@@ -1,63 +1,63 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 interface storeInterface {
-  id: number
-  wallet: string
+  id: number;
+  wallet: string;
 }
 
 export class ReturnPaymentDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 
   @ApiProperty({
-    default: "data"
+    default: 'data',
   })
-  datetime: string
+  datetime: string;
 
   @ApiProperty({
-    default: '2.5'
+    default: '2.5',
   })
-  amount: string
+  amount: string;
 
   @ApiProperty({
-    default: 'Not_paid'
+    default: 'Not_paid',
   })
-  status: string
+  status: string;
 
   @ApiProperty({
-    default: 'comment'
+    default: 'comment',
   })
-  comment: string
+  comment: string;
 
   @ApiProperty({
-    default: null
+    default: null,
   })
-  type: number
+  type: number;
 
   @ApiProperty({
-    default: 'text button'
+    default: 'text button',
   })
-  text: string
+  text: string;
 
   @ApiProperty({
-    default: false
+    default: false,
   })
-  cancelled?: boolean
+  cancelled?: boolean;
 
   @ApiProperty({
     default: {
       id: 1,
-      wallet: 'wallet'
-    }
+      wallet: 'wallet',
+    },
   })
-  store: storeInterface
+  store: storeInterface;
 }
 
 export class returnCreatePaymentDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 }

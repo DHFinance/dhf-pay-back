@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-const env = require('dotenv').config().parsed
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const env = require('dotenv').config().parsed;
 export class addAdmin1631542698364 implements MigrationInterface {
   name = 'addAdmin1631542698364';
 

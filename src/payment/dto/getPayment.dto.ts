@@ -1,8 +1,8 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class GetPaymentDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 }

@@ -1,8 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumberString, Matches, Min, MinLength } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { Matches } from 'class-validator';
 
 export class RegisterDto {
-
   @ApiProperty({
     description: 'Name',
     default: 'kri',
@@ -30,11 +29,16 @@ export class RegisterDto {
   // @MinLength(8, {
   //   message: 'Password is too short. Minimal length is $constraint1 characters'
   // })
-  @Matches('(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}','',{
-    message: 'The password must contain at least 8 characters, 1 special character, 1 uppercase character'
-  })
+  @Matches(
+    '(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}',
+    '',
+    {
+      message:
+        'The password must contain at least 8 characters, 1 special character, 1 uppercase character',
+    },
+  )
   password: string;
 
   @ApiProperty()
-  captchaToken?: string
+  captchaToken?: string;
 }

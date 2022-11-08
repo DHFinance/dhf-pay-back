@@ -1,11 +1,7 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post } from "@nestjs/common";
-import { Crud, CrudController } from "@nestjsx/crud";
-import { Transaction } from "./entities/transaction.entity";
-import { TransactionService } from "./transaction.service";
-import { Payment } from "../payment/entities/payment.entity";
-import { PaymentService } from "../payment/payment.service";
-import { UserService } from "../user/user.service";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Controller } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserService } from '../user/user.service';
+import { TransactionService } from './transaction.service';
 
 @ApiTags('transaction store')
 @Controller('/transaction')
@@ -15,6 +11,4 @@ export class TransactionStoreController {
     public readonly service: TransactionService,
     public readonly userService: UserService,
   ) {}
-
 }
-

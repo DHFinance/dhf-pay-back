@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean } from 'class-validator';
 
 export class BlockStoreDto {
   @ApiProperty({
@@ -12,43 +12,43 @@ export class BlockStoreDto {
     default: true,
   })
   @IsBoolean()
-  blocked: boolean
+  blocked: boolean;
 }
 
 export class ReturnBlockStoreDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 
   @ApiProperty({
-    default: 'test url'
+    default: 'test url',
   })
-  url: string
+  url: string;
 
   @ApiProperty({
-    default: 'test name'
+    default: 'test name',
   })
-  name: string
+  name: string;
 
   @ApiProperty({
-    default: 'wallet'
+    default: 'wallet',
   })
-  wallet: string
+  wallet: string;
 
   @ApiProperty({
-    default: 'description'
+    default: 'description',
   })
-  description: string
+  description: string;
 
   @ApiProperty({
-    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE'
+    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE',
   })
-  apiKey: string
+  apiKey: string;
 
   @ApiProperty({
     description: 'Block status (false/true)',
-    default: true
+    default: true,
   })
-  blocked: boolean
+  blocked: boolean;
 }

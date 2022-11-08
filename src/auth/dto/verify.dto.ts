@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class VerifyDto {
   @ApiProperty({
@@ -6,11 +6,9 @@ export class VerifyDto {
     default: 'kriruban1@gmail.com',
   })
   email: string;
-  @ApiProperty(
-    {
-      description: 'Code sent to email to confirm email',
-      default: '12345678',
-    },
-  )
+  @ApiProperty({
+    description: 'Code sent to email to confirm email',
+    default: '12345678',
+  })
   code: string;
 }

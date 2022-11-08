@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
@@ -15,5 +15,5 @@ export class LoginDto {
   password: string;
 
   @ApiProperty()
-  captchaToken?: string
+  captchaToken?: string;
 }

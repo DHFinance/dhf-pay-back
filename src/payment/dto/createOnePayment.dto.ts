@@ -1,23 +1,23 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsString, Min } from "class-validator";
-import {Type} from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, Min } from 'class-validator';
 
 export class CreateOnePaymentDto {
-    id?: number
+  id?: number;
 
   @ApiProperty({
     description: 'amount cspr',
-    default: "2.5",
-    required: true
+    default: '2.5',
+    required: true,
   })
   @Type(() => Number)
   @Min(2.5)
   @IsNotEmpty({
-    message: 'amount cant be empty'
+    message: 'amount cant be empty',
   })
-  amount: string
+  amount: string;
 
-  cancelled?: boolean
+  cancelled?: boolean;
 
-  text?: string
+  text?: string;
 }
