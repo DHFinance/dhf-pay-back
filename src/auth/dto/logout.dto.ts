@@ -1,13 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LogoutDto {
   @ApiProperty({
-    default: 'test@gmail.com'
+    default: 'test@gmail.com',
   })
-  email: string
+  email: string;
 
   @ApiProperty({
-    default: 'Auth Token'
+    default: 'Auth Token',
   })
-  token: string
+  token: string;
 }
