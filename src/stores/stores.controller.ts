@@ -35,23 +35,6 @@ import { ReturnUpdateStoreDto, UpdateStoreDto } from './dto/updateStore.dto';
 import { Stores } from './entities/stores.entity';
 import { StoresService } from './stores.service';
 
-// @Crud({
-//   model: {
-//     type: Stores,
-//   },
-//   query: {
-//     join: {
-//       user: {
-//         eager: true,
-//         exclude: ["password", "restorePasswordCode", "token"]
-//       },
-//       transaction: {
-//         eager: true,
-//       },
-//     },
-//   },
-// })
-
 @ApiTags('store')
 @Controller('store')
 @ApiBearerAuth('Bearer')

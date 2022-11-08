@@ -37,14 +37,12 @@ export class AuthController {
   @ApiProperty({ type: RegisterDto })
   public async register(@Body() registerUserDto: RegisterDto) {
     try {
-      // console.log(await this.authService.register(registerUserDto))
       if (await this.authService.checkCaptcha(registerUserDto.captchaToken)) {
         return await this.authService.register(registerUserDto);
       } else {
         throw new HttpException('Set Captcha', HttpStatus.BAD_REQUEST);
       }
     } catch (err) {
-      console.log(err);
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
@@ -68,7 +66,6 @@ export class AuthController {
   @ApiProperty({ type: LogoutDto })
   async logout(@Body() logoutUser: LogoutDto) {
     const user = await this.userService.findByToken(logoutUser.token);
-    console.log('user', user);
     if (user) {
       await this.userService.clearToken(logoutUser.email);
     } else {
@@ -85,9 +82,7 @@ export class AuthController {
   @ApiProperty({ type: LoginDto })
   public async login(@Body() loginUserDto: LoginDto) {
     try {
-      const user = await this.authService.login(loginUserDto);
-
-      return user;
+      return this.authService.login(loginUserDto);
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
@@ -125,7 +120,6 @@ export class AuthController {
   @Post('reAuth')
   @ApiProperty()
   public async reAuth(@Body() token) {
-    console.log(token);
     try {
       return await this.authService.reAuth(token.token);
     } catch (err) {

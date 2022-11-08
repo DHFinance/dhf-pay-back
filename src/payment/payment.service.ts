@@ -37,19 +37,6 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     });
   }
 
-  // @Interval(1000)
-  // async getStore(){
-  //   const parentParent = await this.repo.findOne({
-  //     where: {
-  //       store: {
-  //         user: 1
-  //       }
-  //     },
-  //     relations: ['store', 'store.user']
-  //   })
-  //   console.log(parentParent)
-  // }
-
   async save(dto) {
     return this.repo.save({ ...dto, cancelled: true });
   }

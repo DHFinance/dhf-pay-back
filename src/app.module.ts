@@ -19,7 +19,6 @@ const dotEnvPath = isProduction
   ? path.resolve(__dirname, '..', '.env.staging')
   : path.resolve(__dirname, '..', '.env');
 
-// console.log(process.env.npm_lifecycle_event);
 @Module({
   imports: [
     ConfigModule.load(

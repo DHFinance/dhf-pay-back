@@ -13,12 +13,6 @@ import { BlockUserDto } from './dto/block.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
-// @Crud({
-//   model: {
-//     type: User,
-//   },
-// })
-
 @ApiTags('user')
 @Controller('user')
 @ApiBearerAuth('Bearer')

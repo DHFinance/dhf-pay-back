@@ -34,28 +34,6 @@ import {
 import { Payment } from './entities/payment.entity';
 import { PaymentService } from './payment.service';
 
-// @Crud({
-//   model: {
-//     type: Payment,
-//   },
-//   params: {
-//     apiKey: {
-//       field: 'apiKey',
-//       type: "string",
-//     },
-//   },
-//   query: {
-//     join: {
-//       store: {
-//         eager: true,
-//       },
-//       transaction: {
-//         eager: true,
-//       },
-//     },
-//   },
-// })
-
 @ApiTags('payment')
 @Controller('payment')
 @ApiBearerAuth('Bearer')

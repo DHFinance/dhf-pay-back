@@ -37,7 +37,6 @@ export class AuthService {
         `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${token}`,
       )
       .toPromise();
-    console.log('result', result.data);
     return result.data.success;
   }
 

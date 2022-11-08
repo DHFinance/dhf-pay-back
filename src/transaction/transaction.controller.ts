@@ -35,19 +35,6 @@ import {
 } from './dto/returnTransaction.dto';
 import { ReturnNewTransactionDto } from './dto/returnNewTransaction.dto';
 
-// @Crud({
-//   model: {
-//     type: Transaction,
-//   },
-//   query: {
-//     join: {
-//       payment: {
-//         eager: true,
-//       },
-//     },
-//   },
-// })
-
 @ApiTags('transaction')
 @Controller('transaction')
 @ApiBearerAuth('Bearer')
