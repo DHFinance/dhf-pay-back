@@ -16,10 +16,10 @@ class CreatePaymentWithPosTerminalResponse {
   amount: string;
 
   @ApiProperty({
-    description: 'Devise of the payment',
+    description: 'Currency of the payment',
     example: 'USDT',
   })
-  devise: string;
+  currency: string;
 
   @ApiProperty({
     description: 'Status of the payment',

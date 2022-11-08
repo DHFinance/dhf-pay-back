@@ -20,9 +20,9 @@ class CreatePaymentWithPosTerminalRequest {
   @IsNotEmpty()
   @ApiProperty({
     example: 'USDT',
-    description: 'The devise of the payment',
+    description: 'The currency of the payment',
   })
-  devise: string;
+  currency: string;
 
   @IsString()
   @IsOptional()

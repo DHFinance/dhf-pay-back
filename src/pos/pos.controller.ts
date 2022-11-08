@@ -132,7 +132,7 @@ class PosController {
         name: 'test-store',
       },
       amount: '25000000',
-      devise: 'USDT',
+      currency: 'USDT',
       status: Status.Not_paid,
       description: 'This is the test payment',
     };
