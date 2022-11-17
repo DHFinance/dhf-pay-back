@@ -1,8 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CurrencyType } from '../../currency/currency.enum';
+
+interface Wallet {
+  value: string;
+  currency: CurrencyType;
+}
 
 interface storeInterface {
   id: number;
-  wallet: string;
+  wallets: Wallet[];
 }
 
 export class ReturnPaymentDto {
@@ -49,7 +55,12 @@ export class ReturnPaymentDto {
   @ApiProperty({
     default: {
       id: 1,
-      wallet: 'wallet',
+      wallets: [
+        {
+          value: 'wallet value',
+          currency: CurrencyType.Casper,
+        },
+      ],
     },
   })
   store: storeInterface;

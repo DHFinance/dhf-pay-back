@@ -42,12 +42,6 @@ export class ReturnCreateStoreDto {
   name: string;
 
   @ApiProperty({
-    default:
-      '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac',
-  })
-  wallet: string;
-
-  @ApiProperty({
     default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE',
   })
   apiKey: string;

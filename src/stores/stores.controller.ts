@@ -21,7 +21,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CrudController, Override } from '@nestjsx/crud';
 import { UserService } from '../user/user.service';
 import { randomString } from '../utils/randomString';
 import { BlockStoreDto, ReturnBlockStoreDto } from './dto/block.dto';
@@ -32,30 +31,18 @@ import {
   ReturnGetAllStoreDto,
 } from './dto/returnCreateStore.dto';
 import { ReturnUpdateStoreDto, UpdateStoreDto } from './dto/updateStore.dto';
-import { Stores } from './entities/stores.entity';
 import { StoresService } from './stores.service';
 
 @ApiTags('store')
 @Controller('store')
 @ApiBearerAuth('Bearer')
-export class StoresController implements CrudController<Stores> {
+export class StoresController {
   constructor(
     public readonly service: StoresService,
     public readonly userService: UserService,
-  ) {}
-
-  get base(): CrudController<Stores> {
-    return this;
+  ) {
   }
 
-  // @Override()
-  // getMany(
-  //     @ParsedRequest() req: CrudRequest,
-  // ) {
-  //   throw new UnauthorizedException()
-  // }
-
-  @Override()
   @Post()
   @ApiOperation({ summary: 'Create new store' })
   @ApiProperty({ description: 'create new store' })
@@ -136,32 +123,6 @@ export class StoresController implements CrudController<Stores> {
     return this.service.create(dto);
   }
 
-  @Override()
-  createMany() {
-    throw new UnauthorizedException();
-  }
-
-  // @Override('updateOneBase')
-  // coolFunction(
-  //     @ParsedRequest() req: CrudRequest,
-  //     @ParsedBody() dto: Stores,
-  // ) {
-  //   return this.base.createOneBase(req, dto);
-  // }
-
-  // @Override('replaceOneBase')
-  // awesomePUT(
-  //     @ParsedRequest() req: CrudRequest,
-  //     @ParsedBody() dto: Stores,
-  // ) {
-  //   throw new UnauthorizedException()
-  // }
-
-  @Override()
-  async deleteOne() {
-    throw new UnauthorizedException();
-  }
-
   @Post('block')
   @ApiProperty({ type: BlockStoreDto, description: 'block store' })
   @ApiOperation({ summary: 'block store' })
@@ -200,17 +161,6 @@ export class StoresController implements CrudController<Stores> {
     return this.service.changeBlockStore(body.id, false);
   }
 
-  // @Override()
-  // @Get('tx/:token')
-  // @ApiProperty()
-  // async getAllStores(@Headers() token) {
-  //   if(!token?.authorization){
-  //     throw new UnauthorizedException()
-  //   }
-  //   return this.service.getAllStore(token.authorization.split(' ')[1])
-  // }
-
-  @Override()
   @Get()
   @ApiProperty({ description: 'get all stores' })
   @ApiOperation({ summary: 'get all stores' })
@@ -245,12 +195,11 @@ export class StoresController implements CrudController<Stores> {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     if (user.role === 'admin') {
-      return await this.service.find({ relations: ['user'] });
+      return await this.service.find({ relations: ['user', 'wallets'] });
     }
     return this.service.getAllStore(token.authorization.split(' ')[1]);
   }
 
-  @Override()
   @Get(':id')
   @ApiProperty({
     description: 'get store by id',
@@ -285,7 +234,6 @@ export class StoresController implements CrudController<Stores> {
     return this.service.getUserStore(id, token.authorization.split(' ')[1]);
   }
 
-  @Override()
   @Put(':id')
   @ApiProperty({
     description: 'update store by id',
@@ -332,7 +280,6 @@ export class StoresController implements CrudController<Stores> {
     );
   }
 
-  @Override()
   @Patch(':id')
   @ApiProperty({
     description: 'update store by id',

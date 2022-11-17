@@ -7,12 +7,6 @@ export class BlockStoreDto {
     default: 1,
   })
   id: number;
-  @ApiProperty({
-    description: 'Block status (false/true)',
-    default: true,
-  })
-  @IsBoolean()
-  blocked: boolean;
 }
 
 export class ReturnBlockStoreDto {
@@ -30,11 +24,6 @@ export class ReturnBlockStoreDto {
     default: 'test name',
   })
   name: string;
-
-  @ApiProperty({
-    default: 'wallet',
-  })
-  wallet: string;
 
   @ApiProperty({
     default: 'description',

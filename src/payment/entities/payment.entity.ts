@@ -1,15 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
   BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
   ManyToOne,
   OneToMany,
-  CreateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Transaction } from '../../transaction/entities/transaction.entity';
+import { CurrencyType } from '../../currency/currency.enum';
 import { Stores } from '../../stores/entities/stores.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { Transaction } from '../../transaction/entities/transaction.entity';
 
 export enum Status {
   Not_paid = 'Not_paid',
@@ -31,7 +32,10 @@ export class Payment extends BaseEntity {
       'The store to which the payment belongs, you can specify the id or the object itself',
     default: {
       id: 1,
-      wallet: 'wallet',
+      wallets: {
+        value: 'wallet',
+        currency: CurrencyType.Casper,
+      },
     },
   })
   store: Stores;
@@ -49,7 +53,7 @@ export class Payment extends BaseEntity {
   })
   amount: string;
 
-  @Column()
+  @Column({ default: 'Not_paid' })
   @ApiProperty({
     description:
       'Payment status Not_paid when creating, Particularly_paid if not paid in full (maybe in theory), Paid - paid in full',
@@ -80,9 +84,15 @@ export class Payment extends BaseEntity {
   })
   text: string;
 
-  @Column({ nullable: false })
+  @Column({ default: false })
   @ApiProperty({
     default: false,
   })
   cancelled: boolean;
+
+  @Column({ enum: CurrencyType, default: CurrencyType.Casper })
+  @ApiProperty({
+    default: CurrencyType.Casper,
+  })
+  currency: CurrencyType;
 }

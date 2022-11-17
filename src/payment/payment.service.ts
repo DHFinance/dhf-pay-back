@@ -1,9 +1,13 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Payment } from './entities/payment.entity';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { MailerService } from '@nestjs-modules/mailer';
+import { Err, Ok, Result } from 'oxide.ts';
+import { BaseError } from '../common/base-classes/base-error';
 import { Stores } from '../stores/entities/stores.entity';
+import { StoreNotFoundError } from '../stores/errors/store-not-found.error';
+import { CreatePaymentResponseDto } from './dto/create-payment.response-dto';
+import { Payment } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentService extends TypeOrmCrudService<Payment> {
@@ -41,26 +45,30 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     return this.repo.save({ ...dto, cancelled: true });
   }
 
-  async create(dto, apiKey) {
-    try {
-      const store = await Stores.findOne({
-        where: {
-          apiKey: apiKey,
-        },
-      });
-      if (!store) {
-        throw new HttpException('store not found', HttpStatus.NOT_FOUND);
-      }
-      const payment = await this.repo.save({
-        ...dto,
-        status: 'Not_paid',
-        datetime: new Date(),
-        store,
-      });
-      return payment;
-    } catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+  async create(
+    dto,
+    apiKey,
+  ): Promise<Result<CreatePaymentResponseDto, BaseError>> {
+    const store = await Stores.findOne({
+      where: {
+        apiKey: apiKey,
+      },
+    });
+    if (!store) {
+      return Err(new StoreNotFoundError());
     }
+
+    const newPayment = await this.repo.create({
+      amount: (dto.amount * 1_000_000_000).toString(),
+      store,
+      comment: dto.comment || '',
+      text: dto.text || '',
+      currency: dto.currency,
+      type: dto.type || null,
+    });
+
+    const newPaymentInDB = await this.repo.save(newPayment);
+    return Ok({ id: newPaymentInDB.id });
   }
 
   async findPayment(id) {
@@ -77,7 +85,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
       where: {
         id: id,
       },
-      relations: ['store'],
+      relations: ['store', 'store.wallets'],
     });
     if (!payment) {
       throw new HttpException('payment nof found', HttpStatus.NOT_FOUND);
@@ -92,9 +100,13 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
       type: payment.type,
       text: payment.text,
       cancelled: payment.cancelled,
+      currency: payment.currency,
       store: {
         id: payment.store.id,
-        wallet: payment.store.wallet,
+        wallets: payment.store.wallets.map((wallet) => ({
+          value: wallet.value,
+          currency: wallet.currency,
+        })),
       },
     };
   }

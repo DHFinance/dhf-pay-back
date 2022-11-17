@@ -5,14 +5,12 @@ import {
   Headers,
   HttpException,
   HttpStatus,
-  Inject,
   Param,
   Patch,
   Post,
   Put,
   Res,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -21,9 +19,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CrudController, Override } from '@nestjsx/crud';
 import { Response } from 'express';
+import * as http from 'http';
+import { Err, match, Ok, Result } from 'oxide.ts';
+import { BaseError } from '../common/base-classes/base-error';
 import { UserService } from '../user/user.service';
+import { CreatePaymentResponseDto } from './dto/create-payment.response-dto';
 import { CreateOnePaymentDto } from './dto/createOnePayment.dto';
 import { GetPaymentDto } from './dto/getPayment.dto';
 import { ReturnCancelledPaymentDto } from './dto/returnCancelledPayment.dto';
@@ -31,20 +32,18 @@ import {
   returnCreatePaymentDto,
   ReturnPaymentDto,
 } from './dto/returnPayment.dto';
-import { Payment } from './entities/payment.entity';
 import { PaymentService } from './payment.service';
 
 @ApiTags('payment')
 @Controller('payment')
 @ApiBearerAuth('Bearer')
-export class PaymentController implements CrudController<Payment> {
+export class PaymentController {
   constructor(
-    public readonly service: PaymentService,
-    public readonly userService: UserService,
-    @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy,
-  ) {}
+    public readonly _paymentService: PaymentService,
+    public readonly _userService: UserService,
+  ) {
+  }
 
-  @Override()
   @Get()
   @ApiOperation({
     summary: 'Get all payment for store',
@@ -67,22 +66,19 @@ export class PaymentController implements CrudController<Payment> {
     description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc',
   })
   async getAllByStore(@Headers() headers) {
-    /**
-     * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on this store
-     */
     if (!headers['authorization']) {
       throw new HttpException('not found Bearer token', HttpStatus.BAD_REQUEST);
     }
-    const user = await this.userService.findByToken(
+    const user = await this._userService.findByToken(
       headers['authorization'].split(' ')[1],
     );
     if (user?.role === 'admin') {
-      return await this.service.find({
+      return await this._paymentService.find({
         relations: ['store'],
       });
     }
     try {
-      const payments = await this.service.find({
+      const payments = await this._paymentService.find({
         where: {
           store: {
             apiKey: headers.authorization.split(' ')[1],
@@ -99,7 +95,6 @@ export class PaymentController implements CrudController<Payment> {
     }
   }
 
-  @Override()
   @Patch(':id')
   @ApiOperation({
     summary: 'Update payment by id',
@@ -112,7 +107,6 @@ export class PaymentController implements CrudController<Payment> {
     throw new HttpException('Error', HttpStatus.BAD_REQUEST);
   }
 
-  @Override()
   @Put('cancel/:id')
   @ApiOperation({
     summary: 'Change cancelled status',
@@ -141,13 +135,13 @@ export class PaymentController implements CrudController<Payment> {
     if (!token.authorization) {
       throw new HttpException('token not found', HttpStatus.UNAUTHORIZED);
     }
-    const user = await this.userService.findByToken(
+    const user = await this._userService.findByToken(
       token.authorization.split(' ')[1],
     );
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     }
-    const payment = await this.service.findPayment(id.id);
+    const payment = await this._paymentService.findPayment(id.id);
     if (!payment) {
       throw new HttpException('payment not found', HttpStatus.NOT_FOUND);
     }
@@ -158,7 +152,7 @@ export class PaymentController implements CrudController<Payment> {
       );
     }
     if (user.token === payment.store.user.token) {
-      const res = await this.service.save(payment);
+      const res = await this._paymentService.save(payment);
       return {
         id: res.id,
         datetime: res.datetime,
@@ -176,7 +170,6 @@ export class PaymentController implements CrudController<Payment> {
     );
   }
 
-  @Override()
   @Put(':id')
   @ApiOperation({
     summary: 'Update payment by id',
@@ -189,7 +182,6 @@ export class PaymentController implements CrudController<Payment> {
     throw new HttpException('Error', HttpStatus.BAD_REQUEST);
   }
 
-  @Override()
   @Get(':id')
   @ApiOperation({
     summary: 'Get payment by id',
@@ -204,51 +196,35 @@ export class PaymentController implements CrudController<Payment> {
   })
   async getPayment(@Param() id: GetPaymentDto, @Headers() token) {
     if (!token?.authorization) {
-      return await this.service.findById(id.id);
+      return await this._paymentService.findById(id.id);
     }
-    const user = await this.userService.findByTokenSelected(
+    const user = await this._userService.findByTokenSelected(
       token.authorization.split(' ')[1],
     );
     if (user) {
       if (user?.role === 'admin') {
-        return await this.service.findPayment(id.id);
+        return await this._paymentService.findPayment(id.id);
       }
     }
-    return await this.service.findById(id.id);
+    return await this._paymentService.findById(id.id);
   }
 
-  // get base(): CrudController<Payment> {
-  //   return this;
-  // }
-
-  // @Override()
-  // getMany(
-  //     @ParsedRequest() req: CrudRequest,
-  // ) {
-  //   // const user = this.userService.findByToken()
-  //   return this.base.getManyBase(req);
-  // }
-
-  @Override()
   @Post()
   @ApiOperation({
     summary: 'Create new payment',
   })
-  @ApiOkResponse({
-    description: 'create one payment',
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Payment created',
     type: returnCreatePaymentDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'payment already exists',
+    description: 'Wrong request data',
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'store not found',
-  })
-  @ApiResponse({
-    status: HttpStatus.CONFLICT,
-    description: 'cant create payment with incorrect status',
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Store not found',
   })
   @ApiHeader({
     name: 'apiKey store',
@@ -259,89 +235,22 @@ export class PaymentController implements CrudController<Payment> {
     @Headers() headers,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      /**
-       * @description all payments are sent to create in dhf-pay-processor using RabbitMQ. After processing on the server, the id of the created payment is returned. The store to which the created payment will be linked is determined by apiKey, which is passed to headers.authorization
-       * @data {amount: {number}, comment: {string}, apiKey: {string}}
-       * @return {id: {number}}
-       */
-      const findPayment = await this.service.findOne({
-        where: {
-          id: dto.id,
-        },
-      });
-      if (findPayment) {
-        res.status(HttpStatus.BAD_REQUEST).send('payment already exists');
-        return;
-      }
-      if (dto?.cancelled) {
-        if (typeof dto.cancelled !== 'boolean' || dto.cancelled === true) {
-          res
-            .status(HttpStatus.CONFLICT)
-            .send('cant create payment with incorrect status');
-          return;
-        }
-      }
-      if (dto?.text) {
-        if (typeof dto.text !== 'string' || dto.text.length >= 255) {
-          res
-            .status(HttpStatus.CONFLICT)
-            .send('cant create payment with incorrect comment');
-          return;
-        }
-      }
-      dto = {
-        ...dto,
-        amount: (+dto.amount * 1000000000).toString(),
-        cancelled: false,
-      };
-      const response = await this.service.create(
-        dto,
-        headers.authorization.slice(7),
-      );
-      return { id: response.id };
-    } catch (err) {
-      console.log('error');
-      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
-    }
-    // return this.base.createOneBase(req, dto);
+    /**
+     * @description all payments are sent to create in dhf-pay-processor using RabbitMQ. After processing on the server, the id of the created payment is returned. The store to which the created payment will be linked is determined by apiKey, which is passed to headers.authorization
+     * @data {amount: {number}, comment: {string}, apiKey: {string}}
+     * @return {id: {number}}
+     */
+    const result = await this._paymentService.create(dto, headers.authorization.slice(7));
+
+    return match<
+      Result<CreatePaymentResponseDto, BaseError>,
+      CreatePaymentResponseDto | string
+    >(result, {
+      Ok: (paymentId) => paymentId,
+      Err: (error) => {
+        res.status(error.status);
+        return error.message;
+      },
+    });
   }
-
-  // @Override('getOneBase')
-  // getOneAndDoStuff(
-  //   @ParsedRequest() req: CrudRequest,
-  // ) {
-  //   return this.base.getOneBase(req);
-  // }
-
-  // @Override()
-  // createMany(
-  //     @ParsedRequest() req: CrudRequest,
-  //     @ParsedBody() dto: CreateManyDto<Payment>
-  // ) {
-  //   return this.base.createManyBase(req, dto);
-  // }
-  //
-  // @Override('updateOneBase')
-  // coolFunction(
-  //     @ParsedRequest() req: CrudRequest,
-  //     @ParsedBody() dto: Payment,
-  // ) {
-  //   return this.base.updateOneBase(req, dto);
-  // }
-  //
-  // @Override('replaceOneBase')
-  // awesomePUT(
-  //     @ParsedRequest() req: CrudRequest,
-  //     @ParsedBody() dto: Payment,
-  // ) {
-  //   return this.base.replaceOneBase(req, dto);
-  // }
-  //
-  // @Override()
-  // async deleteOne(
-  //     @ParsedRequest() req: CrudRequest,
-  // ) {
-  //   return this.base.deleteOneBase(req);
-  // }
 }

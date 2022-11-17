@@ -6,29 +6,49 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { Stores } from './entities/stores.entity';
-import { deepEqual } from '../utils/deepEqual';
+import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
+import { WalletOrmEntity } from '../wallets/orm-entities/wallet.entity';
+import { Stores } from './entities/stores.entity';
 
 @Injectable()
-export class StoresService extends TypeOrmCrudService<Stores> {
+export class StoresService extends TypeOrmCrudService<any> {
   constructor(
-    @InjectRepository(Stores) repo,
+    @InjectRepository(Stores)
+    private readonly _storesRepository: Repository<Stores>,
+    @InjectRepository(WalletOrmEntity)
+    private readonly _walletsRepository: Repository<WalletOrmEntity>,
     private readonly userService: UserService,
   ) {
-    super(repo);
+    super(_storesRepository);
   }
 
   async create(store) {
+    const currencies = [];
+
+    store.wallets.forEach((wallet) => currencies.push(wallet.currency));
+
+    if ([...new Set(currencies)].length !== currencies.length) {
+      throw new HttpException('wrong wallets', HttpStatus.BAD_REQUEST);
+    }
+
     try {
-      return await this.repo.save(store);
+      const newStore = Stores.create();
+      newStore.blocked = false;
+      newStore.name = store.name;
+      newStore.description = store.description;
+      newStore.wallets = await this._walletsRepository.save(store.wallets);
+      newStore.apiKey = store.apiKey;
+      newStore.url = store.url;
+      newStore.user = store.user;
+      return await this._storesRepository.save(newStore);
     } catch (e) {
       console.log(e);
     }
   }
 
   async changeBlockStore(id, status) {
-    const store = await this.repo.findOne({
+    const store = await this._storesRepository.findOne({
       where: {
         id,
       },
@@ -37,7 +57,10 @@ export class StoresService extends TypeOrmCrudService<Stores> {
       throw new HttpException('store not found', HttpStatus.NOT_FOUND);
     }
     try {
-      const blockedStore = await this.repo.save({ ...store, blocked: status });
+      const blockedStore = await this._storesRepository.save({
+        ...store,
+        blocked: status,
+      });
       return blockedStore;
     } catch (e) {
       throw new HttpException(e, HttpStatus.BAD_REQUEST);
@@ -45,7 +68,7 @@ export class StoresService extends TypeOrmCrudService<Stores> {
   }
 
   async validateStore(apiKey) {
-    const store = await this.repo.findOne({
+    const store = await this._storesRepository.findOne({
       where: {
         apiKey,
       },
@@ -63,8 +86,8 @@ export class StoresService extends TypeOrmCrudService<Stores> {
   }
 
   async getAllStore(token) {
-    const store = await this.repo.find({
-      relations: ['user'],
+    const store = await this._storesRepository.find({
+      relations: ['user', 'wallets'],
     });
     const filteredStores = store.filter((store) => store.user.token === token);
     if (filteredStores.length) {
@@ -80,9 +103,9 @@ export class StoresService extends TypeOrmCrudService<Stores> {
   }
 
   async getUserStore(id, token) {
-    const store = await this.repo.find({
+    const store = await this._storesRepository.find({
       where: { id: id.id },
-      relations: ['user'],
+      relations: ['user', 'wallets'],
     });
     const user = await this.userService.findByToken(token);
     if (user) {
@@ -107,35 +130,28 @@ export class StoresService extends TypeOrmCrudService<Stores> {
   }
 
   async updateStore(body, id, header) {
-    const store = await this.repo.find({
+    const store = await this._storesRepository.findOne({
       where: { id: id.id },
-      relations: ['user'],
+      relations: ['user', 'wallets'],
     });
-    const testStore = store.map((el) => {
-      if (el?.user?.timeBlockLogin) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        el?.user?.timeBlockLogin = new Date(
-          el.user.timeBlockLogin,
-        ).toISOString();
-      }
-      return el;
-    });
-    const user = await this.userService.findByTokenSelected(header);
-    if (body?.user) {
-      if (!deepEqual(body?.user, testStore[0].user)) {
-        throw new HttpException('you cant change user', HttpStatus.BAD_REQUEST);
-      }
+
+    if (store.user.token !== header) {
+      throw new HttpException(
+        'You cant change this store',
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
+    const user = await this.userService.findByTokenSelected(header);
     if (body?.id) {
-      if (body.id !== store[0].id) {
+      if (body.id !== store.id) {
         throw new HttpException('you cant change ID', HttpStatus.CONFLICT);
       }
     } else {
       body = { ...body, id: +id.id };
     }
     if (body?.blocked) {
-      if (body.blocked !== store[0].blocked) {
+      if (body.blocked !== store.blocked) {
         throw new HttpException(
           'you cant change blocked status',
           HttpStatus.CONFLICT,
@@ -145,12 +161,36 @@ export class StoresService extends TypeOrmCrudService<Stores> {
     if (!body.user) {
       body = { ...body, user: user };
     }
-    if (store[0].user.token === header) {
-      return this.repo.save(body);
+    if (body.wallets) {
+      const currencies = [];
+
+      body.wallets.forEach((wallet) => currencies.push(wallet.currency));
+
+      if ([...new Set(currencies)].length !== currencies.length) {
+        throw new HttpException(
+          'you cant update wallets',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      body.wallets
+        .map((wallet) => {
+          if (
+            store.wallets.find(
+              (el) =>
+                el.value === wallet.value && el.currency === wallet.currency,
+            )
+          ) {
+            return null;
+          } else {
+            return wallet;
+          }
+        })
+        .filter(Boolean);
+
+      await this._walletsRepository.save(body.wallets);
     }
-    throw new HttpException(
-      'You cant change this store',
-      HttpStatus.BAD_REQUEST,
-    );
+
+    return this._storesRepository.save(body);
   }
 }

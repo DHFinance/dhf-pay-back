@@ -106,6 +106,10 @@ export class UserService extends TypeOrmCrudService<User> {
   public async verifyUser(email, code) {
     const userVerified = await this.findByEmail(email);
 
+    if (!userVerified) {
+      throw new BadRequestException('User does not exist');
+    }
+
     if (new Date(userVerified.timeBlockLogin) > new Date()) {
       throw new BadRequestException('code', 'try again latter');
     }

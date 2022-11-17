@@ -1,5 +1,6 @@
-import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Wallet } from '../../wallets/interfaces/wallet.interface';
 
 interface userInterface {
   id: number;
@@ -29,16 +30,9 @@ export class UpdateStoreDto {
   })
   name: string;
 
-  @ApiProperty({
-    default: 'test wallet',
-  })
-  @IsNotEmpty({
-    message: 'wallet cant be empty',
-  })
-  @MinLength(20, {
-    message: 'wallet is too short. Minimal length is $constraint1 characters',
-  })
-  wallet: string;
+  @ApiProperty()
+  @ArrayMinSize(1)
+  wallets: Wallet[];
 
   @ApiProperty({
     default: 'can be empty',
@@ -76,12 +70,6 @@ export class ReturnUpdateStoreDto {
     default: 'test url',
   })
   url: string;
-
-  @ApiProperty({
-    default:
-      '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac',
-  })
-  wallet: string;
 
   @ApiProperty({
     default: 'description',

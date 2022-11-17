@@ -9,6 +9,7 @@ import {
 import { User } from '../../user/entities/user.entity';
 import { Payment } from '../../payment/entities/payment.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { WalletOrmEntity } from '../../wallets/orm-entities/wallet.entity';
 
 @Entity()
 export class Stores extends BaseEntity {
@@ -42,15 +43,6 @@ export class Stores extends BaseEntity {
   })
   name: string;
 
-  @Column({ nullable: false })
-  @ApiProperty({
-    description:
-      'Shop wallet. All payments created on behalf of this store will have this wallet',
-    default:
-      '01acdbbd933fd7aaedb7b1bd29c577027d86b5fafc422267a89fc386b7ebf420c9',
-  })
-  wallet: string;
-
   @Column({ nullable: true })
   @ApiProperty({
     description: 'Store Description',
@@ -72,4 +64,7 @@ export class Stores extends BaseEntity {
     default: false,
   })
   blocked: boolean;
+
+  @OneToMany(() => WalletOrmEntity, (wallet) => wallet.store)
+  wallets: WalletOrmEntity[];
 }

@@ -55,11 +55,7 @@ export class AuthController {
   @Post('verify')
   @ApiProperty({ type: VerifyDto })
   public async verify(@Body() verifyDto: VerifyDto) {
-    try {
-      return await this.authService.verify(verifyDto);
-    } catch (err) {
-      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
-    }
+    return this.authService.verify(verifyDto);
   }
 
   @Post('logout')

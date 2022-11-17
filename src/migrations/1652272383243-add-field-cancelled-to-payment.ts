@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+/*
 export class addFieldCancelledToPayment1652272383243
   implements MigrationInterface
 {
@@ -15,3 +16,4 @@ export class addFieldCancelledToPayment1652272383243
     await queryRunner.query(`ALTER TABLE "payment" DROP COLUMN  "cancelled"`);
   }
 }
+*/
