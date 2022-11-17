@@ -294,28 +294,6 @@ export class TransactionController implements CrudController<Transaction> {
     @Param() param: { apiKey: string },
     @Body() dto: CreateTransactionDto,
   ) {
-    const findTransaction = await this.service.findOne({
-      where: {
-        id: dto.id,
-      },
-    });
-
-    if (findTransaction) {
-      throw new HttpException(
-        'transaction already exists',
-        HttpStatus.CONFLICT,
-      );
-    }
-
-    if (dto.status) {
-      if (dto.status !== 'processing') {
-        throw new HttpException(
-          'cant create transaction with incorrect status',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    }
-
     if (!dto?.payment?.id) {
       throw new HttpException(
         'cant create transaction without payment ID',
