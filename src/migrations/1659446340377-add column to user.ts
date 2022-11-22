@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-/*
+
 export class addColumnToUser1659446340377 implements MigrationInterface {
   name = 'addColumnToUser1659446340377';
 
@@ -18,4 +18,3 @@ export class addColumnToUser1659446340377 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "user" DROP COLUMN "timeBlockLogin"`);
   }
 }
-*/

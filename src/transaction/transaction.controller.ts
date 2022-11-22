@@ -12,6 +12,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { CrudController, Override } from '@nestjsx/crud';
+import { GenerateTransactionWithWalletRequestDto } from './dto/generate-transaction-with-wallet.request.dto';
 import { Transaction } from './entities/transaction.entity';
 import { TransactionService } from './transaction.service';
 import { UserService } from '../user/user.service';
@@ -307,5 +308,23 @@ export class TransactionController implements CrudController<Transaction> {
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @Post('generateWallet')
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Currency not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Payment not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+  })
+  async generateTransactionWithWallet(
+    @Body() dto: GenerateTransactionWithWalletRequestDto,
+  ) {
+    return this.service.createNewWithWallet(dto);
   }
 }

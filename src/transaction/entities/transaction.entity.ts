@@ -21,7 +21,7 @@ export class Transaction extends BaseEntity {
   })
   status: string;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({
     description: 'User mail',
     default: 'kriruban1@gmail.com',
@@ -35,7 +35,7 @@ export class Transaction extends BaseEntity {
   })
   updated: Date;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({
     description: 'Unique transaction hash',
     default: '16ae42729a88a4df9519a8e08807d68856070d93cf162898948b7de57e1a3368',
@@ -53,7 +53,7 @@ export class Transaction extends BaseEntity {
   })
   payment: Payment;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty({
     description: "Sender's wallet",
     default:
@@ -67,4 +67,7 @@ export class Transaction extends BaseEntity {
     default: '2500000000',
   })
   amount: string;
+
+  @Column({ nullable: true })
+  walletForTransaction: string;
 }

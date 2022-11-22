@@ -6,9 +6,11 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Put,
+  Query,
   Res,
 } from '@nestjs/common';
 import {
@@ -20,8 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import * as http from 'http';
-import { Err, match, Ok, Result } from 'oxide.ts';
+import { match, Result } from 'oxide.ts';
 import { BaseError } from '../common/base-classes/base-error';
 import { UserService } from '../user/user.service';
 import { CreatePaymentResponseDto } from './dto/create-payment.response-dto';
@@ -41,8 +42,7 @@ export class PaymentController {
   constructor(
     public readonly _paymentService: PaymentService,
     public readonly _userService: UserService,
-  ) {
-  }
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -65,7 +65,11 @@ export class PaymentController {
     name: 'apiKey store',
     description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc',
   })
-  async getAllByStore(@Headers() headers) {
+  async getAllByStore(
+    @Headers() headers,
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('page', ParseIntPipe) page: number,
+  ) {
     if (!headers['authorization']) {
       throw new HttpException('not found Bearer token', HttpStatus.BAD_REQUEST);
     }
@@ -73,9 +77,13 @@ export class PaymentController {
       headers['authorization'].split(' ')[1],
     );
     if (user?.role === 'admin') {
-      return await this._paymentService.find({
+      const payments = await this._paymentService.find({
         relations: ['store'],
+        skip: limit * (page - 1),
+        take: limit,
       });
+      const count = await this._paymentService.count();
+      return { payments, count };
     }
     try {
       const payments = await this._paymentService.find({
@@ -84,10 +92,21 @@ export class PaymentController {
             apiKey: headers.authorization.split(' ')[1],
           },
         },
+        skip: limit * (page - 1),
+        take: limit,
         relations: ['store'],
       });
-      return payments;
+      const count = await this._paymentService.count({
+        where: {
+          store: {
+            apiKey: headers.authorization.split(' ')[1],
+          },
+        },
+        relations: ['store'],
+      });
+      return { payments, count };
     } catch (err) {
+      console.log(err);
       throw new HttpException(
         'This store does not have such a payments',
         HttpStatus.BAD_REQUEST,
@@ -240,7 +259,10 @@ export class PaymentController {
      * @data {amount: {number}, comment: {string}, apiKey: {string}}
      * @return {id: {number}}
      */
-    const result = await this._paymentService.create(dto, headers.authorization.slice(7));
+    const result = await this._paymentService.create(
+      dto,
+      headers.authorization.slice(7),
+    );
 
     return match<
       Result<CreatePaymentResponseDto, BaseError>,

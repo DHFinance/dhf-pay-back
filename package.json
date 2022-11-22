@@ -41,6 +41,8 @@
     "amqp-connection-manager": "^3.9.0",
     "amqplib": "^0.8.0",
     "bcrypt": "^5.0.1",
+    "bitcoin-core": "^4.1.0",
+    "block_io": "^4.2.1",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.2",
     "handlebars": "^4.7.7",
