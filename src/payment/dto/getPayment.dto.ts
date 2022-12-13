@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetPaymentDto {
   @ApiProperty({
-    default: 1,
+    default: 'dasd123-asd34-dasds',
   })
-  id: number;
+  url: string;
 }

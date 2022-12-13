@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { match, Result } from 'oxide.ts';
+import * as url from 'url';
 import { BaseError } from '../common/base-classes/base-error';
 import { UserService } from '../user/user.service';
 import { CreatePaymentResponseDto } from './dto/create-payment.response-dto';
@@ -81,6 +82,9 @@ export class PaymentController {
         relations: ['store'],
         skip: limit * (page - 1),
         take: limit,
+        order: {
+          id: 'DESC',
+        },
       });
       const count = await this._paymentService.count();
       return { payments, count };
@@ -94,6 +98,9 @@ export class PaymentController {
         },
         skip: limit * (page - 1),
         take: limit,
+        order: {
+          id: 'DESC',
+        },
         relations: ['store'],
       });
       const count = await this._paymentService.count({
@@ -213,19 +220,19 @@ export class PaymentController {
     status: HttpStatus.NOT_FOUND,
     description: 'payment not found',
   })
-  async getPayment(@Param() id: GetPaymentDto, @Headers() token) {
+  async getPayment(@Param('id') url: string, @Headers() token) {
     if (!token?.authorization) {
-      return await this._paymentService.findById(id.id);
+      return await this._paymentService.findByUrl(url);
     }
     const user = await this._userService.findByTokenSelected(
       token.authorization.split(' ')[1],
     );
     if (user) {
       if (user?.role === 'admin') {
-        return await this._paymentService.findPayment(id.id);
+        return await this._paymentService.findPaymentUrl(url);
       }
     }
-    return await this._paymentService.findById(id.id);
+    return await this._paymentService.findByUrl(url);
   }
 
   @Post()

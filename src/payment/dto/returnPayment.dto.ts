@@ -52,6 +52,9 @@ export class ReturnPaymentDto {
   })
   cancelled?: boolean;
 
+  @ApiProperty()
+  url: string;
+
   @ApiProperty({
     default: {
       id: 1,

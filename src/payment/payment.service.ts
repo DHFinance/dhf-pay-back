@@ -80,6 +80,15 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     });
   }
 
+  async findPaymentUrl(url) {
+    return await this.repo.findOne({
+      where: {
+        url,
+      },
+      relations: ['store', 'store.user'],
+    });
+  }
+
   async findById(id) {
     const payment = await this.repo.findOne({
       where: {
@@ -99,6 +108,40 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
       comment: payment.comment,
       type: payment.type,
       text: payment.text,
+      url: payment.url,
+      cancelled: payment.cancelled,
+      currency: payment.currency,
+      store: {
+        id: payment.store.id,
+        wallets: payment.store.wallets.map((wallet) => ({
+          value: wallet.value,
+          currency: wallet.currency,
+        })),
+      },
+    };
+  }
+
+  async findByUrl(url: string) {
+    console.log('url', url);
+    const payment = await this.repo.findOne({
+      where: {
+        url,
+      },
+      relations: ['store', 'store.wallets'],
+    });
+    if (!payment) {
+      throw new HttpException('payment nof found', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      id: payment.id,
+      datetime: payment.datetime,
+      amount: payment.amount,
+      status: payment.status,
+      comment: payment.comment,
+      type: payment.type,
+      text: payment.text,
+      url: payment.url,
       cancelled: payment.cancelled,
       currency: payment.currency,
       store: {
