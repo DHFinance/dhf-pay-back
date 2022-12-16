@@ -270,6 +270,7 @@ export class PaymentController {
       dto,
       headers.authorization.slice(7),
     );
+    console.log('result', result);
 
     return match<
       Result<CreatePaymentResponseDto, BaseError>,

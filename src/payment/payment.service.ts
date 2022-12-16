@@ -68,7 +68,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     });
 
     const newPaymentInDB = await this.repo.save(newPayment);
-    return Ok({ id: newPaymentInDB.id });
+    return Ok(newPaymentInDB);
   }
 
   async findPayment(id) {
