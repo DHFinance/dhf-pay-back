@@ -271,11 +271,10 @@ export class PaymentController {
       headers.authorization.slice(7),
     );
 
-    return match<
-      Result<CreatePaymentResponseDto, BaseError>,
-      CreatePaymentResponseDto | string
-    >(result, {
+    return match(result, {
       Ok: (paymentId) => paymentId,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       Err: (error) => {
         res.status(error.status);
         return error.message;

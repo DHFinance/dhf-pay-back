@@ -6,6 +6,10 @@ interface paymentInterface {
 }
 
 export class CreateTransactionDto {
+  id?: number;
+
+  status?: string;
+
   @ApiProperty({
     default: 'example@gmail.com',
   })
