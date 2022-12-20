@@ -12,8 +12,5 @@ export class SetSenderNullableToTrue1668849104444
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "transaction" ALTER COLUMN "sender" SET NOT NULL`,
-    );
   }
 }

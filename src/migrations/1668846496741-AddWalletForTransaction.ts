@@ -10,8 +10,6 @@ export class AddWalletForTransaction1668846496741 implements MigrationInterface 
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "transaction" ALTER COLUMN "txHash" SET NOT NULL`);
-        await queryRunner.query(`ALTER TABLE "transaction" ALTER COLUMN "email" SET NOT NULL`);
         await queryRunner.query(`ALTER TABLE "transaction" DROP COLUMN "walletForTransaction"`);
     }
 
