@@ -10,6 +10,6 @@ export class AddCurrencyToPayment1668421091458 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "payment" DROP COLUMN "currency"`);
+    // await queryRunner.query(`ALTER TABLE "payment" DROP COLUMN "currency"`);
   }
 }
