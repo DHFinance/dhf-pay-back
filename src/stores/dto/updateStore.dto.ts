@@ -1,103 +1,91 @@
-import {IsNotEmpty, MaxLength, MinLength} from 'class-validator';
-import {ApiProperty} from "@nestjs/swagger";
+import { ArrayMinSize, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Wallet } from '../../wallets/interfaces/wallet.interface';
 
 interface userInterface {
-  id: number
+  id: number;
 }
 
 interface userInterfaceReturn {
-  id: number
-  role: string
+  id: number;
+  role: string;
 }
 
 export class UpdateStoreDto {
-  id?: string
+  id?: string;
 
   @ApiProperty({
-    default: 'test url'
+    default: 'test url',
   })
   @IsNotEmpty({
-    message: 'url cant be empty'
+    message: 'url cant be empty',
   })
-  url: string
+  url: string;
 
   @ApiProperty({
-    default: 'test name'
+    default: 'test name',
   })
   @IsNotEmpty({
-    message: 'name cant be empty'
+    message: 'name cant be empty',
   })
-  name: string
+  name: string;
+
+  @ApiProperty()
+  @ArrayMinSize(1)
+  wallets: Wallet[];
 
   @ApiProperty({
-    default: 'test wallet'
+    default: 'can be empty',
   })
-  @IsNotEmpty({
-    message: 'wallet cant be empty'
-  })
-  @MinLength(20, {
-    message: 'wallet is too short. Minimal length is $constraint1 characters'
-  })
-  wallet: string
+  description?: string;
 
   @ApiProperty({
-    default: 'can be empty'
-  })
-  description?: string
-
-  @ApiProperty({
-    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE'
+    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE',
   })
   @MinLength(36, {
-    message: 'ApiKey is too short. Minimal length is $constraint1 characters'
+    message: 'ApiKey is too short. Minimal length is $constraint1 characters',
   })
   @MaxLength(36, {
-    message: 'ApiKey is too long. Maximal length is $constraint1 characters'
+    message: 'ApiKey is too long. Maximal length is $constraint1 characters',
   })
-  apiKey?:string
+  apiKey?: string;
 
-  blocked?: boolean
+  blocked?: boolean;
 
-  user?: userInterface
+  user?: userInterface;
 }
-
 
 export class ReturnUpdateStoreDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 
   @ApiProperty({
-    default: 'test name'
+    default: 'test name',
   })
-  name:string
+  name: string;
 
   @ApiProperty({
-    default: 'test url'
+    default: 'test url',
   })
-  url: string
+  url: string;
 
   @ApiProperty({
-    default: '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac'
+    default: 'description',
   })
-  wallet: string
+  description: string;
 
   @ApiProperty({
-    default: 'description'
+    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE',
   })
-  description: string
-
-  @ApiProperty({
-    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE'
-  })
-  apiKey: string
+  apiKey: string;
 
   @ApiProperty({
     default: {
       id: 1,
-      role: "customer"
-    }
+      role: 'customer',
+    },
   })
-  user: userInterfaceReturn
+  user: userInterfaceReturn;
 }

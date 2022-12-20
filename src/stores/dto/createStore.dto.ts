@@ -1,50 +1,37 @@
-import {IsNotEmpty, MaxLength, Min, MinLength} from 'class-validator';
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
+import { ArrayMinSize, IsNotEmpty } from 'class-validator';
+import { Wallet } from '../../wallets/interfaces/wallet.interface';
 
 interface userInterface {
-  id: number
+  id: number;
 }
 
 export class CreateStoreDto {
-  id: string
+  id: string;
 
   @ApiProperty({
-    default: 'url example'
+    default: 'Url example',
   })
   @IsNotEmpty({
-    message: 'url cant be empty'
+    message: "Url can't be empty",
   })
-  url: string
+  url: string;
 
   @ApiProperty({
-    default: 'test name'
+    default: 'test name',
   })
   @IsNotEmpty({
-    message: 'name cant be empty'
+    message: "Name can't be empty",
   })
-  name: string
+  name: string;
 
-  @ApiProperty({
-    default: '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac'
-  })
-  @IsNotEmpty({
-    message: 'wallet cant be empty'
-  })
-  @MinLength(20, {
-    message: 'wallet is too short. Minimal length is $constraint1 characters'
-  })
-  wallet: string
+  @ApiProperty()
+  @ArrayMinSize(1)
+  wallets: Wallet[];
 
+  apiKey?: string;
 
-  // @MinLength(35, {
-  //   message: 'ApiKey is too short. Minimal length is $constraint1 characters'
-  // })
-  // @MaxLength(37, {
-  //   message: 'ApiKey is too long. Maximal length is $constraint1 characters'
-  // })
-  apiKey?:string
+  blocked?: boolean;
 
-  blocked?: boolean
-
-  user?: userInterface
+  user?: userInterface;
 }

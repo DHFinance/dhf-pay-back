@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn } from "typeorm";
-import { ApiProperty } from "@nestjs/swagger";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BaseEntity,
+  CreateDateColumn,
+} from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class User extends BaseEntity {
@@ -20,23 +26,25 @@ export class User extends BaseEntity {
   })
   lastName: string;
 
-  @Column({select: false})
+  @Column({ select: false })
   @ApiProperty({
     description: 'Encrypted password. Current value - admin',
     default: '$2b$07$n2L5W1iaZwRHyQO2YK72NOibkpofUQBBMCGHboosUWD0VI4NUyW1C',
   })
   password: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @ApiProperty({
-    description: 'The code sent to your email to reset your password. Only needed at the /auth/check-code step',
+    description:
+      'The code sent to your email to reset your password. Only needed at the /auth/check-code step',
     default: null,
   })
   restorePasswordCode: number;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @ApiProperty({
-    description: 'Code sent to email for initial confirmation. Only needed at the /auth/verify step',
+    description:
+      'Code sent to email for initial confirmation. Only needed at the /auth/verify step',
     default: null,
   })
   emailVerification: number;
@@ -53,7 +61,7 @@ export class User extends BaseEntity {
     description: 'User role: admin or customer',
     default: 'customer',
   })
-  role: string //'admin' | 'customer';
+  role: string; //'admin' | 'customer';
 
   @Column()
   @ApiProperty({
@@ -76,15 +84,15 @@ export class User extends BaseEntity {
   })
   blocked: boolean;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   @ApiProperty({
-    default: 0
+    default: 0,
   })
-  loginAttempts: number
+  loginAttempts: number;
 
-  @CreateDateColumn({nullable: true})
+  @CreateDateColumn({ nullable: true })
   @ApiProperty({
-    default: null
+    default: null,
   })
-  timeBlockLogin: Date
+  timeBlockLogin: Date;
 }

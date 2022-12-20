@@ -1,23 +1,50 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsString, Min } from "class-validator";
-import {Type} from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { CurrencyType } from '../../currency/currency.enum';
 
 export class CreateOnePaymentDto {
-    id?: number
-
   @ApiProperty({
     description: 'amount cspr',
-    default: "2.5",
-    required: true
+    default: '2.5',
+    required: true,
   })
+  @IsNumber()
   @Type(() => Number)
-  @Min(2.5)
   @IsNotEmpty({
-    message: 'amount cant be empty'
+    message: 'amount cant be empty',
   })
-  amount: string
+  amount: number;
 
-  cancelled?: boolean
+  @ApiProperty({
+    description: 'Currency of the payment',
+    example: CurrencyType.Casper,
+  })
+  @IsEnum(CurrencyType)
+  currency: CurrencyType;
 
-  text?: string
+  @ApiProperty({
+    description: 'Description of the payment',
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  text?: string;
+
+  @ApiProperty({
+    description: 'Description of the payment',
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  comment?: string;
+
+  @ApiProperty({
+    description: 'Type of the payment button',
+  })
+  @IsNumber()
+  @Min(1)
+  @Max(3)
+  @IsOptional()
+  type?: number;
 }

@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString } from 'class-validator';
 
 export class BillMailDto {
   @ApiProperty({
@@ -18,5 +18,5 @@ export class BillMailDto {
     description: 'bill id',
     default: 27,
   })
-  id: number
+  id: number;
 }

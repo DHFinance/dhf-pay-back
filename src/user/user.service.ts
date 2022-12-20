@@ -1,8 +1,13 @@
-import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
-import {User} from './entities/user.entity';
-import {InjectRepository} from '@nestjs/typeorm';
-import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
-import {MailerService} from '@nestjs-modules/mailer';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
 
 function randomString(len) {
   const charSet =
@@ -17,8 +22,9 @@ function randomString(len) {
 
 @Injectable()
 export class UserService extends TypeOrmCrudService<User> {
-  constructor(@InjectRepository(User) repo,
-              private mailerService: MailerService
+  constructor(
+    @InjectRepository(User) repo,
+    private mailerService: MailerService,
   ) {
     super(repo);
   }
@@ -26,12 +32,12 @@ export class UserService extends TypeOrmCrudService<User> {
   async changeBlockUser(id, blocked) {
     const store = await this.repo.findOne({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
     try {
-      const blockedUser = await this.repo.save({...store, blocked})
-      return blockedUser
+      const blockedUser = await this.repo.save({ ...store, blocked });
+      return blockedUser;
     } catch (e) {
       throw new HttpException(e, HttpStatus.BAD_REQUEST);
     }
@@ -52,7 +58,7 @@ export class UserService extends TypeOrmCrudService<User> {
 
   async setToken(email) {
     const user = await this.findByEmail(email);
-    return await this.repo.save({...user, token: randomString(36)})
+    return await this.repo.save({ ...user, token: randomString(36) });
   }
 
   async setAttempts(email, fail) {
@@ -62,9 +68,12 @@ export class UserService extends TypeOrmCrudService<User> {
         return await this.setLoginTimeBlock(email);
       }
       if (fail) {
-        return await this.repo.save({...user, loginAttempts: +user.loginAttempts + 1})
+        return await this.repo.save({
+          ...user,
+          loginAttempts: +user.loginAttempts + 1,
+        });
       } else {
-        return await this.repo.save({...user, loginAttempts: 0})
+        return await this.repo.save({ ...user, loginAttempts: 0 });
       }
     }
   }
@@ -74,26 +83,32 @@ export class UserService extends TypeOrmCrudService<User> {
     const old = new Date();
     const newDate = new Date();
     newDate.setMinutes(old.getMinutes() + 3);
-    return await this.repo.save({...user, timeBlockLogin: newDate.toISOString(), loginAttempts: 0});
+    return await this.repo.save({
+      ...user,
+      timeBlockLogin: newDate.toISOString(),
+      loginAttempts: 0,
+    });
   }
 
   async findByTokenSelected(token) {
     return await this.repo.findOne({
       where: {
-        token
+        token,
       },
-      select: ['id', 'role']
-    })
+      select: ['id', 'role'],
+    });
   }
-
 
   /**
    * @description checks the code received from the front and the code from the database. If they are the same, it sends an email about successful registration and removes the code from the user record (the user with the code in the emailVerification field cannot be authorized). Sends a user record to the front
    * @return {User}
    */
   public async verifyUser(email, code) {
-
     const userVerified = await this.findByEmail(email);
+
+    if (!userVerified) {
+      throw new BadRequestException('User does not exist');
+    }
 
     if (new Date(userVerified.timeBlockLogin) > new Date()) {
       throw new BadRequestException('code', 'try again latter');
@@ -107,7 +122,7 @@ export class UserService extends TypeOrmCrudService<User> {
         template: 'send-reg-message',
         context: {
           login: email,
-          email: email
+          email: email,
         },
       });
       return await this.repo.save({ ...userVerified, emailVerification: null });
@@ -122,12 +137,26 @@ export class UserService extends TypeOrmCrudService<User> {
       where: {
         email,
       },
-      select: ['id', 'name', "lastName", 'password', 'email', 'role', 'company', 'token', 'blocked', 'restorePasswordCode', 'emailVerification', 'loginAttempts', 'timeBlockLogin']
+      select: [
+        'id',
+        'name',
+        'lastName',
+        'password',
+        'email',
+        'role',
+        'company',
+        'token',
+        'blocked',
+        'restorePasswordCode',
+        'emailVerification',
+        'loginAttempts',
+        'timeBlockLogin',
+      ],
     });
     if (user?.blocked === true) {
       throw new BadRequestException('email', 'User is blocked');
     }
-    return user
+    return user;
   }
 
   /**
@@ -156,8 +185,12 @@ export class UserService extends TypeOrmCrudService<User> {
       });
 
       try {
-        await this.repo.save({ ...userExisted, ...user, emailVerification: code});
-        return true
+        await this.repo.save({
+          ...userExisted,
+          ...user,
+          emailVerification: code,
+        });
+        return true;
       } catch (err) {
         throw new HttpException(err, HttpStatus.BAD_REQUEST);
       }
@@ -175,10 +208,15 @@ export class UserService extends TypeOrmCrudService<User> {
       });
       try {
         const token = randomString(36);
-        await this.repo.save({ ...user, emailVerification: code, token, blocked: false });
-        return true
+        await this.repo.save({
+          ...user,
+          emailVerification: code,
+          token,
+          blocked: false,
+        });
+        return true;
       } catch (err) {
-        console.log(err)
+        console.log(err);
         throw new HttpException(err, HttpStatus.BAD_REQUEST);
       }
     }
@@ -224,16 +262,16 @@ export class UserService extends TypeOrmCrudService<User> {
    * @description checks the received code with the user code with received mail from the database. If the codes match - admits to the next stage
    */
   async checkCode(code, email) {
-    const user = await this.findByEmail(email)
+    const user = await this.findByEmail(email);
     if (new Date(user.timeBlockLogin) > new Date()) {
       throw new BadRequestException('code', 'try again latter');
     }
-    if (!user || user.restorePasswordCode !== +code)  {
+    if (!user || user.restorePasswordCode !== +code) {
       await this.setAttempts(email, true);
       throw new BadRequestException('code', 'Wrong restore code');
     } else {
       await this.setAttempts(email, false);
-      return user
+      return user;
     }
   }
 
@@ -243,15 +281,15 @@ export class UserService extends TypeOrmCrudService<User> {
    * @return {User}
    */
   async reAuth(token: string) {
-    const user = await this.findByToken(token)
+    const user = await this.findByToken(token);
     if (user.blocked === true) {
       throw new BadRequestException('email', 'User is blocked');
     }
-    if (!user)  {
+    if (!user) {
       throw new BadRequestException('token', 'User not exist');
     }
-    delete user.password
-    return user
+    delete user.password;
+    return user;
   }
 
   /**
@@ -263,11 +301,14 @@ export class UserService extends TypeOrmCrudService<User> {
   async changePassword(password, email) {
     const user = await this.findByEmail(email);
     if (!user) {
-      throw new BadRequestException('email', 'User with this email does not exist');
+      throw new BadRequestException(
+        'email',
+        'User with this email does not exist',
+      );
     }
     user.restorePasswordCode = null;
     user.password = password;
     await user.save();
-    return user
+    return user;
   }
 }

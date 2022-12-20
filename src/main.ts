@@ -1,13 +1,12 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { ApiBearerAuth, DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { Transport } from '@nestjs/microservices'
-import { checkAuth } from "./middlewares/checkAuth.middleware";
-import {ValidationPipe} from "@nestjs/common";
-import helmet from "helmet";
+import { checkAuth } from './middlewares/checkAuth.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true })
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.getHttpAdapter().getInstance().disable('X-Powered-By');
   app.getHttpAdapter().getInstance().disable('x-powered-by');
   app.enableCors({
@@ -18,7 +17,7 @@ async function bootstrap() {
       'https://dhfi.online',
       'https://dhfi.io',
       'https://Pay.dhfi',
-      "https://App.dhfi"
+      'https://App.dhfi',
     ],
     methods: 'GET, PUT, POST, DELETE, PATCH',
   });
@@ -32,7 +31,7 @@ async function bootstrap() {
   app.use(
     helmet({
       contentSecurityPolicy: false,
-    })
+    }),
   );
   /**
    * @description swagger creation
@@ -41,11 +40,14 @@ async function bootstrap() {
     .setTitle('pay dhfi API V1')
     .setDescription('pay dhfi project api')
     .setVersion('1.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-    }, 'Bearer')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'Bearer',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api/swagger', app, document);

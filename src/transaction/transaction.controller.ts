@@ -1,8 +1,21 @@
-import {Body, Controller, Get, Headers, HttpException, HttpStatus, Param, Patch, Post, Put, Res} from "@nestjs/common";
-import {Crud, CrudController, Override} from "@nestjsx/crud";
-import {Transaction} from "./entities/transaction.entity";
-import {TransactionService} from "./transaction.service";
-import {UserService} from "../user/user.service";
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpException,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Res,
+} from '@nestjs/common';
+import { CrudController, Override } from '@nestjsx/crud';
+import { GenerateTransactionWithWalletRequestDto } from './dto/generate-transaction-with-wallet.request.dto';
+import { Transaction } from './entities/transaction.entity';
+import { TransactionService } from './transaction.service';
+import { UserService } from '../user/user.service';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -10,31 +23,18 @@ import {
   ApiOperation,
   ApiProperty,
   ApiResponse,
-  ApiTags
-} from "@nestjs/swagger";
-import {StoresService} from "../stores/stores.service";
-import {Response} from "express";
-import {CreateTransactionDto} from "./dto/createTransaction.dto";
+  ApiTags,
+} from '@nestjs/swagger';
+import { StoresService } from '../stores/stores.service';
+import { Response } from 'express';
+import { CreateTransactionDto } from './dto/createTransaction.dto';
 import {
   GetChildTransactionDto,
   GetTransactionDto,
   ReturnChildDto,
-  ReturnTransactionDto
-} from "./dto/returnTransaction.dto";
-import {ReturnNewTransactionDto} from "./dto/returnNewTransaction.dto";
-
-// @Crud({
-//   model: {
-//     type: Transaction,
-//   },
-//   query: {
-//     join: {
-//       payment: {
-//         eager: true,
-//       },
-//     },
-//   },
-// })
+  ReturnTransactionDto,
+} from './dto/returnTransaction.dto';
+import { ReturnNewTransactionDto } from './dto/returnNewTransaction.dto';
 
 @ApiTags('transaction')
 @Controller('transaction')
@@ -47,48 +47,62 @@ export class TransactionController implements CrudController<Transaction> {
     public readonly TransactionService: TransactionService,
   ) {}
 
-
   /**
    * @description if Authorization is not specified or there is no store with such apiKey, then an array with all entries is returned. If a store with such apiKey exists, returns an array of payments that depend on payment that depend on this store
    */
   @Get()
   @ApiProperty()
-  @ApiOperation({summary: 'Get all transactions for current store'})
+  @ApiOperation({ summary: 'Get all transactions for current store' })
   @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED, description: 'Bearer token not found'
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Bearer token not found',
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND, description: 'transaction not found'
+    status: HttpStatus.NOT_FOUND,
+    description: 'transaction not found',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'This store does not have such a payments'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'This store does not have such a payments',
   })
   @ApiOkResponse({
-    status: HttpStatus.OK, type: [ReturnTransactionDto]
+    status: HttpStatus.OK,
+    type: [ReturnTransactionDto],
   })
   @ApiHeader({
     name: 'apiKey store',
-    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc',
   })
   async getAllByStore(@Param() param, @Headers() headers) {
     if (!headers.authorization) {
-      throw new HttpException('Bearer token not found', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Bearer token not found',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
-    const user = await this.userService.findByToken(headers['authorization'].slice(7))
+    const user = await this.userService.findByToken(
+      headers['authorization'].slice(7),
+    );
 
     if (user?.role === 'admin') {
-      return await this.service.find()
+      return await this.service.find();
     }
     try {
-      const transactions = await this.service.find({})
+      const transactions = await this.service.find({});
       return transactions.filter((transaction) => {
-         if (transaction.payment?.store?.apiKey === headers.authorization.split(' ')[1]) {
-           delete transaction.payment
-           return transaction
-         }
-      })
+        if (
+          transaction.payment?.store?.apiKey ===
+          headers.authorization.split(' ')[1]
+        ) {
+          delete transaction.payment;
+          return transaction;
+        }
+      });
     } catch (err) {
-      throw new HttpException('This store does not have such a payments', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'This store does not have such a payments',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -96,78 +110,62 @@ export class TransactionController implements CrudController<Transaction> {
    * @description return last completed transaction for payment with :id
    */
   @Get('/last/:id')
-  @ApiOperation({summary: 'Get last completed transaction for payment with :id'})
+  @ApiOperation({
+    summary: 'Get last completed transaction for payment with :id',
+  })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'This payment does not have such a transaction'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'This payment does not have such a transaction',
   })
   @ApiOkResponse({
-    status: HttpStatus.OK, type: ReturnChildDto
+    status: HttpStatus.OK,
+    type: ReturnChildDto,
   })
-  async getLastTransaction(@Param() param: GetChildTransactionDto, @Headers() headers) {
-
+  async getLastTransaction(@Param() param: GetChildTransactionDto) {
     try {
       const transaction = await this.TransactionService.findOne({
         where: {
-          payment: param.id
-        }
-      })
+          payment: param.id,
+        },
+      });
       const returnInfo = {
         txHash: transaction.txHash,
         status: transaction.status,
-      }
-      return returnInfo
+      };
+      return returnInfo;
     } catch (err) {
-      throw new HttpException('This payment does not have such a transaction', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'This payment does not have such a transaction',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  // @Get(':id')
-  // async getInvoices(@Param() id, @Headers() token) {
-  //   const user = await this.userService.findByToken(token['authorization'].split(' ')[1])
-  //
-  //   if (!user) {
-  //     return false
-  //   }
-  //   try {
-  //     const transaction = await this.service.findOne({
-  //       where: {
-  //         txHash: token.txHash,
-  //       }
-  //     })
-  //     if (!transaction) {
-  //       throw new HttpException('Invoices not exist', HttpStatus.BAD_REQUEST);
-  //     }
-  //
-  //     return transaction
-  //   } catch (err) {
-  //     throw new HttpException('This store does not have such a transaction', HttpStatus.BAD_REQUEST);
-  //   }
-  // }
-
   @Override()
-  @Patch(":id")
+  @Patch(':id')
   @ApiOperation({
-    summary: 'Update transaction'
+    summary: 'Update transaction',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'Error'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Error',
   })
   async patchTransaction() {
-    throw new HttpException('Error', HttpStatus.BAD_REQUEST)
+    throw new HttpException('Error', HttpStatus.BAD_REQUEST);
   }
 
   @Override()
-  @Put(":id")
+  @Put(':id')
   @ApiOperation({
-    summary: 'Update transaction'
+    summary: 'Update transaction',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'Error'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Error',
   })
   async putTransaction() {
-    throw new HttpException('Error', HttpStatus.BAD_REQUEST)
+    throw new HttpException('Error', HttpStatus.BAD_REQUEST);
   }
-
 
   /**
    * @description search by txHash for transaction
@@ -175,63 +173,74 @@ export class TransactionController implements CrudController<Transaction> {
   @Override()
   @Get(':txHash')
   @ApiOperation({
-    summary: 'Get transaction by txHash'
+    summary: 'Get transaction by txHash',
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND, description: 'User not found'
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
   })
   @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized'
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'Transaction not exist'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Transaction not exist',
   })
   @ApiResponse({
-    status: HttpStatus.CONFLICT, description: 'No access to this transaction'
+    status: HttpStatus.CONFLICT,
+    description: 'No access to this transaction',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'This store does not have such a transaction'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'This store does not have such a transaction',
   })
   @ApiOkResponse({
-    status: HttpStatus.OK, type: ReturnTransactionDto
+    status: HttpStatus.OK,
+    type: ReturnTransactionDto,
   })
   @ApiHeader({
     name: 'auth token',
-    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc'
+    description: 'Bearer sgRcXvaZrsd0NNxartp09RFFApSRq8E8g1lc',
   })
-  async getOneByStore(@Param() param: GetTransactionDto, @Headers() headers, @Res({ passthrough: true }) res: Response) {
-
+  async getOneByStore(
+    @Param() param: GetTransactionDto,
+    @Headers() headers,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     if (!headers.authorization) {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    const user = await this.userService.findByToken(headers['authorization'].split(' ')[1])
+    const user = await this.userService.findByToken(
+      headers['authorization'].split(' ')[1],
+    );
 
     if (!user) {
-      throw new HttpException("User not found", HttpStatus.NOT_FOUND)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     try {
       const transaction = await this.service.findOne({
         where: {
           txHash: param.txHash,
-        }
-      })
+        },
+      });
       if (!transaction) {
         res.status(HttpStatus.BAD_REQUEST).send('Transaction not exist');
         return;
       }
 
       if (user.role === 'admin') {
-        return transaction
+        return transaction;
       }
 
       const store = await this.storeService.findOne({
         where: {
-          id: transaction.payment.store.id
+          id: transaction.payment.store.id,
         },
-        relations: ['user']
-      })
+        relations: ['user'],
+      });
 
       if (store.user.token !== user.token) {
         res.status(HttpStatus.CONFLICT).send('No access to this transaction');
@@ -239,67 +248,83 @@ export class TransactionController implements CrudController<Transaction> {
         //throw new HttpException('No access to this transaction', HttpStatus.CONFLICT);
       }
 
-      delete transaction.payment
-      return transaction
+      delete transaction.payment;
+      return transaction;
     } catch (err) {
-      throw new HttpException('This store does not have such a transaction', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'This store does not have such a transaction',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
   @Override()
   @Post()
   @ApiOperation({
-    summary: 'Create new transaction for payment'
+    summary: 'Create new transaction for payment',
   })
   @ApiResponse({
-    status: HttpStatus.CONFLICT, description: 'transaction already exists'
+    status: HttpStatus.CONFLICT,
+    description: 'transaction already exists',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'cant create transaction with incorrect status'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'cant create transaction with incorrect status',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'cant create transaction without payment ID'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'cant create transaction without payment ID',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'transaction already exist'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'transaction already exist',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'payment ID incorrect'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'payment ID incorrect',
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST, description: 'payment already completed'
+    status: HttpStatus.BAD_REQUEST,
+    description: 'payment already completed',
   })
   @ApiOkResponse({
-    status: HttpStatus.OK, type: ReturnNewTransactionDto
+    status: HttpStatus.OK,
+    type: ReturnNewTransactionDto,
   })
-  async createByStore(@Param() param: {apiKey: string}, @Body() dto: CreateTransactionDto) {
-    const findTransaction = await this.service.findOne({
-      where: {
-        id: dto.id
-      }
-    });
-
-    if (findTransaction) {
-      throw new HttpException('transaction already exists', HttpStatus.CONFLICT)
-    }
-
-    if (dto.status) {
-      if (dto.status !== 'processing') {
-        throw new HttpException('cant create transaction with incorrect status', HttpStatus.BAD_REQUEST)
-      }
-    }
-
+  async createByStore(
+    @Param() param: { apiKey: string },
+    @Body() dto: CreateTransactionDto,
+  ) {
     if (!dto?.payment?.id) {
-      throw new HttpException('cant create transaction without payment ID', HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        'cant create transaction without payment ID',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     try {
-      const res = await this.service.create(dto)
-      return res
+      const res = await this.service.create(dto);
+      return res;
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Post('generateWallet')
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Currency not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Payment not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+  })
+  async generateTransactionWithWallet(
+    @Body() dto: GenerateTransactionWithWalletRequestDto,
+  ) {
+    return this.service.createNewWithWallet(dto);
+  }
 }
-
-

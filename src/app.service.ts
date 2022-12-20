@@ -8,7 +8,7 @@ export class AppService {
   callback(body) {
     return {
       result: 'Callback success',
-      body
+      body,
     };
   }
 }

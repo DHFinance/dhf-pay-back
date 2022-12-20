@@ -1,43 +1,43 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ReturnCancelledPaymentDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 
   @ApiProperty({
-    default: "2022-04-29T09:38:39.239Z"
+    default: '2022-04-29T09:38:39.239Z',
   })
-  datetime: Date
+  datetime: Date;
 
   @ApiProperty({
-    default: "2500000000"
+    default: '2500000000',
   })
-  amount: string
+  amount: string;
 
   @ApiProperty({
-    default: "Not_paid"
+    default: 'Not_paid',
   })
-  status: string
+  status: string;
 
   @ApiProperty({
-    default: "test comment"
+    default: 'test comment',
   })
-  comment: string
+  comment: string;
 
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  type: number
+  type: number;
 
   @ApiProperty({
-    default: "test text"
+    default: 'test text',
   })
-  text: string
+  text: string;
 
   @ApiProperty({
-    default: true
+    default: true,
   })
-  cancelled: boolean
+  cancelled: boolean;
 }

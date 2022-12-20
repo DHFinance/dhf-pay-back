@@ -1,22 +1,24 @@
+import { MailerModule } from '@nestjs-modules/mailer';
+// import { HandlebarsAdapter, MailerModule } from "@nest-modules/mailer";
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from 'nestjs-config';
 import * as path from 'path';
-import { UserModule } from './user/user.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
+import { PosModule } from './pos/pos.module';
+import { StoresModule } from './stores/stores.module';
 import { TransactionModule } from './transaction/transaction.module';
-// import { HandlebarsAdapter, MailerModule } from "@nest-modules/mailer";
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import {  MailerModule } from "@nestjs-modules/mailer";
-import { StoresModule } from "./stores/stores.module";
+import { UserModule } from './user/user.module';
+
 const isProduction = process.env.npm_lifecycle_event === 'start:prod';
 const dotEnvPath = isProduction
   ? path.resolve(__dirname, '..', '.env.staging')
   : path.resolve(__dirname, '..', '.env');
-// console.log(process.env.npm_lifecycle_event);
+
 @Module({
   imports: [
     ConfigModule.load(
@@ -57,7 +59,8 @@ const dotEnvPath = isProduction
     AuthModule,
     PaymentModule,
     TransactionModule,
-    StoresModule
+    StoresModule,
+    PosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

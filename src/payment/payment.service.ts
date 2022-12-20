@@ -1,14 +1,19 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Payment} from "./entities/payment.entity";
-import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
-import {MailerService} from "@nestjs-modules/mailer";
-import {Stores} from "../stores/entities/stores.entity";
+import { MailerService } from '@nestjs-modules/mailer';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { Err, Ok, Result } from 'oxide.ts';
+import { BaseError } from '../common/base-classes/base-error';
+import { Stores } from '../stores/entities/stores.entity';
+import { StoreNotFoundError } from '../stores/errors/store-not-found.error';
+import { CreatePaymentResponseDto } from './dto/create-payment.response-dto';
+import { Payment } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentService extends TypeOrmCrudService<Payment> {
-  constructor(@InjectRepository(Payment) repo,
-              private mailerService: MailerService
+  constructor(
+    @InjectRepository(Payment) repo,
+    private mailerService: MailerService,
   ) {
     super(repo);
   }
@@ -16,9 +21,10 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
   async sendMailBill(billMailDto) {
     const payment = await this.repo.findOne({
       where: {
-        id: billMailDto.id
-      }, relations: ['store']
-    })
+        id: billMailDto.id,
+      },
+      relations: ['store'],
+    });
 
     await this.mailerService.sendMail({
       to: billMailDto.email,
@@ -35,53 +41,60 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     });
   }
 
-  // @Interval(1000)
-  // async getStore(){
-  //   const parentParent = await this.repo.findOne({
-  //     where: {
-  //       store: {
-  //         user: 1
-  //       }
-  //     },
-  //     relations: ['store', 'store.user']
-  //   })
-  //   console.log(parentParent)
-  // }
-
   async save(dto) {
-    return this.repo.save({...dto, cancelled: true})
+    return this.repo.save({ ...dto, cancelled: true });
   }
 
-  async create(dto, apiKey) {
-    try {
-      const store = await Stores.findOne({
-        where: {
-          apiKey: apiKey
-        }
-      })
-      if (!store) {
-        throw new HttpException('store not found', HttpStatus.NOT_FOUND);
-      }
-      const payment = await this.repo.save({...dto, status: 'Not_paid', datetime: new Date(), store});
-      return payment
-    } catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+  async create(
+    dto,
+    apiKey,
+  ): Promise<Result<CreatePaymentResponseDto, BaseError>> {
+    const store = await Stores.findOne({
+      where: {
+        apiKey: apiKey,
+      },
+    });
+    if (!store) {
+      return Err(new StoreNotFoundError());
     }
+
+    const newPayment = await this.repo.create({
+      amount: (dto.amount * 1_000_000_000).toString(),
+      store,
+      comment: dto.comment || '',
+      text: dto.text || '',
+      currency: dto.currency,
+      type: dto.type || null,
+    });
+
+    const newPaymentInDB = await this.repo.save(newPayment);
+    return Ok(newPaymentInDB);
   }
 
   async findPayment(id) {
     return await this.repo.findOne({
       where: {
-        id: id
-      }, relations: ['store', 'store.user']
-    })
+        id: id,
+      },
+      relations: ['store', 'store.user'],
+    });
+  }
+
+  async findPaymentUrl(url) {
+    return await this.repo.findOne({
+      where: {
+        url,
+      },
+      relations: ['store', 'store.user'],
+    });
   }
 
   async findById(id) {
     const payment = await this.repo.findOne({
       where: {
-        id: id
-      }, relations: ['store']
+        id: id,
+      },
+      relations: ['store', 'store.wallets'],
     });
     if (!payment) {
       throw new HttpException('payment nof found', HttpStatus.NOT_FOUND);
@@ -95,11 +108,49 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
       comment: payment.comment,
       type: payment.type,
       text: payment.text,
+      url: payment.url,
       cancelled: payment.cancelled,
+      currency: payment.currency,
       store: {
         id: payment.store.id,
-        wallet: payment.store.wallet
-      }
+        wallets: payment.store.wallets.map((wallet) => ({
+          value: wallet.value,
+          currency: wallet.currency,
+        })),
+      },
+    };
+  }
+
+  async findByUrl(url: string) {
+    console.log('url', url);
+    const payment = await this.repo.findOne({
+      where: {
+        url,
+      },
+      relations: ['store', 'store.wallets'],
+    });
+    if (!payment) {
+      throw new HttpException('payment nof found', HttpStatus.NOT_FOUND);
     }
+
+    return {
+      id: payment.id,
+      datetime: payment.datetime,
+      amount: payment.amount,
+      status: payment.status,
+      comment: payment.comment,
+      type: payment.type,
+      text: payment.text,
+      url: payment.url,
+      cancelled: payment.cancelled,
+      currency: payment.currency,
+      store: {
+        id: payment.store.id,
+        wallets: payment.store.wallets.map((wallet) => ({
+          value: wallet.value,
+          currency: wallet.currency,
+        })),
+      },
+    };
   }
 }

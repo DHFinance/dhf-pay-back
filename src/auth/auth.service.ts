@@ -1,49 +1,57 @@
-import {BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException} from "@nestjs/common";
-import {UserService} from '../user/user.service';
-import {User} from '../user/entities/user.entity';
-import {createHmac} from "crypto";
-import {ensureProgram} from "ts-loader/dist/utils";
-import {StoresService} from "../stores/stores.service";
-import { HttpService } from "@nestjs/axios";
+import { HttpService } from '@nestjs/axios';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
+import { StoresService } from '../stores/stores.service';
+import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
 
-const bcrypt = require("bcrypt");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcrypt');
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly storesService: StoresService, private readonly httpService: HttpService) {
-  }
+  constructor(
+    private readonly userService: UserService,
+    private readonly storesService: StoresService,
+    private readonly httpService: HttpService,
+  ) {}
 
   /**
    *
    * @param password
    */
   encryptPassword = (password: string): string => {
-    const saltRounds = 7
-    const salt = bcrypt.genSaltSync(saltRounds)
+    const saltRounds = 7;
+    const salt = bcrypt.genSaltSync(saltRounds);
     const hashed = bcrypt.hashSync(password, salt); // GOOD
     return hashed;
   };
 
   public async checkCaptcha(token: string) {
-    const result = await this.httpService.post(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${token}`).toPromise();
-    console.log('result', result.data);
-    return result.data.success
+    const result = await this.httpService
+      .post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${token}`,
+      )
+      .toPromise();
+    return result.data.success;
   }
 
   public async validate(token, as) {
     if (as === 'user') {
       const user = await this.userService.findByToken(token.slice(7));
-      return user
+      return user;
     }
     if (as === 'store') {
       const store = await this.storesService.validateStore(token.slice(7));
-      return store
+      return store;
     }
-
   }
 
   public async register(userDto) {
-
     const user = {
       name: userDto.name,
       lastName: userDto.lastName,
@@ -54,21 +62,20 @@ export class AuthService {
       password: this.encryptPassword(userDto.password),
       loginAttempts: 0,
       timeBlockLogin: null,
-    }
+    };
 
     await this.userService.create(user);
   }
 
-
-  public async verify({email, code}) {
+  public async verify({ email, code }) {
     return await this.userService.verifyUser(email, code);
   }
 
-  public async sendCode({email}) {
+  public async sendCode({ email }) {
     await this.userService.sendCode(email);
   }
 
-  public async checkCode({code, email}) {
+  public async checkCode({ code, email }) {
     return await this.userService.checkCode(code, email);
   }
 
@@ -76,8 +83,8 @@ export class AuthService {
     return await this.userService.reAuth(token);
   }
 
-  public async changePassword({password, email}) {
-    const encryptPassword = this.encryptPassword(password)
+  public async changePassword({ password, email }) {
+    const encryptPassword = this.encryptPassword(password);
     return await this.userService.changePassword(encryptPassword, email);
   }
 
@@ -102,7 +109,10 @@ export class AuthService {
       }
       if (user?.emailVerification !== null) {
         await this.userService.setAttempts(user.email, true);
-        throw new BadRequestException('email or password', 'email or password incorrect');
+        throw new BadRequestException(
+          'email or password',
+          'email or password incorrect',
+        );
       }
       /**
        * @description password comparison using the bcrypt algorithm. login UserDto.password - encrypted from the front, user.password - encrypted from the database
@@ -111,14 +121,20 @@ export class AuthService {
       if (res) {
         await this.userService.setAttempts(user.email, false);
         const userData = await this.userService.setToken(user.email);
-        delete userData.password
-        return userData
+        delete userData.password;
+        return userData;
       } else {
         await this.userService.setAttempts(user.email, true);
-        throw new BadRequestException('email or password', 'email or password incorrect')
+        throw new BadRequestException(
+          'email or password',
+          'email or password incorrect',
+        );
       }
     } else {
-      throw new BadRequestException('email or password', 'email or password incorrect');
+      throw new BadRequestException(
+        'email or password',
+        'email or password incorrect',
+      );
     }
   }
 }

@@ -1,25 +1,32 @@
 import {
   Body,
-  Controller, Get,
+  Controller,
   HttpException,
-  HttpStatus, Param,
-  Post, Query,
-  Res
-} from "@nestjs/common";
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { RegisterDto } from './dto/register.dto';
+import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
-import { LoginDto } from "./dto/login.dto";
-import { ChangePasswordDto, ResetCodeDto, ResetEmailDto } from "./dto/reset.dto";
-import { VerifyDto } from "./dto/verify.dto";
-import { ApiProperty, ApiTags } from "@nestjs/swagger";
-import { LogoutDto } from "./dto/logout.dto";
-import { UserService } from "../user/user.service";
+import { LoginDto } from './dto/login.dto';
+import { LogoutDto } from './dto/logout.dto';
+import { RegisterDto } from './dto/register.dto';
+import {
+  ChangePasswordDto,
+  ResetCodeDto,
+  ResetEmailDto,
+} from './dto/reset.dto';
+import { VerifyDto } from './dto/verify.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   /**
    *
@@ -30,14 +37,12 @@ export class AuthController {
   @ApiProperty({ type: RegisterDto })
   public async register(@Body() registerUserDto: RegisterDto) {
     try {
-      // console.log(await this.authService.register(registerUserDto))
       if (await this.authService.checkCaptcha(registerUserDto.captchaToken)) {
         return await this.authService.register(registerUserDto);
       } else {
-        throw new HttpException("Set Captcha", HttpStatus.BAD_REQUEST);
+        throw new HttpException('Set Captcha', HttpStatus.BAD_REQUEST);
       }
     } catch (err) {
-      console.log(err)
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
@@ -50,24 +55,18 @@ export class AuthController {
   @Post('verify')
   @ApiProperty({ type: VerifyDto })
   public async verify(@Body() verifyDto: VerifyDto) {
-    try {
-      return await this.authService.verify(verifyDto);
-    } catch (err) {
-      throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
-    }
+    return this.authService.verify(verifyDto);
   }
 
   @Post('logout')
-  @ApiProperty({type: LogoutDto})
+  @ApiProperty({ type: LogoutDto })
   async logout(@Body() logoutUser: LogoutDto) {
     const user = await this.userService.findByToken(logoutUser.token);
-    console.log('user', user);
     if (user) {
       await this.userService.clearToken(logoutUser.email);
     } else {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
-
   }
 
   /**
@@ -79,13 +78,12 @@ export class AuthController {
   @ApiProperty({ type: LoginDto })
   public async login(@Body() loginUserDto: LoginDto) {
     try {
-      const user = await this.authService.login(loginUserDto);
-
-      return user
+      return this.authService.login(loginUserDto);
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
+
   /**
    *
    * @description Password recovery stage 1. searches for a user by email sends a code to the mail. Return true to move to the next step
@@ -93,13 +91,16 @@ export class AuthController {
    */
   @Post('send-code')
   @ApiProperty({ type: ResetEmailDto })
-  async sendCode(@Res({passthrough: true}) response: Response, @Body() resetUserDto: ResetEmailDto) {
+  async sendCode(
+    @Res({ passthrough: true }) response: Response,
+    @Body() resetUserDto: ResetEmailDto,
+  ) {
     try {
       if (await this.authService.checkCaptcha(resetUserDto.captchaToken)) {
         await this.authService.sendCode(resetUserDto);
-        return true
+        return true;
       } else {
-        response.status(HttpStatus.BAD_REQUEST).send("Set Captcha");
+        response.status(HttpStatus.BAD_REQUEST).send('Set Captcha');
         return;
       }
     } catch (err) {
@@ -115,7 +116,6 @@ export class AuthController {
   @Post('reAuth')
   @ApiProperty()
   public async reAuth(@Body() token) {
-    console.log(token);
     try {
       return await this.authService.reAuth(token.token);
     } catch (err) {
@@ -131,9 +131,13 @@ export class AuthController {
    */
   @Post('check-code')
   @ApiProperty({ type: ResetCodeDto })
-  public async checkCode(@Res({passthrough: true}) response: Response, @Body() resetUserPasswordDto: ResetCodeDto) {
-
-    const captcha = await this.authService.checkCaptcha(resetUserPasswordDto.captchaToken);
+  public async checkCode(
+    @Res({ passthrough: true }) response: Response,
+    @Body() resetUserPasswordDto: ResetCodeDto,
+  ) {
+    const captcha = await this.authService.checkCaptcha(
+      resetUserPasswordDto.captchaToken,
+    );
     if (!captcha) {
       throw new HttpException('set Captcha', HttpStatus.BAD_REQUEST);
     }
@@ -141,8 +145,8 @@ export class AuthController {
       const user = await this.authService.checkCode(resetUserPasswordDto);
       if (user) {
         return {
-          code: user.restorePasswordCode
-        }
+          code: user.restorePasswordCode,
+        };
       }
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
@@ -161,7 +165,7 @@ export class AuthController {
     try {
       const user = await this.authService.changePassword(changeUserPasswordDto);
       if (user) {
-        return user
+        return user;
       }
     } catch (err) {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);

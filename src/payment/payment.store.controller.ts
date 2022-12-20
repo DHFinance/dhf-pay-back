@@ -1,20 +1,25 @@
-import { Body, Controller, Get, Headers, HttpException, HttpStatus, Inject, Param, Post } from "@nestjs/common";
-import { PaymentService } from "./payment.service";
-import { ClientProxy } from "@nestjs/microservices";
-import { UserService } from "../user/user.service";
-import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
-import { ChangePasswordDto } from "../auth/dto/reset.dto";
-import { BillMailDto } from "./dto/billMail.dto";
+import {
+  Body,
+  Controller,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Post,
+} from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { UserService } from '../user/user.service';
+import { BillMailDto } from './dto/billMail.dto';
+import { PaymentService } from './payment.service';
 
 @ApiTags('store payment')
-@Controller('/payment')
+@Controller('payment')
 @ApiBearerAuth('Bearer')
 export class PaymentStoreController {
-
   constructor(
     public readonly service: PaymentService,
     public readonly userService: UserService,
-    @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy
+    @Inject('PAYMENT_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   @Post('send-mail-bill')
@@ -26,6 +31,4 @@ export class PaymentStoreController {
       throw new HttpException(err.response, HttpStatus.BAD_REQUEST);
     }
   }
-
 }
-

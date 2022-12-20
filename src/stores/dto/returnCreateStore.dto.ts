@@ -1,111 +1,107 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 interface UserInterface {
-  id: number
-  role: string
+  id: number;
+  role: string;
 }
 
 interface UserInterfaceStores {
-  id: number
-  name: string
-  lastName: string
-  email: string
-  role: string
-  company: string
-  blocked: boolean
+  id: number;
+  name: string;
+  lastName: string;
+  email: string;
+  role: string;
+  company: string;
+  blocked: boolean;
 }
 
 export class ReturnCreateStoreDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 
   @ApiProperty({
-    default: 'description'
+    default: 'description',
   })
-  description: string
+  description: string;
 
   @ApiProperty({
-    default: false
+    default: false,
   })
-  blocked: boolean
+  blocked: boolean;
 
   @ApiProperty({
-    default: 'url example'
+    default: 'url example',
   })
-  url: string
+  url: string;
 
   @ApiProperty({
-    default: 'test name'
+    default: 'test name',
   })
-  name: string
+  name: string;
 
   @ApiProperty({
-    default: '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac'
+    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE',
   })
-  wallet: string
-
-  @ApiProperty({
-    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE'
-  })
-  apiKey: string
+  apiKey: string;
 
   @ApiProperty({
     default: {
       id: 1,
-      role: 'customer'
-    }
+      role: 'customer',
+    },
   })
-  user: UserInterface
+  user: UserInterface;
 }
 
 export class ReturnGetAllStoreDto {
   @ApiProperty({
-    default: 1
+    default: 1,
   })
-  id: number
+  id: number;
 
   @ApiProperty({
-    default: 'description'
+    default: 'description',
   })
-  description: string
+  description: string;
 
   @ApiProperty({
-    default: false
+    default: false,
   })
-  blocked: boolean
+  blocked: boolean;
 
   @ApiProperty({
-    default: 'url example'
+    default: 'url example',
   })
-  url: string
+  url: string;
 
   @ApiProperty({
-    default: 'test name'
+    default: 'test name',
   })
-  name: string
+  name: string;
 
   @ApiProperty({
-    default: '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac'
+    default:
+      '01fa50651784b46fc79ab6943793ac13a4cbdad0f2016b70c6cc075f32a896b6ac',
   })
-  wallet: string
+  wallet: string;
 
   @ApiProperty({
-    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE'
+    default: '9c91OXwkRUvKNK5gWn37dMuoVgdXM9ZRuTzE',
   })
-  apiKey: string
+  apiKey: string;
 
   @ApiProperty({
-  default: {
-    id: 1,
-    role: 'customer',
-    name: 'testName',
-    lastName: 'test lastName',
-    email: 'example@gmail.com',
-    company: 'company',
-    blocked: false
-  }
+    default: {
+      id: 1,
+      role: 'customer',
+      name: 'testName',
+      lastName: 'test lastName',
+      email: 'example@gmail.com',
+      company: 'company',
+      blocked: false,
+    },
   })
-  user: UserInterfaceStores
+  user: UserInterfaceStores;
 }

@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class BlockUserDto {
   @ApiProperty({
@@ -10,5 +10,5 @@ export class BlockUserDto {
     description: 'Block status (false/true)',
     default: true,
   })
-  blocked: boolean
+  blocked: boolean;
 }

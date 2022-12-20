@@ -1,6 +1,5 @@
-import { User } from "../user/entities/user.entity";
-import { Stores } from "../stores/entities/stores.entity";
-import e from "express";
+import { Stores } from '../stores/entities/stores.entity';
+import { User } from '../user/entities/user.entity';
 
 /**
  * @description authorization occurs in this middleware. Some requests do not require a token. The token is obtained from Authorization. The token can belong to either the user or the store (apiKey)
@@ -11,29 +10,33 @@ export const checkAuth = async (req, res, next) => {
    */
   if (req.originalUrl.includes('swagger')) {
     next();
-  }
-  /**
-   *  @description The /api/auth endpoints are used without an account. Therefore, a token is not required for them.
-   */
-  else if (req.originalUrl.includes('auth')) {
+  } else if (req.originalUrl.includes('auth')) {
+    /**
+     *  @description The /api/auth endpoints are used without an account. Therefore, a token is not required for them.
+     */
     next();
-  }
-  /**
-   * @description The bill page may contain unauthorized users who should have access to the store, transaction and payment associated with this receipt
-   */
-  else if (req.method === "GET" && (req.originalUrl.includes('store') || req.originalUrl.includes('payment') || req.originalUrl.includes('transaction'))) {
+  } else if (
+    /**
+     * @description The bill page may contain unauthorized users who should have access to the store, transaction and payment associated with this receipt
+     */
+    req.method === 'GET' &&
+    (req.originalUrl.includes('store') ||
+      req.originalUrl.includes('payment') ||
+      req.originalUrl.includes('transaction'))
+  ) {
     next();
-  }
-  /**
-   * @description Transactions are not created by unauthorized users on the bill page
-   */
-  else if (req.method === "POST" && req.originalUrl.includes('transaction')) {
+  } else if (req.method === 'POST' && req.originalUrl.includes('transaction')) {
+    /**
+     * @description Transactions are not created by unauthorized users on the bill page
+     */
     next();
-  }
-  /**
-   * @description Only the admin has the authority to block and view users
-   */
-  else if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
+  } else if (
+    /**
+     * @description Only the admin has the authority to block and view users
+     */
+    req.originalUrl.includes('block') ||
+    req.originalUrl.includes('user')
+  ) {
     if (req.headers.authorization) {
       const token = req.headers.authorization.slice(7);
       const admin = await User.findOne({
@@ -50,17 +53,16 @@ export const checkAuth = async (req, res, next) => {
           error: 'There is no admin with this token',
         });
       }
-      } else {
+    } else {
       res.status(401).send({
         statusCode: 401,
         error: 'Token not found',
       });
     }
-  }
-  /**
-   * @description For all other routes, the token is checked. The token can be owned by the user (token) or the store (apiKey). Depending on the token, the data selection changes. If an apiKey is entered in Authorization - for /payment and /transaction a selection is given for the store that owns this apiKey.
-   */
-  else if (req.headers.authorization) {
+  } else if (req.headers.authorization) {
+    /**
+     * @description For all other routes, the token is checked. The token can be owned by the user (token) or the store (apiKey). Depending on the token, the data selection changes. If an apiKey is entered in Authorization - for /payment and /transaction a selection is given for the store that owns this apiKey.
+     */
     /**
      * @description getting a token from the Bearer view s8sN4V475LqBdYYze3oZKVY4fyqozwKMBaN5 to the view s8sN4V475LqBdYYze3oZKVY4fyqozwKMBaN5
      */
@@ -85,21 +87,21 @@ export const checkAuth = async (req, res, next) => {
     });
     if (req.originalUrl.includes('block') || req.originalUrl.includes('user')) {
       try {
-        console.log(req.originalUrl)
-        const isAdmin = existsUser.role === "admin"
-        console.log(isAdmin)
+        console.log(req.originalUrl);
+        const isAdmin = existsUser.role === 'admin';
+        console.log(isAdmin);
         if (isAdmin) {
-          console.log('next')
+          console.log('next');
           next();
         } else {
-          console.log('err')
+          console.log('err');
           res.status(403).send({
             statusCode: 403,
             error: 'only admin can block',
           });
         }
       } catch (e) {
-        console.log('admin action error:', e)
+        console.log('admin action error:', e);
       }
     }
     /**
@@ -114,8 +116,7 @@ export const checkAuth = async (req, res, next) => {
         error: 'token or apiKey not exist or blocked',
       });
     }
-  }
-  else {
+  } else {
     res.status(401).send({
       statusCode: 401,
       error: 'bearer token not found',
