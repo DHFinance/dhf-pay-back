@@ -15,6 +15,6 @@ export class addAdmin1631542698364 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DELETE FROM "user" WHERE Id=1`);
+    await queryRunner.query(`DELETE FROM "user" WHERE "email" LIKE 'anton23490@gmail.coc'`);
   }
 }
