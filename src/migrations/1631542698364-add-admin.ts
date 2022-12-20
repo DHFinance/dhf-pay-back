@@ -15,9 +15,6 @@ export class addAdmin1631542698364 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "user" DROP COLUMN "loginAttempts"`);
-    await queryRunner.query(`ALTER TABLE "user" DROP COLUMN "timeBlockLogin"`);
-    await queryRunner.query(`ALTER TABLE "payment" DROP COLUMN  "cancelled"`);
-    await queryRunner.query(`DELETE FROM "user"`);
+    await queryRunner.query(`DELETE FROM "user" WHERE Id=1`);
   }
 }
