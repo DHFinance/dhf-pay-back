@@ -37,8 +37,8 @@ const dotEnvPath = isProduction
     MailerModule.forRoot({
       transport: {
         host: process.env.MAILER_HOST,
-        SSL: !!process.env.MAILER_SSL,
-        QAuth: !!process.env.MAILER_QAUTH,
+        SSL: true,
+        QAuth: true,
         port: process.env.MAILER_PORT,
         auth: {
           user: process.env.MAILER_EMAIL,
